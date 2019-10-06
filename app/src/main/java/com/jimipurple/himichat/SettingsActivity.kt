@@ -15,18 +15,16 @@ import kotlinx.android.synthetic.main.activity_settings.settingsButton
 import android.graphics.BitmapFactory
 import android.app.Activity
 import android.provider.MediaStore
-import android.view.View
-import android.widget.ImageView
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.squareup.picasso.*
 import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import kotlinx.io.ByteArrayInputStream
-import kotlin.concurrent.thread
+import java.io.File
 
 
 class SettingsActivity : BaseActivity() {
@@ -60,6 +58,9 @@ class SettingsActivity : BaseActivity() {
         dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
         settingsButton.setOnClickListener { settingsButtonOnClick() }
         loadAvatarButton.setOnClickListener { loadAvatarButtonOnClick() }
+    }
+
+    private fun loadAvatarFromStorage() {
     }
 
     private fun logoutButtonOnClick() {
@@ -156,35 +157,36 @@ class SettingsActivity : BaseActivity() {
             val columnIndex = cursor.getColumnIndex(filePathColumn[0])
             val picturePath = cursor.getString(columnIndex)
             cursor.close()
-            Log.i("image_test", picturePath)
-            thread(start = true) {
-                Log.i("image_test", picturePath + "111111")
-                val outputStream = ByteArrayOutputStream()
-                var ref : StorageReference? = null
-                when {
-                    picturePath.endsWith(".png", true) -> {
-                        Log.i("image_test", picturePath + "222222")
-                        val rawImage = Picasso.get().load(picturePath).resize(500, 500).centerCrop()
-                        rawImage.get().compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                        ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".png")
+            val outputStream = ByteArrayOutputStream()
+            var ref : StorageReference? = null
+            val rawImage : RequestCreator?
+            Picasso.get().load(File(picturePath.trim())).resize(500, 500).centerCrop().into(object : com.squareup.picasso.Target {
+                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                    when {
+                        picturePath.endsWith(".png", true) -> {
+                            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                            ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".png")
+                        }
+                        picturePath.endsWith(".jpg", true) -> {
+                            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                            ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
+                        }
+                        picturePath.endsWith(".jpeg", true) -> {
+                            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                            ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpeg")
+                        }
                     }
-                    picturePath.endsWith(".jpg", true) -> {
-                        Log.i("image_test", picturePath + "222222")
-                        val rawImage = Picasso.get().load(picturePath).resize(500, 500).centerCrop()
-                        rawImage.get().compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                        ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
-                    }
-                    picturePath.endsWith(".jpeg", true) -> {
-                        Log.i("image_test", picturePath + "222222")
-                        val rawImage = Picasso.get().load(picturePath).resize(500, 500).centerCrop()
-                        rawImage.get().compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                        ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpeg")
-                    }
+                    ref!!.putBytes(outputStream.toByteArray())
+//                    avatarView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
+
                 }
-                ref!!.putBytes(outputStream.toByteArray())
-                avatarView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
-            }
-//            t(start = true)
+
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                    Log.i("avatar_load", "Загрузка изображения не удалась " + picturePath + "\n" + e?.message)
+                }
+            })
         }
 
 
