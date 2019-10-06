@@ -24,7 +24,9 @@ import androidx.core.content.ContextCompat
 import com.squareup.picasso.*
 import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.io.ByteArrayInputStream
+import kotlin.concurrent.thread
 
 
 class SettingsActivity : BaseActivity() {
@@ -154,43 +156,33 @@ class SettingsActivity : BaseActivity() {
             val columnIndex = cursor.getColumnIndex(filePathColumn[0])
             val picturePath = cursor.getString(columnIndex)
             cursor.close()
-
-            val t = Thread {
+            Log.i("image_test", picturePath)
+            thread(start = true) {
+                Log.i("image_test", picturePath + "111111")
+                val outputStream = ByteArrayOutputStream()
+                var ref : StorageReference? = null
                 when {
                     picturePath.endsWith(".png", true) -> {
+                        Log.i("image_test", picturePath + "222222")
                         val rawImage = Picasso.get().load(picturePath).resize(500, 500).centerCrop()
-                        val outputStream = ByteArrayOutputStream()
                         rawImage.get().compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                        val ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".png")
-                        ref.putStream(ByteArrayInputStream(outputStream.toByteArray()))
-            //            Log.i("image_test", decodedImage)
-
-                        val imageView = findViewById<View>(R.id.avatarView) as ImageView
-                        imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
+                        ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".png")
                     }
                     picturePath.endsWith(".jpg", true) -> {
+                        Log.i("image_test", picturePath + "222222")
                         val rawImage = Picasso.get().load(picturePath).resize(500, 500).centerCrop()
-                        val outputStream = ByteArrayOutputStream()
                         rawImage.get().compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                        val ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
-                        ref.putStream(ByteArrayInputStream(outputStream.toByteArray()))
-            //            Log.i("image_test", decodedImage)
-
-                        val imageView = findViewById<View>(R.id.avatarView) as ImageView
-                        imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
+                        ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
                     }
                     picturePath.endsWith(".jpeg", true) -> {
+                        Log.i("image_test", picturePath + "222222")
                         val rawImage = Picasso.get().load(picturePath).resize(500, 500).centerCrop()
-                        val outputStream = ByteArrayOutputStream()
                         rawImage.get().compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                        val ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpeg")
-                        ref.putStream(ByteArrayInputStream(outputStream.toByteArray()))
-            //            Log.i("image_test", decodedImage)
-
-                        val imageView = findViewById<View>(R.id.avatarView) as ImageView
-                        imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
+                        ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpeg")
                     }
                 }
+                ref!!.putBytes(outputStream.toByteArray())
+                avatarView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
             }
 //            t(start = true)
         }
@@ -205,7 +197,7 @@ class SettingsActivity : BaseActivity() {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE -> {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     // start Activity if granted
                     startActivityForResult(
