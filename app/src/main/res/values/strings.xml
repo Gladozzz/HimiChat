@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">HimiChat</string>
+
+    <string name="loading">Loading…</string>>
+    <string name="find">Find</string>>
+
+    <string name="label_email">Email:</string>
+    <string name="label_password">Password:</string>
+    <string name="label_password_repeat">Repeat password:</string>
+    <string name="label_nickname">Nickname:</string>
+    <string name="label_real_name">Real name:</string>
+
+    <string name="button_sign_out">sign out</string>
+    <string name="button_sign_in">sign in</string>
+    <string name="button_register">register</string>
+    <string name="button_register_mode">I don\'t have account…</string>
+    <string name="button_login_mode">I already have account…</string>
+    <string name="button_find_friend">Find a friend</string>
+    <string name="button_friend_requests">Friend requests</string>
+    <string name="button_Invite">Invite</string>
+    <string name="button_sent">Sent</string>
+    <string name="button_received">Received</string>
+    <string name="button_logout">Logout</string>>
+    <string name="button_load_avatar">Load avatar</string>
+
+    <string name="toast_auth_error">Authentication failed.</string>
+    <string name="toast_auth_error_wrong_password">Wrong password</string>
+    <string name="toast_auth_error_user_doesnt_exist">User does\'nt exist</string>
+    <string name="toast_nickname_not_valid">Nickname is not valid</string>
+    <string name="toast_user_nickname_not_found">User with this nickname is not found</string>
+    <string name="toast_no_found_user">You didn\'t found any users</string>
+    <string name="toast_selfinvite">You can\'t invite yourself</string>
+    <string name="toast_invite_successful">Invited</string>
+    <string name="toast_invite_already">Already invited</string>
+    <string name="toast_invite_already_you">This user is already invited you</string>
+    <string name="toast_accept_invite_complete">added to your friend list</string>
+    <string name="toast_accept_invite_error">error to accept invite of</string>
+    <string name="toast_block_invite_complete">was blocked</string>
+    <string name="toast_block_invite_error">error to block</string>
+    <string name="toast_cancel_invite_complete">friend request was canceled</string>
+    <string name="toast_cancel_invite_error">error to cancel friend request</string>
+    <string name="toast_load_avatar_complete">avatar was loaded</string>
+    <string name="toast_load_avatar_error">error to load avatar</string>
+</resources>
