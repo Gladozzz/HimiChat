@@ -41,22 +41,26 @@
             app:layout_constraintStart_toEndOf="@+id/dialoguesButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" android:backgroundTint="@color/colorPrimaryDark"/>
+
     <Button
-            android:text="@string/button_find_friend"
-            android:layout_width="210dp"
-            android:layout_height="wrap_content"
             android:id="@+id/findFriendButton"
-            app:layout_constraintStart_toStartOf="parent"
-            android:background="@color/colorPrimary" app:layout_constraintBottom_toTopOf="@+id/friendsButton"
-            android:layout_marginBottom="4dp"/>
-    <Button
-            android:text="@string/button_friend_requests"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/friendRequestsButton" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/findFriendButton"
             android:background="@color/colorPrimary"
-            app:layout_constraintBottom_toTopOf="@+id/dialoguesButton" app:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginBottom="4dp"/>
+            android:text="@string/button_find_friend"
+            app:layout_constraintBottom_toTopOf="@+id/friendsButton"
+            app:layout_constraintEnd_toStartOf="@+id/friendRequestsButton"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+            android:id="@+id/friendRequestsButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="@string/button_friend_requests"
+            app:layout_constraintBottom_toTopOf="@+id/dialoguesButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/findFriendButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

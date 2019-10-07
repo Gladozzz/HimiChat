@@ -49,20 +49,22 @@
 
     <Button
             android:id="@+id/reсeivedButton"
-            android:layout_width="205dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:text="@string/button_received"
             app:layout_constraintBottom_toTopOf="@+id/friendsButton"
+            app:layout_constraintEnd_toStartOf="@+id/sentButton"
             app:layout_constraintStart_toStartOf="parent" />
 
     <Button
             android:id="@+id/sentButton"
-            android:layout_width="205dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:text="@string/button_sent"
             app:layout_constraintBottom_toTopOf="@+id/settingsButton"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/reсeivedButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
