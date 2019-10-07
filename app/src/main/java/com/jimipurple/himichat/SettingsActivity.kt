@@ -12,12 +12,12 @@ import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.android.synthetic.main.activity_settings.dialoguesButton
 import kotlinx.android.synthetic.main.activity_settings.friendsButton
 import kotlinx.android.synthetic.main.activity_settings.settingsButton
-import android.graphics.BitmapFactory
 import android.app.Activity
 import android.provider.MediaStore
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.squareup.picasso.*
@@ -25,13 +25,6 @@ import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.File
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.storage.UploadTask
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import androidx.fragment.app.FragmentActivity
-import kotlinx.android.synthetic.main.activity_find_friend.*
 import kotlinx.android.synthetic.main.activity_settings.avatarView
 
 
@@ -67,7 +60,7 @@ class SettingsActivity : BaseActivity() {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("FriendListAdapter", "Загрузка изображения не удалась " + result["avatar"] as String + "\n" + e?.message)
+                        Log.i("avatar", "Загрузка изображения не удалась " + result["avatar"] as String + "\n" + e?.message)
                     }
                 })
             }
@@ -184,42 +177,150 @@ class SettingsActivity : BaseActivity() {
                     when {
                         picturePath.endsWith(".png", true) -> {
                             bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                            ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".png")
-                        }
-                        picturePath.endsWith(".jpg", true) -> {
-                            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                            ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
-                        }
-                        picturePath.endsWith(".jpeg", true) -> {
-                            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                            ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpeg")
-                        }
-                    }
-                    ref!!.putBytes(outputStream.toByteArray())
-                        .addOnSuccessListener(OnSuccessListener<UploadTask.TaskSnapshot> {
-                            ref!!.downloadUrl.addOnSuccessListener { uri ->
-                                Log.i("avatar_load", "onSuccess: uri= $uri")
-                                var res1 = functions
-                                    .getHttpsCallable("setAvatar")
-                                    .call(data).addOnCompleteListener { task1 ->
-                                        try {
-                                            Log.i("setAvatar", "result " + task1.result?.data.toString())
-                                            val result = task1.result?.data as HashMap<String, Any>
-                                            val avatarURL = result["added"] as String
-                                            val added = try {
-                                                result["added"] as String
-                                            } catch (e: Exception) {
-                                                ""
-                                            }
-                                            //TODO error
-                                        } catch (e: Exception) {
-                                            Log.i("setAvatar", "error " + e.message)
+                            storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg").delete().addOnCompleteListener {
+                                ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".png")
+                                ref!!.putBytes(outputStream.toByteArray())
+                                    .addOnSuccessListener {
+                                        ref!!.downloadUrl.addOnSuccessListener { uri ->
+                                            Log.i("avatar_load", "onSuccess: uri= $uri")
+                                            val dataForJson = mapOf("id" to mAuth!!.uid!!, "avatar" to uri.toString())
+                                            var res1 = functions
+                                                .getHttpsCallable("setAvatar")
+                                                .call(dataForJson).addOnCompleteListener { task1 ->
+                                                    try {
+                                                        val i = Log.i(
+                                                            "setAvatar",
+                                                            "result " + task1.result?.data.toString()
+                                                        )
+                                                        val result = task1.result?.data as HashMap<String, Any>
+//                                            val avatarURL = result["avatar"] as String
+                                                        val added = try {
+                                                            result["added"] as Boolean
+                                                        } catch (e: Exception) {
+                                                            false
+                                                        }
+                                                        if (added) {
+                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+                                                        } else {
+                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+                                                        }
+                                                    } catch (e: Exception) {
+                                                        Log.i("setAvatar", "error " + e.message)
+                                                    }
+                                                    //messageInput.setText("")
+                                                }
                                         }
-                                        //messageInput.setText("")
                                     }
                             }
-                        })
-//                    avatarView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
+                        }
+                        picturePath.endsWith(".jpg", true) -> {
+                            bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                            storage.reference.child("avatars/" + mAuth!!.uid!! + ".png").delete().addOnCompleteListener {
+                                ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
+                                ref!!.putBytes(outputStream.toByteArray())
+                                    .addOnSuccessListener {
+                                        ref!!.downloadUrl.addOnSuccessListener { uri ->
+                                            Log.i("avatar_load", "onSuccess: uri= $uri")
+                                            val dataForJson = mapOf("id" to mAuth!!.uid!!, "avatar" to uri.toString())
+                                            var res1 = functions
+                                                .getHttpsCallable("setAvatar")
+                                                .call(dataForJson).addOnCompleteListener { task1 ->
+                                                    try {
+                                                        val i = Log.i(
+                                                            "setAvatar",
+                                                            "result " + task1.result?.data.toString()
+                                                        )
+                                                        val result = task1.result?.data as HashMap<String, Any>
+//                                            val avatarURL = result["avatar"] as String
+                                                        val added = try {
+                                                            result["added"] as Boolean
+                                                        } catch (e: Exception) {
+                                                            false
+                                                        }
+                                                        if (added) {
+                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+                                                        } else {
+                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+                                                        }
+                                                    } catch (e: Exception) {
+                                                        Log.i("setAvatar", "error " + e.message)
+                                                    }
+                                                    //messageInput.setText("")
+                                                }
+                                        }
+                                    }
+                            }
+                        }
+                        picturePath.endsWith(".jpeg", true) -> {
+                            bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                            storage.reference.child("avatars/" + mAuth!!.uid!! + ".png").delete().addOnCompleteListener {
+                                ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
+                                ref!!.putBytes(outputStream.toByteArray())
+                                    .addOnSuccessListener {
+                                        ref!!.downloadUrl.addOnSuccessListener { uri ->
+                                            Log.i("avatar_load", "onSuccess: uri= $uri")
+                                            val dataForJson = mapOf("id" to mAuth!!.uid!!, "avatar" to uri.toString())
+                                            var res1 = functions
+                                                .getHttpsCallable("setAvatar")
+                                                .call(dataForJson).addOnCompleteListener { task1 ->
+                                                    try {
+                                                        val i = Log.i(
+                                                            "setAvatar",
+                                                            "result " + task1.result?.data.toString()
+                                                        )
+                                                        val result = task1.result?.data as HashMap<String, Any>
+//                                            val avatarURL = result["avatar"] as String
+                                                        val added = try {
+                                                            result["added"] as Boolean
+                                                        } catch (e: Exception) {
+                                                            false
+                                                        }
+                                                        if (added) {
+                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+                                                        } else {
+                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+                                                        }
+                                                    } catch (e: Exception) {
+                                                        Log.i("setAvatar", "error " + e.message)
+                                                    }
+                                                    //messageInput.setText("")
+                                                }
+                                        }
+                                    }
+                            }
+                        }
+                    }
+//                    ref!!.putBytes(outputStream.toByteArray())
+//                        .addOnSuccessListener {
+//                            ref!!.downloadUrl.addOnSuccessListener { uri ->
+//                                Log.i("avatar_load", "onSuccess: uri= $uri")
+//                                var res1 = functions
+//                                    .getHttpsCallable("setAvatar")
+//                                    .call(data).addOnCompleteListener { task1 ->
+//                                        try {
+//                                            val i = Log.i(
+//                                                "setAvatar",
+//                                                "result " + task1.result?.data.toString()
+//                                            )
+//                                            val result = task1.result?.data as HashMap<String, Any>
+////                                            val avatarURL = result["avatar"] as String
+//                                            val added = try {
+//                                                result["added"] as Boolean
+//                                            } catch (e: Exception) {
+//                                                false
+//                                            }
+//                                            if (added) {
+//                                                Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+//                                            } else {
+//                                                Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+//                                            }
+//                                        } catch (e: Exception) {
+//                                            Log.i("setAvatar", "error " + e.message)
+//                                        }
+//                                        //messageInput.setText("")
+//                                    }
+//                            }
+//                        }
 
                 }
 
