@@ -9,13 +9,17 @@ import android.provider.BaseColumns
 object DialogMessage : BaseColumns {
     const val TABLE_NAME = "messages"
     const val COLUMN_NAME_ID = "id"
+    const val COLUMN_NAME_DIALOG_ID = "dialog_id"
     const val COLUMN_NAME_TEXT = "text"
+    const val COLUMN_NAME_SENDER_ID = "sender_id"
 }
 
 private const val SQL_CREATE_ENTRIES =
     "CREATE TABLE ${DialogMessage.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-            "${DialogMessage.COLUMN_NAME_ID} TEXT," +
+            "${DialogMessage.COLUMN_NAME_ID} ID," +
+            "${DialogMessage.COLUMN_NAME_DIALOG_ID} ID," +
+            "${DialogMessage.COLUMN_NAME_SENDER_ID} TEXT," +
             "${DialogMessage.COLUMN_NAME_TEXT} TEXT)"
 
 private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${DialogMessage.TABLE_NAME}"
