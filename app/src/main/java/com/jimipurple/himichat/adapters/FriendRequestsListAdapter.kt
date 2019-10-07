@@ -13,18 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.Task
 import com.jimipurple.himichat.R
 import com.squareup.picasso.Picasso
+import com.jimipurple.himichat.models.*
 
 
 
 
-
-data class FriendRequest(
-    val invited_by : Boolean,
-    val id : String,
-    val nickname : String,
-    val realName : String,
-    val avatar : String
-)
 
 class FriendRequestsListAdapter(var items: ArrayList<FriendRequest>, val clickCallback: Callback, val cancelCallback: (fr: FriendRequest)-> Task<Unit>, val blockCallback: (fr: FriendRequest)-> Task<Unit>, val acceptCallback: (fr: FriendRequest)->Task<Unit>) : RecyclerView.Adapter<FriendRequestsListAdapter.BaseViewHolder>() {
 

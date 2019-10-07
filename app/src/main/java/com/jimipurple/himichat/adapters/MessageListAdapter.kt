@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import com.jimipurple.himichat.models.*
 
 class MessageListAdapter(private val context: Activity, private val userId: ArrayList<Int>, private val name: ArrayList<String>, private val avatar: ArrayList<String>, private val is_registered: ArrayList<String>)
     : ArrayAdapter<String>(context, R.layout.friends_list, name) {

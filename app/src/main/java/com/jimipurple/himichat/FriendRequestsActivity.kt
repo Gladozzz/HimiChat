@@ -7,8 +7,8 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.jimipurple.himichat.adapters.FriendRequest
 import com.jimipurple.himichat.adapters.FriendRequestsListAdapter
+import com.jimipurple.himichat.models.*
 import kotlinx.android.synthetic.main.activity_friend_requests.*
 
 class FriendRequestsActivity : BaseActivity() {
