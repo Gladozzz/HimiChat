@@ -17,6 +17,7 @@ import android.provider.MediaStore
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -24,6 +25,7 @@ import com.squareup.picasso.*
 import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.jimipurple.himichat.adapters.FriendRequest
 import java.io.File
 import kotlinx.android.synthetic.main.activity_settings.avatarView
 
@@ -172,6 +174,32 @@ class SettingsActivity : BaseActivity() {
             val outputStream = ByteArrayOutputStream()
             var ref : StorageReference? = null
             val rawImage : RequestCreator?
+            val setAvatar = {uri: Uri -> Unit
+                val dataForJson = mapOf("id" to mAuth!!.uid, "avatar" to uri.toString())
+                functions
+                    .getHttpsCallable("setAvatar")
+                        .call(dataForJson).addOnCompleteListener { task1 ->
+                            try {
+                                val i = Log.i(
+                                    "setAvatar",
+                                    "result " + task1.result?.data.toString()
+                                )
+                                val result = task1.result?.data as HashMap<String, Any>
+                                val added = try {
+                                    result["added"] as Boolean
+                                } catch (e: Exception) {
+                                    false
+                                }
+                                if (added) {
+                                    Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Log.i("setAvatar", "error " + e.message)
+                            }
+                    }
+            }
             Picasso.get().load(File(picturePath.trim())).resize(500, 500).centerCrop().into(object : com.squareup.picasso.Target {
                 override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                     when {
@@ -183,32 +211,7 @@ class SettingsActivity : BaseActivity() {
                                     .addOnSuccessListener {
                                         ref!!.downloadUrl.addOnSuccessListener { uri ->
                                             Log.i("avatar_load", "onSuccess: uri= $uri")
-                                            val dataForJson = mapOf("id" to mAuth!!.uid!!, "avatar" to uri.toString())
-                                            var res1 = functions
-                                                .getHttpsCallable("setAvatar")
-                                                .call(dataForJson).addOnCompleteListener { task1 ->
-                                                    try {
-                                                        val i = Log.i(
-                                                            "setAvatar",
-                                                            "result " + task1.result?.data.toString()
-                                                        )
-                                                        val result = task1.result?.data as HashMap<String, Any>
-//                                            val avatarURL = result["avatar"] as String
-                                                        val added = try {
-                                                            result["added"] as Boolean
-                                                        } catch (e: Exception) {
-                                                            false
-                                                        }
-                                                        if (added) {
-                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
-                                                        } else {
-                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
-                                                        }
-                                                    } catch (e: Exception) {
-                                                        Log.i("setAvatar", "error " + e.message)
-                                                    }
-                                                    //messageInput.setText("")
-                                                }
+                                            setAvatar(uri)
                                         }
                                     }
                             }
@@ -221,32 +224,7 @@ class SettingsActivity : BaseActivity() {
                                     .addOnSuccessListener {
                                         ref!!.downloadUrl.addOnSuccessListener { uri ->
                                             Log.i("avatar_load", "onSuccess: uri= $uri")
-                                            val dataForJson = mapOf("id" to mAuth!!.uid!!, "avatar" to uri.toString())
-                                            var res1 = functions
-                                                .getHttpsCallable("setAvatar")
-                                                .call(dataForJson).addOnCompleteListener { task1 ->
-                                                    try {
-                                                        val i = Log.i(
-                                                            "setAvatar",
-                                                            "result " + task1.result?.data.toString()
-                                                        )
-                                                        val result = task1.result?.data as HashMap<String, Any>
-//                                            val avatarURL = result["avatar"] as String
-                                                        val added = try {
-                                                            result["added"] as Boolean
-                                                        } catch (e: Exception) {
-                                                            false
-                                                        }
-                                                        if (added) {
-                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
-                                                        } else {
-                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
-                                                        }
-                                                    } catch (e: Exception) {
-                                                        Log.i("setAvatar", "error " + e.message)
-                                                    }
-                                                    //messageInput.setText("")
-                                                }
+                                            setAvatar(uri)
                                         }
                                     }
                             }
@@ -259,68 +237,12 @@ class SettingsActivity : BaseActivity() {
                                     .addOnSuccessListener {
                                         ref!!.downloadUrl.addOnSuccessListener { uri ->
                                             Log.i("avatar_load", "onSuccess: uri= $uri")
-                                            val dataForJson = mapOf("id" to mAuth!!.uid!!, "avatar" to uri.toString())
-                                            var res1 = functions
-                                                .getHttpsCallable("setAvatar")
-                                                .call(dataForJson).addOnCompleteListener { task1 ->
-                                                    try {
-                                                        val i = Log.i(
-                                                            "setAvatar",
-                                                            "result " + task1.result?.data.toString()
-                                                        )
-                                                        val result = task1.result?.data as HashMap<String, Any>
-//                                            val avatarURL = result["avatar"] as String
-                                                        val added = try {
-                                                            result["added"] as Boolean
-                                                        } catch (e: Exception) {
-                                                            false
-                                                        }
-                                                        if (added) {
-                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
-                                                        } else {
-                                                            Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
-                                                        }
-                                                    } catch (e: Exception) {
-                                                        Log.i("setAvatar", "error " + e.message)
-                                                    }
-                                                    //messageInput.setText("")
-                                                }
+                                            setAvatar(uri)
                                         }
                                     }
                             }
                         }
                     }
-//                    ref!!.putBytes(outputStream.toByteArray())
-//                        .addOnSuccessListener {
-//                            ref!!.downloadUrl.addOnSuccessListener { uri ->
-//                                Log.i("avatar_load", "onSuccess: uri= $uri")
-//                                var res1 = functions
-//                                    .getHttpsCallable("setAvatar")
-//                                    .call(data).addOnCompleteListener { task1 ->
-//                                        try {
-//                                            val i = Log.i(
-//                                                "setAvatar",
-//                                                "result " + task1.result?.data.toString()
-//                                            )
-//                                            val result = task1.result?.data as HashMap<String, Any>
-////                                            val avatarURL = result["avatar"] as String
-//                                            val added = try {
-//                                                result["added"] as Boolean
-//                                            } catch (e: Exception) {
-//                                                false
-//                                            }
-//                                            if (added) {
-//                                                Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
-//                                            } else {
-//                                                Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
-//                                            }
-//                                        } catch (e: Exception) {
-//                                            Log.i("setAvatar", "error " + e.message)
-//                                        }
-//                                        //messageInput.setText("")
-//                                    }
-//                            }
-//                        }
 
                 }
 
