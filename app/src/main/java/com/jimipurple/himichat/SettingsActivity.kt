@@ -25,6 +25,14 @@ import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.File
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.storage.UploadTask
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import androidx.fragment.app.FragmentActivity
+import kotlinx.android.synthetic.main.activity_find_friend.*
+import kotlinx.android.synthetic.main.activity_settings.avatarView
 
 
 class SettingsActivity : BaseActivity() {
@@ -188,6 +196,29 @@ class SettingsActivity : BaseActivity() {
                         }
                     }
                     ref!!.putBytes(outputStream.toByteArray())
+                        .addOnSuccessListener(OnSuccessListener<UploadTask.TaskSnapshot> {
+                            ref!!.downloadUrl.addOnSuccessListener { uri ->
+                                Log.i("avatar_load", "onSuccess: uri= $uri")
+                                var res1 = functions
+                                    .getHttpsCallable("setAvatar")
+                                    .call(data).addOnCompleteListener { task1 ->
+                                        try {
+                                            Log.i("setAvatar", "result " + task1.result?.data.toString())
+                                            val result = task1.result?.data as HashMap<String, Any>
+                                            val avatarURL = result["added"] as String
+                                            val added = try {
+                                                result["added"] as String
+                                            } catch (e: Exception) {
+                                                ""
+                                            }
+                                            //TODO error
+                                        } catch (e: Exception) {
+                                            Log.i("setAvatar", "error " + e.message)
+                                        }
+                                        //messageInput.setText("")
+                                    }
+                            }
+                        })
 //                    avatarView.setImageBitmap(BitmapFactory.decodeFile(picturePath))
 
                 }
