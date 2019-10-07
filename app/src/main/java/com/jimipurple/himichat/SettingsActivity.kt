@@ -51,6 +51,17 @@ class SettingsActivity : BaseActivity() {
             .call(data).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
                 nicknameText.text = result["nickname"] as String
+                Picasso.get().load(result["avatar"] as String).into(object : com.squareup.picasso.Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        avatarView.setImageBitmap(bitmap)
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        Log.i("FriendListAdapter", "Загрузка изображения не удалась " + result["avatar"] as String + "\n" + e?.message)
+                    }
+                })
             }
 
         logoutButton.setOnClickListener { logoutButtonOnClick() }
