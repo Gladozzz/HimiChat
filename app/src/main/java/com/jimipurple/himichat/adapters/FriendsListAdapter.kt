@@ -1,115 +1,75 @@
 package com.jimipurple.himichat.adapters
 
-import android.app.Activity
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.os.AsyncTask
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.Task
 import com.jimipurple.himichat.R
 import com.squareup.picasso.Picasso
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import android.content.Context.LAYOUT_INFLATER_SERVICE
-import android.view.LayoutInflater
-import android.widget.BaseAdapter
+import com.jimipurple.himichat.models.*
 
 
 
 
-class FriendsListAdapter(private val context: Activity, private val userId: ArrayList<String>,  private val name: ArrayList<String>, private val avatar: ArrayList<String>, private val is_registered: ArrayList<String>)
-    : ArrayAdapter<String>(context, R.layout.friends_list, name) {
 
-    var pos : Int = 0
+class FriendsListAdapter(var items: ArrayList<User>, val clickCallback: Callback, val sendMessageButtonOnClick: (u: User)-> Task<Unit>) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
 
-    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
-        val inflater = context.layoutInflater
-        val rowView = inflater.inflate(R.layout.friends_list, null, true)
-
-        pos = position
-
-        val id: String = userId[position]
-        val nameText = rowView.findViewById(R.id.name) as TextView
-        val messageText = rowView.findViewById(R.id.lastMessage) as TextView
-        val avatarText = rowView.findViewById(R.id.avatarDialog) as ImageView
-
-        nameText.text = name[position]
-        messageText.text = is_registered[position]
-
-        var bitmap : Bitmap? = null
-
-        //DownloadImageTask(context, avatar[position]).execute()
-
-        Picasso.get().load(avatar[position]).into(object : com.squareup.picasso.Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                avatarText.setImageBitmap(bitmap)
-            }
-
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + avatar[position] + "\n" + e?.message)
-            }
-        })
-
-        return rowView
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.friends_list, parent, false)
+        return FriendHolder(view)
     }
 
-    fun getFriend(position: Int): Map<String, String> {
-        val name = name[position]
-        val uid = userId[position]
-        val avatarURL = avatar[position]
-        return mapOf("nickname" to name, "userId" to uid, "avatar" to avatarURL)
+    override fun getItemCount() = items.size
+
+    override fun onBindViewHolder(holder: FriendHolder, position: Int) {
+        holder.bind(items[position])
+        Log.i("Recycler", "items $items")
+    }
+
+    inner class FriendHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        private val name = itemView.findViewById(R.id.name) as TextView
+        private val realName = itemView.findViewById(R.id.realName) as TextView
+        private val avatar = itemView.findViewById(R.id.avatarFriend) as ImageView
+        private val sendMessageButton = itemView.findViewById(R.id.sendMessageButton) as ImageButton
+
+        fun bind(item: User) {
+            name.text = item.nickname
+            realName.text = item.realName
+            Log.i("Recycler", "all must be ok")
+            Log.i("Recycler", "item $item")
+
+            if (item.avatar.isNotEmpty()) {
+                Picasso.get().load(item.avatar).into(object : com.squareup.picasso.Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        avatar.setImageBitmap(bitmap)
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        Log.i("FriendListAdapter", "Загрузка изображения не удалась " + item.avatar + "\n" + e?.message)
+                    }
+                })
+            }
+
+            itemView.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+            }
+
+            sendMessageButton.setOnClickListener {sendMessageButtonOnClick(item)}
+        }
+    }
+
+    interface Callback {
+        fun onItemClicked(item: User)
     }
 }
-
-//private class MyCustomAdapter : BaseAdapter() {
-//
-//    private val mData = ArrayList()
-//    private val mInflater: LayoutInflater
-//
-//    init {
-//        mInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-//    }
-//
-//    fun addItem(item: String) {
-//        mData.add(item)
-//        notifyDataSetChanged()
-//    }
-//
-//    override fun getCount(): Int {
-//        return mData.size()
-//    }
-//
-//    override fun getItem(position: Int): String {
-//        return mData.get(position)
-//    }
-//
-//    override fun getItemId(position: Int): Long {
-//        return position.toLong()
-//    }
-//
-//    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-//        var convertView = convertView
-//        println("getView $position $convertView")
-//        var holder: ViewHolder? = null
-//        if (convertView == null) {
-//            convertView = mInflater.inflate(R.layout.item1, null)
-//            holder = ViewHolder()
-//            holder.textView = convertView!!.findViewById<View>(R.id.text) as TextView
-//            convertView.tag = holder
-//        } else {
-//            holder = convertView.tag as ViewHolder
-//        }
-//        holder.textView.setText(mData.get(position))
-//        return convertView
-//    }
-//
-//}

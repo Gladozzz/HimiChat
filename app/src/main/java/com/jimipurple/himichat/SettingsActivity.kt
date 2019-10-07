@@ -25,7 +25,7 @@ import com.squareup.picasso.*
 import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.jimipurple.himichat.adapters.FriendRequest
+import com.jimipurple.himichat.models.*
 import java.io.File
 import kotlinx.android.synthetic.main.activity_settings.avatarView
 
