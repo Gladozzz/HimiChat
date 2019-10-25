@@ -59,11 +59,11 @@
             android:inputType="text"
             android:minHeight="70dp"
             app:layout_constraintBottom_toTopOf="@+id/friendsButton"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton"
+            app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
             app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/sendMessageButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginEnd="8dp"

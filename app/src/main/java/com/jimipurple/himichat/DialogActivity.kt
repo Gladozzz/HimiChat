@@ -16,12 +16,15 @@ class DialogActivity : BaseActivity() {
     private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var firebaseToken: String  = ""
     private var functions = FirebaseFunctions.getInstance()
+    private var id : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dialog)
         mAuth = FirebaseAuth.getInstance()
+        id = savedInstanceState!!["friend_id"] as String
 
+        sendMessageButton.setOnClickListener { onSendBtnClick() }
         friendsButton.setOnClickListener { friendsButtonOnClick() }
         dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
         settingsButton.setOnClickListener { settingsButtonOnClick() }
