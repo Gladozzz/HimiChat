@@ -19,7 +19,7 @@ import com.jimipurple.himichat.models.*
 
 
 
-class FriendsListAdapter(var items: ArrayList<User>, val clickCallback: Callback, val sendMessageButtonOnClick: (u: User)-> Task<Unit>) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
+class FriendsListAdapter(var items: ArrayList<User>, val clickCallback: Callback, val sendMessageButtonOnClick: (u: User)-> Unit) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendHolder {
         val view = LayoutInflater.from(parent.context)

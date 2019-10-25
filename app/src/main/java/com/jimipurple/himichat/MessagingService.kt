@@ -10,17 +10,20 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.jimipurple.himichat.models.ReceivedMessage
+import java.util.*
 
 
 class MessagingService : FirebaseMessagingService() {
 
     private var callbackOnMessageReceived = {}
+    private var mAuth = FirebaseAuth.getInstance()
 
     val INTENT_FILTER = "INTENT_FILTER"
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.i("messaging1337", "From: " + remoteMessage.from!!)
+        Log.i("messaging", "From: " + remoteMessage.from!!)
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
@@ -28,63 +31,28 @@ class MessagingService : FirebaseMessagingService() {
 
             //TODO Сделать обработку сообщений
 
-//            if (/* Check if data needs to be processed by long running job */ true) {
-//                // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
-//                val from_text = remoteMessage.data["text"]!!.toString()
-//                val peer_text = remoteMessage.data["text"]!!.toString()
-//                val from_pgp = remoteMessage.data["fromPGP"]!!.toString()
-//                val from_id = remoteMessage.data["fromId"]!!.toInt()
-//                val peer_pgp = remoteMessage.data["peerPGP"]!!.toString()
-//                val peer_id = remoteMessage.data["peerId"]!!.toInt()
-//                val back = remoteMessage.data["back"]!!.toString()
-//                val user_id = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getInt("user_id", 0)
-//                val firebase_token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-//
-//                Log.i("messaging1337", remoteMessage.data.toString())
-//                Log.i("messaging1337", remoteMessage.data.toString())
-//                Log.i("messaging1337", from_text)
-//                Log.i("messaging1337", peer_text)
-//                Log.i("messaging1337", from_pgp)
-//                Log.i("messaging1337", peer_pgp)
-//                Log.i("messaging1337", peer_id.toString())
-//                Log.i("messaging1337", user_id.toString())
-//
-//
-//                if (back == "false") {
-//                    val msg = Message(1, user_id, "date", peer_id, peer_pgp, from_id, from_pgp, peer_text)
-//                    addMessageToDB(applicationContext, msg)
-//                    val data = hashMapOf(
-//                        "from_text" to from_text,
-//                        "peer_text" to peer_text,
-//                        "token" to firebase_token,
-//                        "user_id" to user_id.toString(),
-//                        "peer_id" to peer_id.toString(),
-//                        "from_id" to from_id.toString(),
-//                        "peer_pgp" to peer_pgp,
-//                        "from_pgp" to from_pgp,
-//                        "back" to "true"
-//                    )
-//                    val functions = FirebaseFunctions.getInstance()
-//                    var res = functions
-//                        .getHttpsCallable("sendMessage")
-//                        .call(data).addOnCompleteListener { task ->
-//                            try {
-//                                Log.i("messaging1337", "result " + task.result?.data.toString())
-//                            } catch (e: Exception) {
-//                                Log.i("messaging1337", "error " + e.message)
-//                            }
-//                        }
-//                } else {
-//                    val msg = Message(1, user_id, "date", peer_id, peer_pgp, from_id, from_pgp, from_text)
-//                    addMessageToDB(applicationContext, msg)
-//                }
-//
-//                val intent = Intent(INTENT_FILTER)
-//                sendBroadcast(intent)
-//            } else {
-//                // Handle message within 10 seconds
-//                //handleNow()
-//            }
+            if (/* Check if data needs to be processed by long running job */ true) {
+                // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
+                val text = remoteMessage.data["text"]!!.toString()
+                val sender_id = remoteMessage.data["sender_id"]!!.toString()
+                val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
+
+                Log.i("messaging", remoteMessage.data.toString())
+                Log.i("messaging", remoteMessage.data.toString())
+                Log.i("messaging", text)
+                Log.i("messaging", sender_id)
+                Log.i("messaging", receiver_id)
+				  val db = MessagesDBHelper(applicationContext)
+				  val msg = ReceivedMessage(sender_id, receiver_id, text, Date(), null, null)
+				  db.pushMessage(mAuth!!.uid!!, msg)
+
+
+                val intent = Intent(INTENT_FILTER)
+                sendBroadcast(intent)
+            } else {
+                // Handle message within 10 seconds
+                //handleNow()
+            }
 
         }
 

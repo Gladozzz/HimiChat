@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
 
 class FriendsActivity : BaseActivity() {
 
+    val REQUEST_CODE_DIALOG_ACTIVITY = 1
     private var mAuth: FirebaseAuth? = null
     private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var firebaseToken: String  = ""
@@ -60,6 +61,11 @@ class FriendsActivity : BaseActivity() {
                     }
                 }
         }
+        val sendMsg = {u: User -> Unit
+            val i = Intent(applicationContext, DialogActivity::class.java)
+            i.putExtra("friend_id", u.id)
+            startActivityForResult(i, REQUEST_CODE_DIALOG_ACTIVITY)
+        }
         functions
             .getHttpsCallable("getFriends")
             .call(data).continueWith { task ->
@@ -81,7 +87,7 @@ class FriendsActivity : BaseActivity() {
                                     override fun onItemClicked(item: User) {
                                         profile(item)
                                     }
-                                }, profile)
+                                }, sendMsg)
                                 FriendsList.adapter = adapter
                                 //friendRequests.layoutManager = LinearLayoutManager(this)
                             }

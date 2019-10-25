@@ -56,35 +56,35 @@ class DialoguesListAdapter(private val context: Activity, private val userId: Ar
     }
 
 
-    class DownloadImageTask(private val context: Activity, private val urlstring: String) : AsyncTask<String, Void, Bitmap>() {
-        override fun doInBackground(vararg param: String): Bitmap? {
-            try {
-                val url = URL(urlstring)
-                if (urlstring == "") Log.i("FriendListAdapter", "pizdec")
-                val connection = url.openConnection() as HttpURLConnection
-                connection.doInput = true
-                connection.connect()
-                val input = connection.inputStream
-                return BitmapFactory.decodeStream(input)
-            } catch (e: IOException) {
-                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + urlstring + "\n" + e.message)
-            }
-            return null
-        }
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            // ...
-        }
-
-        override fun onPostExecute(result: Bitmap?) {
-            super.onPostExecute(result)
-            val inflater = context.layoutInflater
-            val rowView = inflater.inflate(R.layout.friends_list, null, true)
-            val avatarText = rowView.findViewById(R.id.avatarDialog) as ImageView
-            if (result == null) Log.i("FriendListAdapter", "pizdec")
-            avatarText.setImageBitmap(result)
-            //Log.i("FriendListAdapter", "complete")
-        }
-    }
+//    class DownloadImageTask(private val context: Activity, private val urlstring: String) : AsyncTask<String, Void, Bitmap>() {
+//        override fun doInBackground(vararg param: String): Bitmap? {
+//            try {
+//                val url = URL(urlstring)
+//                if (urlstring == "") Log.i("FriendListAdapter", "pizdec")
+//                val connection = url.openConnection() as HttpURLConnection
+//                connection.doInput = true
+//                connection.connect()
+//                val input = connection.inputStream
+//                return BitmapFactory.decodeStream(input)
+//            } catch (e: IOException) {
+//                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + urlstring + "\n" + e.message)
+//            }
+//            return null
+//        }
+//
+//        override fun onPreExecute() {
+//            super.onPreExecute()
+//            // ...
+//        }
+//
+//        override fun onPostExecute(result: Bitmap?) {
+//            super.onPostExecute(result)
+//            val inflater = context.layoutInflater
+//            val rowView = inflater.inflate(R.layout.friends_list, null, true)
+//            val avatarText = rowView.findViewById(R.id.avatarDialog) as ImageView
+//            if (result == null) Log.i("FriendListAdapter", "pizdec")
+//            avatarText.setImageBitmap(result)
+//            //Log.i("FriendListAdapter", "complete")
+//        }
+//    }
 }
