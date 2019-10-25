@@ -32,10 +32,10 @@ class DialogActivity : BaseActivity() {
 
     private fun onSendBtnClick(){
         val text = messageInput.text.toString()
-        val receiverId = ""
-        val senderId = ""
-        val msg = UndeliveredMessage(receiverId, text)
-        val deliveredId = ""
+        val receiverId = id
+        val senderId = mAuth!!.uid!!
+        val msg = UndeliveredMessage(receiverId!!, text)
+        val deliveredId = "1337"
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,
