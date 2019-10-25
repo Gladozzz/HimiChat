@@ -22,7 +22,7 @@ class DialogActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dialog)
         mAuth = FirebaseAuth.getInstance()
-        id = savedInstanceState!!["friend_id"] as String
+        id = intent.getStringExtra("friend_id")
 
         sendMessageButton.setOnClickListener { onSendBtnClick() }
         friendsButton.setOnClickListener { friendsButtonOnClick() }
