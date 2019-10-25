@@ -40,7 +40,8 @@ class DialogActivity : BaseActivity() {
             "receiverId" to receiverId,
             "senderId" to senderId,
             "deliveredId" to deliveredId,
-            "text" to text
+            "text" to text,
+            "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
         )
 
         var res = functions
