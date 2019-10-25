@@ -48,14 +48,14 @@ class DialogActivity : BaseActivity() {
             .getHttpsCallable("sendMessage")
             .call(data).addOnCompleteListener { task ->
                 try {
-                    Log.i("dialogig", "result " + task.result?.data.toString())
+                    Log.i("dialogMessage", "result " + task.result?.data.toString())
                 } catch (e: Exception) {
-                    Log.i("dialogig", "error " + e.message)
+                    Log.i("dialogMessage", "error " + e.message)
                 }
                 messageInput.setText("")
             }
 
-        Log.i("dialogig", "data $data")
+        Log.i("dialogMessage", "data $data")
     }
 
     private fun friendsButtonOnClick() {
