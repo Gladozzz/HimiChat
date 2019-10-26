@@ -43,7 +43,8 @@ class DialogActivity : BaseActivity() {
             "text" to text,
             "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
         )
-
+        messageInput.setText("")
+        Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
         var res = functions
             .getHttpsCallable("sendMessage")
             .call(data).addOnCompleteListener { task ->

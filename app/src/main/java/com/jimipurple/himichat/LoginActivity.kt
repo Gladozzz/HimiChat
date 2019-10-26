@@ -10,6 +10,7 @@ import android.util.Log
 import java.util.regex.Pattern
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.functions.FirebaseFunctions
 
 
 class LoginActivity : BaseActivity() {
@@ -17,6 +18,7 @@ class LoginActivity : BaseActivity() {
     private var mAuth: FirebaseAuth? = null
     private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var firebaseToken: String  = ""
+    private var functions = FirebaseFunctions.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +55,16 @@ class LoginActivity : BaseActivity() {
                         user["token"] = firebaseToken
                         user["real_name"] = rn
                         user["email"] = email
-                        firestore.collection("users").document(currentUID).set(user)
+                        //firestore.collection("users").document(currentUID).set(user
+                        var res = functions
+                            .getHttpsCallable("setUser")
+                            .call(user).addOnCompleteListener { task ->
+                                try {
+                                    Log.i("setUser", "result " + task.result?.data.toString())
+                                } catch (e: Exception) {
+                                    Log.i("setUser", "error " + e.message)
+                                }
+                            }
                         successful()
                     } else {
                         // If sign in fails, display a message to the user.
@@ -85,7 +96,19 @@ class LoginActivity : BaseActivity() {
                         val currentUser = mAuth!!.currentUser
                         val currentUID = currentUser!!.uid
                         val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-                        firestore.collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
+                        val data = hashMapOf(
+                            "userId" to mAuth!!.uid!!,
+                            "token" to token
+                        )
+                        var res = functions
+                            .getHttpsCallable("setToken")
+                            .call(data).addOnCompleteListener { task ->
+                                try {
+                                    Log.i("setToken", "result " + task.result?.data.toString())
+                                } catch (e: Exception) {
+                                    Log.i("setToken", "error " + e.message)
+                                }
+                            }
                         successful()
                     } else {
                         // If sign in fails, display a message to the user.
@@ -118,7 +141,20 @@ class LoginActivity : BaseActivity() {
             val currentUID = currentUser.uid
             val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
             if (token.isNotEmpty()) {
-                firestore.collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
+                //firestore.collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
+                val data = hashMapOf(
+                    "userId" to mAuth!!.uid!!,
+                    "token" to token
+                )
+                var res = functions
+                    .getHttpsCallable("setToken")
+                    .call(data).addOnCompleteListener { task ->
+                        try {
+                            Log.i("setToken", "result " + task.result?.data.toString())
+                        } catch (e: Exception) {
+                            Log.i("setToken", "error " + e.message)
+                        }
+                    }
                 Log.i("auth:start", "Пользователь авторизован, firebaseToken отправлен")
                 successful()
             } else {
@@ -181,7 +217,19 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun successful() {
-        //TODO Сделать переход на главный экран, так как авторизация уже выполнена
+        val data = hashMapOf(
+            "userId" to mAuth!!.uid!!,
+            "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+        )
+        var res = functions
+            .getHttpsCallable("setToken")
+            .call(data).addOnCompleteListener { task ->
+                try {
+                    Log.i("setToken", "result " + task.result?.data.toString())
+                } catch (e: Exception) {
+                    Log.i("setToken", "error " + e.message)
+                }
+            }
         val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
         startActivity(newIntent)
         finish()
