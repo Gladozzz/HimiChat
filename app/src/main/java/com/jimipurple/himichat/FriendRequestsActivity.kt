@@ -36,7 +36,7 @@ class FriendRequestsActivity : BaseActivity() {
     private fun hashMapToFriendRequest(h : ArrayList<HashMap<String, Any>>) : ArrayList<FriendRequest> {
         val fr : ArrayList<FriendRequest> = ArrayList<FriendRequest>()
         h.forEach {
-            if (it["invited_by"] == mAuth!!.uid) {
+            if (it["id"] == mAuth!!.uid) {
                 fr.add(FriendRequest(false, it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
             } else {
                 fr.add(FriendRequest(true, it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))

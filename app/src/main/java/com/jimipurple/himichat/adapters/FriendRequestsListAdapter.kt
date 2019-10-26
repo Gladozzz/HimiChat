@@ -90,7 +90,7 @@ class FriendRequestsListAdapter(var items: ArrayList<FriendRequest>, val clickCa
 
         private val name = itemView.findViewById(R.id.name) as TextView
         private val realName = itemView.findViewById(R.id.realName) as TextView
-        private val avatar = itemView.findViewById(R.id.avatarReceivedRequest) as ImageView
+        private val avatar = itemView.findViewById(R.id.avatarSentRequest) as ImageView
         private val cancelButton = itemView.findViewById(R.id.cancelButton) as ImageButton
 
         override fun bind(item: FriendRequest) {
