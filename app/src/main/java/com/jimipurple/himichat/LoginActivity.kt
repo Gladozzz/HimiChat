@@ -50,6 +50,7 @@ class LoginActivity : BaseActivity() {
                         val currentUID: String = mAuth!!.currentUser!!.uid
                         Log.i("auth:data", "current email: $currentUID, nickname: $nickname")
                         val user = HashMap<String, Any>()
+                        user["id"] = currentUID
                         user["nickname"] = nickname
                         user["avatar"] = ""
                         user["token"] = firebaseToken
