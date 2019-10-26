@@ -48,11 +48,12 @@ class SettingsActivity : BaseActivity() {
 
         mAuth = FirebaseAuth.getInstance()
 
-        val data = mapOf("id" to mAuth!!.uid)
+        val data = mapOf("id" to mAuth!!.uid!!)
         functions
             .getHttpsCallable("getUser")
             .call(data).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
+                Log.i("settings", result.toString())
                 nicknameText.text = result["nickname"] as String
                 Picasso.get().load(result["avatar"] as String).into(object : com.squareup.picasso.Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {

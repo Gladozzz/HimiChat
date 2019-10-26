@@ -11,6 +11,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.jimipurple.himichat.models.ReceivedMessage
+import com.jimipurple.himichat.models.SentMessage
 import java.util.*
 
 
@@ -25,6 +26,7 @@ class MessagingService : FirebaseMessagingService() {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.i("messaging", "From: " + remoteMessage.from!!)
 
+        val db = MessagesDBHelper(applicationContext)
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.i("messaging", "Message data payload: " + remoteMessage.data)
@@ -33,18 +35,25 @@ class MessagingService : FirebaseMessagingService() {
 
             if (/* Check if data needs to be processed by long running job */ true) {
                 // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
-                val text = remoteMessage.data["text"]!!.toString()
-                val sender_id = remoteMessage.data["sender_id"]!!.toString()
-                val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
+                if (remoteMessage.data.containsKey("text")){
+                    val text = remoteMessage.data["text"]!!.toString()
+                    val sender_id = remoteMessage.data["sender_id"]!!.toString()
+                    val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
 
-                Log.i("messaging", remoteMessage.data.toString())
-                Log.i("messaging", remoteMessage.data.toString())
-                Log.i("messaging", text)
-                Log.i("messaging", sender_id)
-                Log.i("messaging", receiver_id)
-				  val db = MessagesDBHelper(applicationContext)
-				  val msg = ReceivedMessage(sender_id, receiver_id, text, Date(), null, null)
-				  db.pushMessage(mAuth!!.uid!!, msg)
+                    Log.i("messaging", remoteMessage.data.toString())
+                    Log.i("messaging", remoteMessage.data.toString())
+                    Log.i("messaging", text)
+                    Log.i("messaging", sender_id)
+                    Log.i("messaging", receiver_id)
+                    val db = MessagesDBHelper(applicationContext)
+                    val msg = ReceivedMessage(sender_id, receiver_id, text, Date(), null, null)
+                    db.pushMessage(mAuth!!.uid!!, msg)
+                } else {
+                    val unmsg = db.getUndeliveredMessage(remoteMessage.data["delivered_id"]!!)!!
+                    val msg = SentMessage(mAuth!!.uid!!, unmsg.receiverId, unmsg.text, Date(), null, null)
+                    db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
+                    db.pushMessage(mAuth!!.uid!!, msg)
+                }
 
 
                 val intent = Intent(INTENT_FILTER)

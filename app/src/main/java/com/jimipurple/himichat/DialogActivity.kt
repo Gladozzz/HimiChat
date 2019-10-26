@@ -17,6 +17,7 @@ class DialogActivity : BaseActivity() {
     private var firebaseToken: String  = ""
     private var functions = FirebaseFunctions.getInstance()
     private var id : String? = null
+    private var db = MessagesDBHelper(applicationContext)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +35,14 @@ class DialogActivity : BaseActivity() {
         val text = messageInput.text.toString()
         val receiverId = id
         val senderId = mAuth!!.uid!!
-        val msg = UndeliveredMessage(receiverId!!, text)
-        val deliveredId = "1337"
+        val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        val randomString = (1..8)
+            .map { i -> kotlin.random.Random.nextInt(0, charPool.size) }
+            .map(charPool::get)
+            .joinToString("")
+        val deliveredId = randomString
+        val msg = UndeliveredMessage(receiverId!!, text, deliveredId)
+        db.pushMessage(mAuth!!.uid!!, msg)
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,
@@ -50,6 +57,7 @@ class DialogActivity : BaseActivity() {
             .call(data).addOnCompleteListener { task ->
                 try {
                     Log.i("dialogMessage", "result " + task.result?.data.toString())
+                    data["text"]
                 } catch (e: Exception) {
                     Log.i("dialogMessage", "error " + e.message)
                 }
