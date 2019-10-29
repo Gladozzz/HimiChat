@@ -41,7 +41,7 @@ class FriendRequestsListAdapter(var items: ArrayList<FriendRequest>, val clickCa
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (items[position].invited_by) {
+        return if (items[position].isReceived) {
             ItemViewType.RECEIVED_FRIEND_REQUEST
         } else {
             ItemViewType.SENT_FRIEND_REQUEST
