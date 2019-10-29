@@ -67,6 +67,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/privacy" />
 
+        <com.google.android.material.tabs.TabItem
+                android:id="@+id/DesignSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/design" />
+
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager.widget.ViewPager

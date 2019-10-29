@@ -61,6 +61,7 @@ class SettingsActivity : BaseActivity() {
 
         val fragmentAdapter = SettingsPageAdapter(supportFragmentManager, applicationContext, logout, loadAvatar)
         viewpager_main.adapter = fragmentAdapter
+        SettingsTabs.setupWithViewPager(viewpager_main)
 
         //logoutButton.setOnClickListener { logoutButtonOnClick() }
         friendsButton.setOnClickListener { friendsButtonOnClick() }

@@ -34,7 +34,7 @@ import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import kotlinx.io.ByteArrayOutputStream
 
 
-class DesignSettingsFragment : Fragment() {
+class PrivacySettingsFragment : Fragment() {
 
     private var mAuth: FirebaseAuth? = null
     private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
