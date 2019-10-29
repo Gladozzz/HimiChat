@@ -17,13 +17,14 @@ class DialogActivity : BaseActivity() {
     private var firebaseToken: String  = ""
     private var functions = FirebaseFunctions.getInstance()
     private var id : String? = null
-    private var db = MessagesDBHelper(applicationContext)
+    private var db : MessagesDBHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dialog)
         mAuth = FirebaseAuth.getInstance()
         id = intent.getStringExtra("friend_id")
+        db = MessagesDBHelper(applicationContext)
 
         sendMessageButton.setOnClickListener { onSendBtnClick() }
         friendsButton.setOnClickListener { friendsButtonOnClick() }
@@ -42,7 +43,7 @@ class DialogActivity : BaseActivity() {
             .joinToString("")
         val deliveredId = randomString
         val msg = UndeliveredMessage(receiverId!!, text, deliveredId)
-        db.pushMessage(mAuth!!.uid!!, msg)
+        db!!.pushMessage(mAuth!!.uid!!, msg)
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,

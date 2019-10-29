@@ -10,6 +10,7 @@ import com.google.firebase.firestore.SetOptions
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
+import com.jimipurple.himichat.models.UndeliveredMessage
 import java.util.*
 
 
@@ -45,12 +46,16 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("messaging", receiver_id)
                     val db = MessagesDBHelper(applicationContext)
                     val msg = ReceivedMessage(sender_id, receiver_id, text, Date(), null, null)
-                    db.pushMessage(mAuth!!.uid!!, msg)
+                    db.pushMessage(mAuth.uid!!, msg)
                 } else {
-                    val unmsg = db.getUndeliveredMessage(remoteMessage.data["delivered_id"]!!)!!
-                    val msg = SentMessage(mAuth!!.uid!!, unmsg.receiverId, unmsg.text, Date(), null, null)
-                    db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
-                    db.pushMessage(mAuth!!.uid!!, msg)
+                    val unmsg : UndeliveredMessage? = db.getUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
+                    if (unmsg != null) {
+                        val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Date(), null, null)
+                        db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
+                        db.pushMessage(mAuth.uid!!, msg)
+                    } else {
+                        Log.i("messaging", "undelivered message wasn't found")
+                    }
                 }
 
 
