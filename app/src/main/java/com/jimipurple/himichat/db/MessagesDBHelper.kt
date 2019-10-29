@@ -248,7 +248,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
         cv.put(TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID, msg.deliveredId)
         cv.put(TableUndeliveredMessages.COLUMN_NAME_TEXT, msg.text)
-        db!!.insert("messages", null, cv)
+        db!!.insert(TableUndeliveredMessages.TABLE_NAME, null, cv)
         db.close()
     }
     fun pushMessage(uid: String, msg: ReceivedMessage) {
@@ -262,7 +262,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
         val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
         cv.put("date", date)
-        db!!.insert("messages", null, cv)
+        db!!.insert(TableMessages.TABLE_NAME, null, cv)
         db.close()
     }
     fun pushMessage(uid: String, msg: SentMessage) {
@@ -276,7 +276,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
         val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
         cv.put("date", date)
-        db!!.insert("messages", null, cv)
+        db!!.insert(TableMessages.TABLE_NAME, null, cv)
         db.close()
     }
     fun pushMessages(msgs: ArrayList<Message>) {
@@ -294,6 +294,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                     cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
                     val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
                     cv.put("date", date)
+                    db!!.insert(TableMessages.TABLE_NAME, null, cv)
                 }
                 is SentMessage -> {
                     val cv = ContentValues()
@@ -305,14 +306,14 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                     cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
                     val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
                     cv.put("date", date)
-                    db!!.insert("messages", null, cv)
+                    db!!.insert(TableMessages.TABLE_NAME, null, cv)
                 }
                 is UndeliveredMessage -> {
                     val cv = ContentValues()
                     cv.put(TableUndeliveredMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
                     cv.put(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
                     cv.put(TableUndeliveredMessages.COLUMN_NAME_TEXT, msg.text)
-                    db!!.insert("undelivered_messages", null, cv)
+                    db!!.insert(TableUndeliveredMessages.TABLE_NAME, null, cv)
                 }
             }
         }
