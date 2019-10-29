@@ -136,6 +136,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         val projection = arrayOf(BaseColumns._ID,
             TableUndeliveredMessages.COLUMN_NAME_USER_ID,
             TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID,
+            TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID,
             TableUndeliveredMessages.COLUMN_NAME_TEXT
         )
         // Filter results WHERE "user_id" = 'uid'

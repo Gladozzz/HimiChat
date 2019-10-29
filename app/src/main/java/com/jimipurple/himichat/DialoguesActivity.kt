@@ -36,6 +36,7 @@ class DialoguesActivity : BaseActivity() {
         val msgs = db.getMessages(mAuth!!.uid!!)
         val undeliveredMsgs = db.getUndeliveredMessages(mAuth!!.uid!!)
         Log.i("msgs", msgs.toString())
+        Log.i("unmsgs", undeliveredMsgs.toString())
 
         friendsButton.setOnClickListener { friendsButtonOnClick() }
         dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
