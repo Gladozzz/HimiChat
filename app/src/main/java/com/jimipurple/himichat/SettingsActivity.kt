@@ -25,9 +25,11 @@ import com.squareup.picasso.*
 import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.jimipurple.himichat.adapters.SettingsPageAdapter
 import com.jimipurple.himichat.models.*
 import java.io.File
-import kotlinx.android.synthetic.main.activity_settings.avatarView
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import kotlinx.android.synthetic.main.profile_settings_fragment.*
 
 
 class SettingsActivity : BaseActivity() {
@@ -49,33 +51,22 @@ class SettingsActivity : BaseActivity() {
         mAuth = FirebaseAuth.getInstance()
 
         val data = mapOf("id" to mAuth!!.uid!!)
-        functions
-            .getHttpsCallable("getUser")
-            .call(data).continueWith { task ->
-                val result = task.result?.data as HashMap<String, Any>
-                Log.i("settings", result.toString())
-                nicknameText.text = result["nickname"] as String
-                Picasso.get().load(result["avatar"] as String).into(object : com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        avatarView.setImageBitmap(bitmap)
-                    }
 
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+        val logout = {
+            logoutButtonOnClick()
+        }
+        val loadAvatar = {
+            loadAvatarButtonOnClick()
+        }
 
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("avatar", "Загрузка изображения не удалась " + result["avatar"] as String + "\n" + e?.message)
-                    }
-                })
-            }
+        val fragmentAdapter = SettingsPageAdapter(supportFragmentManager, applicationContext, logout, loadAvatar)
+        viewpager_main.adapter = fragmentAdapter
 
-        logoutButton.setOnClickListener { logoutButtonOnClick() }
+        //logoutButton.setOnClickListener { logoutButtonOnClick() }
         friendsButton.setOnClickListener { friendsButtonOnClick() }
         dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
         settingsButton.setOnClickListener { settingsButtonOnClick() }
-        loadAvatarButton.setOnClickListener { loadAvatarButtonOnClick() }
-    }
-
-    private fun loadAvatarFromStorage() {
+        //loadAvatarButton.setOnClickListener { loadAvatarButtonOnClick() }
     }
 
     private fun logoutButtonOnClick() {
@@ -284,5 +275,15 @@ class SettingsActivity : BaseActivity() {
             }
         }// other 'case' lines to check for other
         // permissions this app might request
+    }
+
+    public override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("POSITION", SettingsTabs.getSelectedTabPosition())
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        viewpager_main.currentItem = savedInstanceState.getInt("POSITION")
     }
 }

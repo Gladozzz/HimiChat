@@ -6,7 +6,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.jimipurple.himichat.R
+import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.UndeliveredMessage
 import kotlinx.android.synthetic.main.activity_dialog.*
 

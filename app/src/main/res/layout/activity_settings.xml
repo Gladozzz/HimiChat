@@ -5,36 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"
-        android:paddingStart="20dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingRight="20dp"
         tools:context=".SettingsActivity">
-
-    <ImageButton
-            android:id="@+id/friendsButton"
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:padding="0dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/dialoguesButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/friends" />
-
-    <ImageButton
-            android:id="@+id/dialoguesButton"
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:padding="0dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/settingsButton"
-            app:layout_constraintStart_toEndOf="@+id/friendsButton"
-            app:srcCompat="@drawable/dialogues" />
 
     <ImageButton
             android:id="@+id/settingsButton"
@@ -45,92 +16,70 @@
             android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/dialoguesButton"
             app:srcCompat="@drawable/settings" />
 
-    <Button
-            android:id="@+id/logoutButton"
+    <ImageButton
+            android:id="@+id/dialoguesButton"
             android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="15dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/button_logout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loadRenameButton" />
+            android:layout_height="80dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/settingsButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/friendsButton"
+            app:srcCompat="@drawable/dialogues" />
 
-    <TextView
-            android:id="@+id/nickname"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="15dp"
-            android:text="@string/label_nickname"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/avatarView" />
-
-    <TextView
-            android:id="@+id/nicknameText"
+    <ImageButton
+            android:id="@+id/friendsButton"
             android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/nickname"
-            app:layout_constraintTop_toBottomOf="@+id/avatarView" />
-
-    <Button
-            android:id="@+id/loadAvatarButton"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="15dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/button_load_avatar"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="80dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/dialoguesButton"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/realNameView" />
+            app:srcCompat="@drawable/friends" />
 
-    <ImageView
-            android:id="@+id/avatarView"
-            android:layout_width="351dp"
-            android:layout_height="185dp"
+    <com.google.android.material.tabs.TabLayout
+            android:id="@+id/SettingsTabs"
+            android:layout_width="409dp"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/defaultavatar" />
+            app:tabMode="auto">
 
-    <TextView
-            android:id="@+id/rename"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="15dp"
-            android:gravity="right"
-            android:text="@string/label_rename"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nickname" />
+        <com.google.android.material.tabs.TabItem
+                android:id="@+id/ProfileSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile" />
 
-    <TextView
-            android:id="@+id/realNameView"
+        <com.google.android.material.tabs.TabItem
+                android:id="@+id/PrivacySettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/privacy" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewpager_main"
             android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="8dp"
+            android:layout_height="0dp"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
+            app:layout_constraintBottom_toTopOf="@+id/dialoguesButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/rename"
-            app:layout_constraintTop_toBottomOf="@+id/nicknameText" />
-
-    <Button
-            android:id="@+id/loadRenameButton"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="15dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/loadRenameButton"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loadAvatarButton" />
+            app:layout_constraintTop_toBottomOf="@+id/SettingsTabs"
+            app:layout_constraintVertical_bias="0.0" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

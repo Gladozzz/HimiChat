@@ -1,4 +1,4 @@
-package com.jimipurple.himichat
+package com.jimipurple.himichat.db
 
 import android.content.ContentValues
 import android.content.Context
@@ -52,7 +52,10 @@ private const val SQL_CREATE_TABLE_UNDELIVERED_MESSAGES =
 private const val SQL_DELETE_TABLE_MESSAGES = "DROP TABLE IF EXISTS ${TableMessages.TABLE_NAME}"
 private const val SQL_DELETE_TABLE_UNDELIVERED_MESSAGES = "DROP TABLE IF EXISTS ${TableUndeliveredMessages.TABLE_NAME}"
 
-class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
+    DATABASE_NAME, null,
+    DATABASE_VERSION
+) {
 
     private var mAuth: FirebaseAuth? = FirebaseAuth.getInstance()
     override fun onCreate(db: SQLiteDatabase) {
@@ -72,7 +75,14 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
     fun getMessages(uid: String): ArrayList<Message>? {
         //TODO получение всех сообщений пользователя из бд
         val db = this.readableDatabase
-        val projection = arrayOf(BaseColumns._ID, TableMessages.COLUMN_NAME_USER_ID, TableMessages.COLUMN_NAME_SENDER_ID, TableMessages.COLUMN_NAME_RECEIVER_ID, TableMessages.COLUMN_NAME_TEXT, TableMessages.COLUMN_NAME_DATE, TableMessages.COLUMN_NAME_PUBLIC_KEY)
+        val projection = arrayOf(BaseColumns._ID,
+            TableMessages.COLUMN_NAME_USER_ID,
+            TableMessages.COLUMN_NAME_SENDER_ID,
+            TableMessages.COLUMN_NAME_RECEIVER_ID,
+            TableMessages.COLUMN_NAME_TEXT,
+            TableMessages.COLUMN_NAME_DATE,
+            TableMessages.COLUMN_NAME_PUBLIC_KEY
+        )
         // Filter results WHERE "user_id" = 'uid'
         val selection = "${TableMessages.COLUMN_NAME_USER_ID} = ?"
         val selectionArgs = arrayOf(uid)
@@ -123,7 +133,11 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
     fun getUndeliveredMessages(uid: String): ArrayList<UndeliveredMessage>? {
         //TODO получение всех сообщений пользователя из бд
         val db = this.readableDatabase
-        val projection = arrayOf(BaseColumns._ID, TableUndeliveredMessages.COLUMN_NAME_USER_ID, TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, TableUndeliveredMessages.COLUMN_NAME_TEXT)
+        val projection = arrayOf(BaseColumns._ID,
+            TableUndeliveredMessages.COLUMN_NAME_USER_ID,
+            TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID,
+            TableUndeliveredMessages.COLUMN_NAME_TEXT
+        )
         // Filter results WHERE "user_id" = 'uid'
         val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
         val selectionArgs = arrayOf(uid)
@@ -161,7 +175,11 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
     fun getUndeliveredMessage(deliveredId: String): UndeliveredMessage? {
         //TODO получение всех сообщений пользователя из бд
         val db = this.readableDatabase
-        val projection = arrayOf(BaseColumns._ID, TableUndeliveredMessages.COLUMN_NAME_USER_ID, TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, TableUndeliveredMessages.COLUMN_NAME_TEXT)
+        val projection = arrayOf(BaseColumns._ID,
+            TableUndeliveredMessages.COLUMN_NAME_USER_ID,
+            TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID,
+            TableUndeliveredMessages.COLUMN_NAME_TEXT
+        )
         // Filter results WHERE "user_id" = 'uid'
         val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
         val selectionArgs = arrayOf(deliveredId)

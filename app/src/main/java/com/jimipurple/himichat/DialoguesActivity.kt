@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.jimipurple.himichat.R
+import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
 import kotlinx.android.synthetic.main.activity_dialogues.*
 import java.util.*
@@ -18,7 +18,8 @@ class DialoguesActivity : BaseActivity() {
     private var mAuth: FirebaseAuth? = null
     private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var firebaseToken: String  = ""
-    private var db: MessagesDBHelper  = MessagesDBHelper(this)
+    private var db: MessagesDBHelper =
+        MessagesDBHelper(this)
     private var currentTime: Date?  = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

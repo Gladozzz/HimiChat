@@ -24,7 +24,9 @@
     <string name="button_load_avatar">Load avatar</string>
     <string name="label_rename">Rename field:</string>
     <string name="loadRenameButton">Rename</string>
-
+    <string name="profile">Profile</string>
+    <string name="privacy">Privacy</string>
+    <string name="design">Design</string>
 
 
     <string name="toast_auth_error">Authentication failed.</string>
@@ -45,4 +47,7 @@
     <string name="toast_cancel_invite_error">error to cancel friend request</string>
     <string name="toast_load_avatar_complete">avatar was loaded</string>
     <string name="toast_load_avatar_error">error to load avatar</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

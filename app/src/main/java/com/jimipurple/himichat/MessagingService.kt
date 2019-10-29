@@ -1,15 +1,13 @@
 package com.jimipurple.himichat
 
 import android.util.Log
-import com.jimipurple.himichat.models.Message
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.firebase.functions.FirebaseFunctions
 import android.content.Intent
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import java.util.*
