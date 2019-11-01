@@ -1,35 +1,37 @@
 package com.jimipurple.himichat.adapters
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.tasks.Task
 import com.jimipurple.himichat.R
-import com.squareup.picasso.Picasso
 import com.jimipurple.himichat.models.*
 
 
 
 
 
-class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callback, val cancelCallback: (fr: Message)-> Task<Unit>, val blockCallback: (fr: Message)-> Task<Unit>, val acceptCallback: (fr: Message)->Task<Unit>) : RecyclerView.Adapter<MessageListAdapter.BaseViewHolder>() {
+class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callback, val deleteCallback: (msg: Message)-> Unit, val editCallback: (msg: Message)-> Unit, val onHoldCallback: (msg: Message)->Unit) : RecyclerView.Adapter<MessageListAdapter.BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return if (viewType == ItemViewType.RECEIVED_MESSAGE) {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.received_requests_list, parent, false)
-            ReceivedMessageHolder(view)
-        } else {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.sent_requests_list, parent, false)
-            SentMessageolder(view)
+        return when (viewType) {
+            ItemViewType.RECEIVED_MESSAGE -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.received_message_list, parent, false)
+                ReceivedMessageHolder(view)
+            }
+            ItemViewType.SENT_MESSAGE -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.sent_message_list, parent, false)
+                SentMessageHolder(view)
+            }
+            else -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.unreceived_message_list, parent, false)
+                UnreceivedMessageHolder(view)
+            }
         }
     }
 
@@ -41,21 +43,22 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (items[position] is ReceivedMessage) {
-            return ItemViewType.RECEIVED_MESSAGE
-        } else if (items[position] is SentMessage){
-            return ItemViewType.SENT_MESSAGE
-        }
-        return ItemViewType.UNDELIVERED_MESSAGE
-    }
+        when (items[position]) {
+            is ReceivedMessage -> {
+                return ItemViewType.RECEIVED_MESSAGE
+            }
+            is SentMessage -> {
+                return ItemViewType.SENT_MESSAGE
+            }
+            else -> {
+                return ItemViewType.UNDELIVERED_MESSAGE
+            }
+        }    }
 
     inner class ReceivedMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
-        private val text = itemView.findViewById(R.id.name) as TextView
-        private val date = itemView.findViewById(R.id.sentMessageDate) as TextView
-        private val avatar = itemView.findViewById(R.id.avatarReceivedRequest) as ImageView
-        private val blockButton = itemView.findViewById(R.id.blockButton) as ImageButton
-        private val acceptButton = itemView.findViewById(R.id.acceptButton) as ImageButton
+        private val text = itemView.findViewById(R.id.receivedMessageText) as TextView
+        private val date = itemView.findViewById(R.id.receivedMessageDate) as TextView
 
         override fun bind(item: Message) {
             val i = item as ReceivedMessage
@@ -83,13 +86,13 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
             }
 
-            blockButton.setOnClickListener {blockCallback(i)}
+            //blockButton.setOnClickListener {blockCallback(i)}
 
-            acceptButton.setOnClickListener {acceptCallback(i)}
+            //acceptButton.setOnClickListener {acceptCallback(i)}
         }
     }
 
-    inner class SentMessageolder(itemView: View) : BaseViewHolder(itemView) {
+    inner class SentMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
         private val text = itemView.findViewById(R.id.sentMessageDate) as TextView
         private val date = itemView.findViewById(R.id.sentMessageText) as TextView
@@ -104,7 +107,7 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
         }
     }
 
-    inner class UnreceivedMessageolder(itemView: View) : BaseViewHolder(itemView) {
+    inner class UnreceivedMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
         private val text = itemView.findViewById(R.id.unreceivedMessageText) as TextView
 

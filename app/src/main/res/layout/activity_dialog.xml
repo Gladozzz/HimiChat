@@ -24,30 +24,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
-    <ImageButton
-            android:layout_width="140dp"
-            android:layout_height="80dp" app:srcCompat="@drawable/friends"
-            android:id="@+id/friendsButton" android:padding="0dp"
-            android:scaleType="centerInside" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/dialoguesButton" android:backgroundTint="@color/colorPrimaryDark"/>
-    <ImageButton
-            android:layout_width="140dp"
-            android:layout_height="80dp" app:srcCompat="@drawable/dialogues"
-            android:id="@+id/dialoguesButton"
-            android:padding="0dp" android:scaleType="centerInside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
-            android:backgroundTint="@color/colorPrimaryDark"/>
-    <ImageButton
-            android:layout_width="140dp"
-            android:layout_height="80dp" app:srcCompat="@drawable/settings"
-            android:id="@+id/settingsButton"
-            android:scaleType="centerInside" android:padding="0dp"
-            app:layout_constraintStart_toEndOf="@+id/dialoguesButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" android:backgroundTint="@color/colorPrimaryDark"/>
-
     <EditText
             android:id="@+id/messageInput"
             android:layout_width="0dp"
@@ -61,6 +37,44 @@
             app:layout_constraintBottom_toTopOf="@+id/friendsButton"
             app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
             app:layout_constraintStart_toStartOf="parent" />
+    <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/dialoguesButton"
+            app:srcCompat="@drawable/settings" />
+
+    <ImageButton
+            android:id="@+id/dialoguesButton"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/settingsButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/friendsButton"
+            app:srcCompat="@drawable/dialogues" />
+
+    <ImageButton
+            android:id="@+id/friendsButton"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/dialoguesButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/friends" />
 
     <ImageButton
             android:id="@+id/sendMessageButton"

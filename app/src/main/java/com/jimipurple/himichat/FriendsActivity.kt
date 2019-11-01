@@ -83,7 +83,7 @@ class FriendsActivity : BaseActivity() {
                                 val unfound = result1["unfound"] as ArrayList<String>
                                 Log.i("FriendList", "users $users")
                                 Log.i("FriendList", "unfound $unfound")
-                                val adapter = FriendsListAdapter(hashMapToUser(users), object : FriendsListAdapter.Callback {
+                                val adapter = FriendsListAdapter(this, hashMapToUser(users), object : FriendsListAdapter.Callback {
                                     override fun onItemClicked(item: User) {
                                         profile(item)
                                     }

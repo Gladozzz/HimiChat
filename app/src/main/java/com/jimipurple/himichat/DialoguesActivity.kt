@@ -28,12 +28,8 @@ class DialoguesActivity : BaseActivity() {
         mAuth = FirebaseAuth.getInstance()
         val currentTime = Calendar.getInstance().time
 
-        val temp = ArrayList<Message>()
-        temp.add(ReceivedMessage("senderIDIDIDIDIDIDIDIDID", "receiverIDIDIDIDIDIDID", "texttext", Date(), null, null))
-        temp.add(ReceivedMessage("111111111", "222222222", "33333333333", Date(), null, null))
-        temp.add(ReceivedMessage("aaaaaaaaa", "bbbbbbbbb", "cccccccccccc", Date(), null, null))
-        db.pushMessages(temp)
-        val msgs = db.getMessages(mAuth!!.uid!!)
+        val allMsgs = db.getMessages(mAuth!!.uid!!)!!
+        val msgs = ArrayList<Message>()
         val undeliveredMsgs = db.getUndeliveredMessages(mAuth!!.uid!!)
         Log.i("msgs", msgs.toString())
         Log.i("unmsgs", undeliveredMsgs.toString())

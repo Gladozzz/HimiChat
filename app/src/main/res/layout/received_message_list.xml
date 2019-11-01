@@ -16,7 +16,7 @@
             android:orientation="vertical">
 
         <TextView
-                android:id="@+id/sentMessageDate"
+                android:id="@+id/receivedMessageDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -25,9 +25,9 @@
                 android:text="da:te" />
 
         <TextView
-                android:id="@+id/sentMessageText"
+                android:id="@+id/receivedMessageText"
                 android:layout_width="match_parent"
-                android:layout_height="65dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="70dp"
                 android:text=""

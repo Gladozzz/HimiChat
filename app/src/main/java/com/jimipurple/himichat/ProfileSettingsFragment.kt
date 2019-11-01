@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -16,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
+import com.jimipurple.himichat.utills.loadBitmap
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.regex.Pattern
@@ -58,17 +60,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
                 renameRealnameButton.setOnClickListener { loadUserData() }
                 logoutButton.setOnClickListener { logoutCallback() }
                 loadAvatarButton.setOnClickListener { loadAvatarCallback() }
-                Picasso.get().load(result["avatar"] as String).into(object : com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        avatarView.setImageBitmap(bitmap)
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("avatar", "Загрузка изображения не удалась " + result["avatar"] as String + "\n" + e?.message)
-                    }
-                })
+                avatarView.setImageBitmap(loadBitmap(context!!, Uri.parse(result["avatar"] as String)))
             }
     }
 
