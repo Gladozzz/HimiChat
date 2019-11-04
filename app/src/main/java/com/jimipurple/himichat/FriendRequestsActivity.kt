@@ -104,7 +104,7 @@ class FriendRequestsActivity : BaseActivity() {
     private fun receivedButtonOnClick() {
         val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
-        val adapter = FriendRequestsListAdapter(hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+        val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
             override fun onItemClicked(item: FriendRequest) {
                 profile(item)
             }
@@ -133,7 +133,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["unfound"] as ArrayList<String>
                                     Log.i("received_inv", "users $users")
                                     Log.i("received_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }
@@ -156,7 +156,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["found"] as ArrayList<String>
                                     Log.i("received_inv", "users $users")
                                     Log.i("received_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }
@@ -172,7 +172,7 @@ class FriendRequestsActivity : BaseActivity() {
     private fun sentButtonOnClick() {
         val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
-        val adapter = FriendRequestsListAdapter(hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+        val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
             override fun onItemClicked(item: FriendRequest) {
                 profile(item)
             }
@@ -201,7 +201,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["unfound"] as ArrayList<String>
                                     Log.i("sent_inv", "users $users")
                                     Log.i("sent_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }
@@ -224,7 +224,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["found"] as ArrayList<String>
                                     Log.i("sent_inv", "users $users")
                                     Log.i("sent_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }

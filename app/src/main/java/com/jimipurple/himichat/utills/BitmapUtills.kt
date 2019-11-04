@@ -3,18 +3,11 @@ package com.jimipurple.himichat.utills
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.util.Log
 import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import com.squareup.picasso.Picasso
 import android.graphics.Bitmap.CompressFormat
 import android.net.Uri
-import android.widget.ImageView
 import com.jimipurple.himichat.db.BitmapsDBHelper
 import java.lang.Exception
 import kotlin.concurrent.thread
@@ -41,24 +34,4 @@ fun getBytes(bitmap: Bitmap): ByteArray {
 // convert from byte array to bitmap
 fun getImage(image: ByteArray): Bitmap {
     return BitmapFactory.decodeByteArray(image, 0, image.size)
-}
-
-fun loadBitmap(context: Context, urlToImage: Uri): Bitmap? {
-    try {
-        return BitmapsDBHelper(context).getBitmapFromDBorFromUri(urlToImage)
-    } catch (e: Exception) {
-        Log.i("bitmap", e.message)
-        return null
-    }
-}
-
-fun loadBitmapToImageView(context: Context, urlToImage: Uri, setBitmap: (b: Bitmap) -> Unit) {
-    thread() {
-        try {
-            val bitmap = BitmapsDBHelper(context).getBitmapFromDBorFromUri(urlToImage)
-            setBitmap(bitmap!!)
-        } catch (e: Exception) {
-            Log.i("bitmap load error", e.message)
-        }
-    }
 }

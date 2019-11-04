@@ -12,13 +12,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.tasks.Task
 import com.jimipurple.himichat.R
-import com.jimipurple.himichat.db.BitmapsDBHelper
 import com.squareup.picasso.Picasso
 import com.jimipurple.himichat.models.*
-import com.jimipurple.himichat.utills.*
-import com.jimipurple.himichat.utills.loadBitmap
+import com.squareup.picasso.LruCache
 import java.lang.Exception
 
 
@@ -51,25 +48,28 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val c
             Log.i("Recycler", "item $item")
 
             if (item.avatar.isNotEmpty()) {
-//                Picasso.get().load(item.avatar).into(object : com.squareup.picasso.Target {
-//                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-//                        avatar.setImageBitmap(bitmap)
-//                    }
-//
-//                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-//
-//                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-//                        Log.i("FriendListAdapter", "Загрузка изображения не удалась " + item.avatar + "\n" + e?.message)
-//                    }
-//                })
                 val url = Uri.parse(item.avatar)
-                val bitmap = loadBitmap(context, url)
-                if (bitmap != null) {
-                    avatar.setImageBitmap(bitmap)
-                } else {
-                    Log.i("FriendsAdapter", "bitmap wasn't received")
-                }
+                if (url != null) {
+                    val bitmap = LruCache(context)[item.avatar]
+                    if (bitmap != null) {
+                        avatar.setImageBitmap(bitmap)
+                    } else {
+                        Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                avatar.setImageBitmap(bitmap)
+                                LruCache(context).set(url.toString(), bitmap!!)
+                            }
 
+                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
+                            }
+                        })
+                    }
+                } else {
+                    Log.i("FriendListAdapter", "avatar wasn't received")
+                }
             }
 
             itemView.setOnClickListener {

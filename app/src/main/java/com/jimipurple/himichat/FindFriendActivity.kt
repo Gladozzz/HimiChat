@@ -2,6 +2,7 @@ package com.jimipurple.himichat
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.utills.loadBitmap
 import com.jimipurple.himichat.utills.loadBitmapToImageView
+import com.squareup.picasso.LruCache
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_find_friend.*
 import kotlinx.android.synthetic.main.activity_find_friend.nicknameEdit
 import kotlinx.android.synthetic.main.activity_find_friend.realNameEdit
@@ -104,12 +107,24 @@ class FindFriendActivity : BaseActivity() {
                                                 null
                                             }
                                             if (avatar != null) {
-                                                //val bitmap = loadBitmap(this, Uri.parse(avatar))
-                                                //avatarView.setImageBitmap(bitmap)
-                                                val setBitmap = {b: Bitmap -> Unit
-                                                    avatarView.setImageBitmap(b)
+                                                val bitmap = LruCache(this)[avatar]
+                                                if (bitmap != null) {
+                                                    avatarView.setImageBitmap(bitmap)
+                                                } else {
+                                                    Picasso.get().load(avatar).into(object : com.squareup.picasso.Target {
+                                                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                                            avatarView.setImageBitmap(bitmap)
+                                                        }
+
+                                                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                                                        override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
+                                                            Log.i("FriendListAdapter", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
+                                                        }
+                                                    })
                                                 }
-                                                loadBitmapToImageView(this, Uri.parse(avatar), setBitmap)
+                                            } else {
+                                                Log.i("findUser", "avatar wasn't received")
                                             }
                                             var rn = ""
                                             try {

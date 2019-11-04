@@ -1,9 +1,11 @@
 package com.jimipurple.himichat.adapters
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.AsyncTask
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,9 +16,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.Dialog
+import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
+import java.lang.Exception
 
-class DialoguesListAdapter(var items: ArrayList<Dialog>, val clickCallback: Callback, val onHoldCallback: (d: Dialog)-> Unit) : RecyclerView.Adapter<DialoguesListAdapter.DialogHolder>() {
+class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, val clickCallback: Callback, val onHoldCallback: (d: Dialog)-> Unit) : RecyclerView.Adapter<DialoguesListAdapter.DialogHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DialogHolder {
         val view = LayoutInflater.from(parent.context)
@@ -44,17 +48,28 @@ class DialoguesListAdapter(var items: ArrayList<Dialog>, val clickCallback: Call
             Log.i("Recycler", "item $item")
 
             if (item.avatar.isNotEmpty()) {
-                Picasso.get().load(item.avatar).into(object : com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                val url = Uri.parse(item.avatar)
+                if (url != null) {
+                    val bitmap = LruCache(context)[item.avatar]
+                    if (bitmap != null) {
                         avatar.setImageBitmap(bitmap)
-                    }
+                    } else {
+                        Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                avatar.setImageBitmap(bitmap)
+                                LruCache(context).set(url.toString(), bitmap!!)
+                            }
 
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("FriendListAdapter", "Загрузка изображения не удалась " + item.avatar + "\n" + e?.message)
+                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
+                            }
+                        })
                     }
-                })
+                } else {
+                    Log.i("FriendListAdapter", "avatar wasn't received")
+                }
             }
 
             itemView.setOnClickListener {

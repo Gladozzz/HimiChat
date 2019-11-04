@@ -1,27 +1,18 @@
 package com.jimipurple.himichat
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.jimipurple.himichat.BaseActivity
-import com.jimipurple.himichat.R
-import com.jimipurple.himichat.adapters.FriendRequestsListAdapter
 import com.jimipurple.himichat.adapters.FriendsListAdapter
-import com.jimipurple.himichat.models.FriendRequest
 import com.jimipurple.himichat.models.*
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_friend_requests.*
 import kotlinx.android.synthetic.main.activity_friends.*
 import kotlinx.android.synthetic.main.activity_friends.dialoguesButton
 import kotlinx.android.synthetic.main.activity_friends.friendsButton
 import kotlinx.android.synthetic.main.activity_friends.settingsButton
-import kotlinx.android.synthetic.main.activity_settings.*
 
 class FriendsActivity : BaseActivity() {
 
