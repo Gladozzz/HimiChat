@@ -17,8 +17,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
-import com.jimipurple.himichat.utills.loadBitmap
-import com.jimipurple.himichat.utills.loadBitmapToImageView
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
@@ -48,6 +46,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
+        loadAvatarButton.setOnClickListener { loadAvatarCallback() }
 
         val data = mapOf("id" to mAuth!!.uid!!)
         functions

@@ -98,9 +98,25 @@ class SettingsActivity : BaseActivity() {
         val i = Intent(applicationContext, SettingsActivity::class.java)
         startActivity(i)
     }
+	
+	private fun setupPermissions() {
+        val permission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+ 
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            Log.i("SettingsActivity", "Permission to read storage denied")
+            makeRequest()
+        }
+    }
+ 
+    private fun makeRequest() {
+        ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
+    }
 
     private fun loadAvatarButtonOnClick() {
-        if (ContextCompat.checkSelfPermission(
+        /*if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
@@ -138,14 +154,15 @@ class SettingsActivity : BaseActivity() {
                     android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI
                 ), GET_FROM_GALLERY
             )
-        }
+        }*/
         val i = Intent(
             Intent.ACTION_PICK,
             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         )
 
         startActivityForResult(i, RESULT_LOAD_IMAGE)
-
+		
+		setupPermissions()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -268,7 +285,7 @@ class SettingsActivity : BaseActivity() {
                     )
 
                 } else {
-
+					Log.i("SettingsActivity", " no permission to load avatar from storage")
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }

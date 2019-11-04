@@ -16,7 +16,6 @@ import com.google.android.gms.tasks.Task
 import com.jimipurple.himichat.R
 import com.squareup.picasso.Picasso
 import com.jimipurple.himichat.models.*
-import com.jimipurple.himichat.utills.loadBitmap
 import com.squareup.picasso.LruCache
 import java.lang.Exception
 
