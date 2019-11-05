@@ -26,10 +26,7 @@ import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.jimipurple.himichat.adapters.SettingsPageAdapter
-import com.jimipurple.himichat.models.*
 import java.io.File
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import kotlinx.android.synthetic.main.profile_settings_fragment.*
 
 
 class SettingsActivity : BaseActivity() {
@@ -63,11 +60,9 @@ class SettingsActivity : BaseActivity() {
         viewpager_main.adapter = fragmentAdapter
         SettingsTabs.setupWithViewPager(viewpager_main)
 
-        //logoutButton.setOnClickListener { logoutButtonOnClick() }
         friendsButton.setOnClickListener { friendsButtonOnClick() }
         dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
         settingsButton.setOnClickListener { settingsButtonOnClick() }
-        //loadAvatarButton.setOnClickListener { loadAvatarButtonOnClick() }
     }
 
     private fun logoutButtonOnClick() {
@@ -116,45 +111,6 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun loadAvatarButtonOnClick() {
-        /*if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
-            ) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
-                )
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        } else {
-            startActivityForResult(
-                Intent(
-                    Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI
-                ), GET_FROM_GALLERY
-            )
-        }*/
         val i = Intent(
             Intent.ACTION_PICK,
             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI

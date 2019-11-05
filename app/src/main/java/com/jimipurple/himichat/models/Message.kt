@@ -14,7 +14,7 @@ abstract class Message(rId: String, txt: String) {
     }
 }
 
-class ReceivedMessage(sId: String?, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(rId, txt) {
+class ReceivedMessage(sId: String, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(rId, txt) {
     var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
