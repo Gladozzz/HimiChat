@@ -45,14 +45,14 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("messaging", sender_id)
                     Log.i("messaging", receiver_id)
                     //val db = MessagesDBHelper(applicationContext)
-                    val msg = ReceivedMessage(sender_id, receiver_id, text, Date(), null, null)
+                    val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
                     db.pushMessage(mAuth.uid!!, msg)
                 } else {
                     val unmsg : UndeliveredMessage? = db.getUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
                     Log.i("messaging", "delivered_id ${remoteMessage.data["delivered_id"]!!}")
                     Log.i("messaging", unmsg.toString())
                     if (unmsg != null) {
-                        val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Date(), null, null)
+                        val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Calendar.getInstance().time, null, null)
                         db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
                         db.pushMessage(mAuth.uid!!, msg)
                         Log.i("messaging", msg.toString())

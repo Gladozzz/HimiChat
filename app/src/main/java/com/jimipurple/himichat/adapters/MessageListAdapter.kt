@@ -8,9 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.*
-
-
-
+import java.text.SimpleDateFormat
 
 
 class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callback, val deleteCallback: (msg: Message)-> Unit, val editCallback: (msg: Message)-> Unit, val onHoldCallback: (msg: Message)->Unit) : RecyclerView.Adapter<MessageListAdapter.BaseViewHolder>() {
@@ -63,8 +61,11 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
         override fun bind(item: Message) {
             val i = item as ReceivedMessage
             text.text = item.text
-            val dateStr = i.date!!.hours.toString() + "." + i.date!!.minutes.toString() + "." + i.date!!.day.toString() + "." + i.date!!.month.toString() + "." + (i.date!!.year + 1900).toString()
-            date.text = dateStr
+            //val dateStr = i.date!!.hours.toString() + "." + i.date!!.minutes.toString() + "." + i.date!!.day.toString() + "." + i.date!!.month.toString() + "." + (i.date!!.year + 1900).toString()
+            val d = i.date!!.time
+            val df = SimpleDateFormat("dd-MMM-yyyy")
+            val formattedDate = df.format(d)
+            date.text = formattedDate
             Log.i("Recycler", "all must be ok")
             Log.i("Recycler", "item $i")
 
@@ -98,8 +99,12 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
         private val date = itemView.findViewById(R.id.sentMessageText) as TextView
 
         override fun bind(item: Message) {
-            text.text = item.text
-            date.text = item.text
+            val i = item as SentMessage
+            text.text = i.text
+            val d = i.date!!.time
+            val df = SimpleDateFormat("dd-MMM-yyyy")
+            val formattedDate = df.format(d)
+            date.text = formattedDate
 
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])

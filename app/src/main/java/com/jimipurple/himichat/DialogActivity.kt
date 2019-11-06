@@ -47,26 +47,28 @@ class DialogActivity : BaseActivity() {
                     Log.i("Dialog:getUser", "result wasn't received")
                 }
             }
-        val allMsgs = db!!.getMessages(mAuth!!.uid!!)!!
+        val allMsgs = db!!.getMessages(mAuth!!.uid!!)
         val msgs = ArrayList<Message>()
-        val unmsgs = db!!.getUndeliveredMessages(mAuth!!.uid!!)!! as ArrayList<Message>
+        val unmsgs = db!!.getUndeliveredMessages(mAuth!!.uid!!) as ArrayList<Message>
         Log.i("DialogMessaging", allMsgs.toString())
         Log.i("DialogMessaging", msgs.toString())
         Log.i("DialogMessaging", unmsgs.toString())
-        for (msg in allMsgs) {
-            when (msg) {
-                is ReceivedMessage -> {
-                    if ((msg as ReceivedMessage).receiverId == friend_id!! || (msg as ReceivedMessage).senderId == id) {
-                        msgs.add(msg)
+        if (allMsgs != null) {
+            for (msg in allMsgs) {
+                when (msg) {
+                    is ReceivedMessage -> {
+                        if ((msg as ReceivedMessage).receiverId == friend_id!! || (msg as ReceivedMessage).senderId == id) {
+                            msgs.add(msg)
+                        }
+                    }
+                    is SentMessage -> {
+                        if ((msg as SentMessage).senderId == friend_id!! || (msg as SentMessage).receiverId == id) {
+                            msgs.add(msg)
+                        }
                     }
                 }
-                is SentMessage -> {
-                    if ((msg as SentMessage).senderId == friend_id!! || (msg as SentMessage).receiverId == id) {
-                        msgs.add(msg)
-                    }
-                }
+                msgs.add(msg)
             }
-            msgs.add(msg)
         }
         msgs.addAll(unmsgs)
 

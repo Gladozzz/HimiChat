@@ -76,12 +76,12 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
                             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + avatarView + "\n" + e?.message)
+                                Log.i("Profile", "Загрузка изображения не удалась " + avatarView + "\n" + e?.message)
                             }
                         })
                     }
                 } else {
-                    Log.i("FriendListAdapter", "avatar wasn't received")
+                    Log.i("Profile", "avatar wasn't received")
                 }
             }
     }

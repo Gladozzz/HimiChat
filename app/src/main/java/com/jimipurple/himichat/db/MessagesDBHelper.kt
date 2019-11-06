@@ -38,7 +38,7 @@ private const val SQL_CREATE_TABLE_MESSAGES =
             "${TableMessages.COLUMN_NAME_SENDER_ID} TEXT," +
             "${TableMessages.COLUMN_NAME_RECEIVER_ID} TEXT," +
             "${TableMessages.COLUMN_NAME_TEXT} TEXT," +
-            "${TableMessages.COLUMN_NAME_DATE} TEXT," +
+            "${TableMessages.COLUMN_NAME_DATE} INTEGER," +
             "${TableMessages.COLUMN_NAME_PUBLIC_KEY} TEXT)"
 
 private const val SQL_CREATE_TABLE_UNDELIVERED_MESSAGES =
@@ -86,7 +86,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         // Filter results WHERE "user_id" = 'uid'
         val selection = "${TableMessages.COLUMN_NAME_USER_ID} = ?"
         val selectionArgs = arrayOf(uid)
-        val sortOrder = "${BaseColumns._ID} DESC"
+        val sortOrder = "${BaseColumns._ID}"
         val cursor = db.query(
             TableMessages.TABLE_NAME,   // The table to query
             projection,             // The array of columns to return (pass null to get all)
@@ -110,18 +110,14 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                 val senderId = cursor.getString(senderIdColumn)
                 val receiverId = cursor.getString(receiverIdColumn)
                 val text = cursor.getString(textColumn)
-                val date = cursor.getString(dateColumn)
-                val dateSplit = date.split(".")
-                val hours = dateSplit[0].toInt()
-                val minutes = dateSplit[1].toInt()
-                val day = dateSplit[2].toInt()
-                val month = dateSplit[3].toInt()
-                val year = dateSplit[4].toInt()
+                val dateLong = cursor.getLong(dateColumn)
+                val date = Date()
+                date.time = dateLong
                 if (senderId == mAuth!!.uid!!){
-                    val msg = SentMessage(senderId, receiverId, text, Date(year, month, day, hours, minutes),null, null)
+                    val msg = SentMessage(senderId, receiverId, text, date,null, null)
                     msgs.add(msg)
                 } else if (receiverId == mAuth!!.uid!!) {
-                    val msg = ReceivedMessage(senderId, receiverId, text, Date(year, month, day, hours, minutes),null, null)
+                    val msg = ReceivedMessage(senderId, receiverId, text, date,null, null)
                     msgs.add(msg)
                 }
             } while (cursor.moveToNext())
@@ -142,7 +138,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         // Filter results WHERE "user_id" = 'uid'
         val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
         val selectionArgs = arrayOf(uid)
-        val sortOrder = "${BaseColumns._ID} DESC"
+        val sortOrder = "${BaseColumns._ID}"
         val cursor = db.query(
             TableUndeliveredMessages.TABLE_NAME,   // The table to query
             projection,             // The array of columns to return (pass null to get all)
@@ -184,7 +180,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         // Filter results WHERE "user_id" = 'uid'
         val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
         val selectionArgs = arrayOf(deliveredId)
-        val sortOrder = "${BaseColumns._ID} DESC"
+        val sortOrder = "${BaseColumns._ID}"
         val cursor = db.query(
             TableUndeliveredMessages.TABLE_NAME,   // The table to query
             projection,             // The array of columns to return (pass null to get all)
@@ -261,8 +257,8 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
         cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
         cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
-        val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
-        cv.put("date", date)
+       // val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
+        cv.put(TableMessages.COLUMN_NAME_DATE, msg.date!!.time)
         db!!.insert(TableMessages.TABLE_NAME, null, cv)
         db.close()
     }
@@ -275,8 +271,9 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
         cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
         cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
-        val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
-        cv.put("date", date)
+        val dateLong = msg.date!!.time
+        cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
+        cv.put(TableMessages.COLUMN_NAME_DATE, dateLong)
         db!!.insert(TableMessages.TABLE_NAME, null, cv)
         db.close()
     }
@@ -287,26 +284,24 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             when (msg) {
                 is ReceivedMessage -> {
                     val cv = ContentValues()
-                    val tempMsg = msg as ReceivedMessage
                     cv.put(TableMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
                     cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
                     cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
                     cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
                     cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
-                    val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
-                    cv.put("date", date)
+                    // val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
+                    cv.put(TableMessages.COLUMN_NAME_DATE, msg.date!!.time)
                     db!!.insert(TableMessages.TABLE_NAME, null, cv)
                 }
                 is SentMessage -> {
                     val cv = ContentValues()
-                    val tempMsg = msg as SentMessage
                     cv.put(TableMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
                     cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
                     cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
                     cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
                     cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
-                    val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
-                    cv.put("date", date)
+                    val dateLong = msg.date!!.time
+                    cv.put("date", dateLong)
                     db!!.insert(TableMessages.TABLE_NAME, null, cv)
                 }
                 is UndeliveredMessage -> {
@@ -344,7 +339,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
     }
     companion object {
         // If you change the database schema, you must increment the database version.
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
         const val DATABASE_NAME = "messages.db"
     }
 }

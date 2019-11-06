@@ -12,7 +12,10 @@ import com.jimipurple.himichat.models.*
 import kotlinx.android.synthetic.main.activity_dialogues.*
 import java.util.*
 import kotlin.collections.ArrayList
-
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import java.text.SimpleDateFormat
 
 
 class DialoguesActivity : BaseActivity() {
@@ -130,6 +133,13 @@ class DialoguesActivity : BaseActivity() {
                     }, onHoldCallback)
                 }
             }
+
+        val c = Calendar.getInstance().time
+        Log.i("dateTEST","Current time => $c")
+
+        val df = SimpleDateFormat("dd-MMM-yyyy")
+        val formattedDate = df.format(c)
+        Log.i("dateTEST","Current time => $formattedDate")
 
         friendsButton.setOnClickListener { friendsButtonOnClick() }
         dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
