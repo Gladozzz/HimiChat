@@ -44,6 +44,7 @@ class DialoguesActivity : BaseActivity() {
         Log.i("unmsgs", undeliveredMsgs.toString())
 
         if (msgs != null && msgs.isNotEmpty()) {
+            msgs.reverse()
             for (msg in msgs) {
                 when (msg) {
                     is UndeliveredMessage -> {

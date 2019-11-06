@@ -1,6 +1,9 @@
 package com.jimipurple.himichat
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -32,6 +35,23 @@ class DialogActivity : BaseActivity() {
         friend_id = intent.getStringExtra("friend_id")
         id = mAuth!!.uid!!
         db = MessagesDBHelper(applicationContext)
+
+        registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+
+        reloadMsgs()
+
+        sendMessageButton.setOnClickListener { onSendBtnClick() }
+        friendsButton.setOnClickListener { friendsButtonOnClick() }
+        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
+        settingsButton.setOnClickListener { settingsButtonOnClick() }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(FCMReceiver)
+    }
+
+    private fun reloadMsgs() {
         val data = mapOf("id" to mAuth!!.uid!!)
         functions
             .getHttpsCallable("getUser")
@@ -93,11 +113,6 @@ class DialogActivity : BaseActivity() {
                 Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
             }
         }, delete, edit, onHold)
-
-        sendMessageButton.setOnClickListener { onSendBtnClick() }
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
         messageList.adapter = adapter
     }
 
@@ -110,7 +125,7 @@ class DialogActivity : BaseActivity() {
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,
-            "deliveredId" to msg.deliveredId,
+            "deliveredId" to msg.deliveredId.toString(),
             "text" to text,
             "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
         )
@@ -144,5 +159,11 @@ class DialogActivity : BaseActivity() {
     private fun settingsButtonOnClick() {
         val i = Intent(applicationContext, SettingsActivity::class.java)
         startActivity(i)
+    }
+
+    val FCMReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            reloadMsgs()
+        }
     }
 }

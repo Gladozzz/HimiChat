@@ -95,8 +95,8 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
 
     inner class SentMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
-        private val text = itemView.findViewById(R.id.sentMessageDate) as TextView
-        private val date = itemView.findViewById(R.id.sentMessageText) as TextView
+        private val text = itemView.findViewById(R.id.sentMessageText) as TextView
+        private val date = itemView.findViewById(R.id.sentMessageDate) as TextView
 
         override fun bind(item: Message) {
             val i = item as SentMessage
