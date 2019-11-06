@@ -46,7 +46,7 @@ private const val SQL_CREATE_TABLE_UNDELIVERED_MESSAGES =
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} ID," +
             "${TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID} TEXT," +
-            "${TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID} TEXT," +
+            "${TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID} INTEGER," +
             "${TableUndeliveredMessages.COLUMN_NAME_TEXT} TEXT)"
 
 private const val SQL_DELETE_TABLE_MESSAGES = "DROP TABLE IF EXISTS ${TableMessages.TABLE_NAME}"
@@ -159,7 +159,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                 val id = cursor.getInt(idColumn)
                 val userId = cursor.getString(userIdColumn)
                 val receiverId = cursor.getString(receiverIdColumn)
-                val deliveredId = cursor.getString(deliveredIdColumn)
+                val deliveredId = cursor.getLong(deliveredIdColumn)
                 val text = cursor.getString(textColumn)
                 val msg = UndeliveredMessage(receiverId, text, deliveredId)
                 msgs.add(msg)
@@ -201,7 +201,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             val id = cursor.getInt(idColumn)
             val userId = cursor.getString(userIdColumn)
             val receiverId = cursor.getString(receiverIdColumn)
-            val dId = cursor.getString(deliveredIdColumn)
+            val dId = cursor.getLong(deliveredIdColumn)
             val text = cursor.getString(textColumn)
             val msg = UndeliveredMessage(receiverId, text, dId)
             msgs.add(msg)
@@ -209,6 +209,16 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         }
         cursor.close()
         return null
+    }
+    fun getDeliveredId(uid: String): Long {
+        var i: Long = 0
+        val msgs = getUndeliveredMessages(uid)
+        if (msgs != null) {
+            for (msg in msgs) {
+                i = msg.deliveredId + 1
+            }
+        }
+        return i
     }
     fun getMessagesOfDialog(dialogId: String): ArrayList<Message> {
         //TODO получение всех сообщений диалога из бд

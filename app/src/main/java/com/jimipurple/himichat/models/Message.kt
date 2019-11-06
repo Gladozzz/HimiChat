@@ -82,10 +82,10 @@ class SentMessage(sId: String?, rId: String, txt: String, date: Date?, encrypted
     }
 }
 
-class UndeliveredMessage(rId: String, txt: String, dId: String) : Message(rId, txt) {
+class UndeliveredMessage(rId: String, txt: String, dId: Long) : Message(rId, txt) {
     //var receiverId = rId
     //var text : String = txt
-    var deliveredId: String = dId
+    var deliveredId: Long = dId
 
     override fun toString(): String {
         //return super.toString()

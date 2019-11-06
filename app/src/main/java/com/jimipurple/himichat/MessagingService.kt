@@ -39,25 +39,24 @@ class MessagingService : FirebaseMessagingService() {
                     val sender_id = remoteMessage.data["sender_id"]!!.toString()
                     val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
 
-                    Log.i("messaging", remoteMessage.data.toString())
-                    Log.i("messaging", remoteMessage.data.toString())
-                    Log.i("messaging", text)
-                    Log.i("messaging", sender_id)
-                    Log.i("messaging", receiver_id)
+                    Log.i("msgService", "data ${remoteMessage.data}")
+                    Log.i("msgService", "text $text")
+                    Log.i("msgService", "sender_id $sender_id")
+                    Log.i("msgService", "receiver_id $receiver_id")
                     //val db = MessagesDBHelper(applicationContext)
                     val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
                     db.pushMessage(mAuth.uid!!, msg)
                 } else {
                     val unmsg : UndeliveredMessage? = db.getUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
-                    Log.i("messaging", "delivered_id ${remoteMessage.data["delivered_id"]!!}")
-                    Log.i("messaging", unmsg.toString())
+                    Log.i("msgService", "delivered_id ${remoteMessage.data["delivered_id"]!!}")
+                    Log.i("msgService", unmsg.toString())
                     if (unmsg != null) {
                         val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Calendar.getInstance().time, null, null)
                         db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
                         db.pushMessage(mAuth.uid!!, msg)
-                        Log.i("messaging", msg.toString())
+                        Log.i("msgService", msg.toString())
                     } else {
-                        Log.i("messaging", "undelivered message wasn't found")
+                        Log.i("msgService", "undelivered message wasn't found")
                     }
                 }
 

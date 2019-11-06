@@ -49,7 +49,7 @@ class DialogActivity : BaseActivity() {
             }
         val allMsgs = db!!.getMessages(mAuth!!.uid!!)
         val msgs = ArrayList<Message>()
-        val unmsgs = db!!.getUndeliveredMessages(mAuth!!.uid!!) as ArrayList<Message>
+        val unmsgs = db!!.getUndeliveredMessages(mAuth!!.uid!!)
         Log.i("DialogMessaging", allMsgs.toString())
         Log.i("DialogMessaging", msgs.toString())
         Log.i("DialogMessaging", unmsgs.toString())
@@ -70,7 +70,9 @@ class DialogActivity : BaseActivity() {
                 msgs.add(msg)
             }
         }
-        msgs.addAll(unmsgs)
+        if (unmsgs != null) {
+            msgs.addAll(unmsgs as ArrayList<Message>)
+        }
 
 
 
@@ -103,17 +105,12 @@ class DialogActivity : BaseActivity() {
         val text = messageInput.text.toString()
         val receiverId = friend_id
         val senderId = mAuth!!.uid!!
-        val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-        val randomString = (1..8)
-            .map { i -> kotlin.random.Random.nextInt(0, charPool.size) }
-            .map(charPool::get)
-            .joinToString("")
-        val msg = UndeliveredMessage(receiverId!!, text, randomString)
+        val msg = UndeliveredMessage(receiverId!!, text, db!!.getDeliveredId(mAuth!!.uid!!))
         db!!.pushMessage(mAuth!!.uid!!, msg)
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,
-            "deliveredId" to randomString,
+            "deliveredId" to msg.deliveredId,
             "text" to text,
             "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
         )
