@@ -33,7 +33,7 @@ class MessagingService : FirebaseMessagingService() {
             //TODO Сделать обработку сообщений
 
             if (/* Check if data needs to be processed by long running job */ true) {
-                // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
+                // For long-running tasks (10 seconds or more) use Firebase Job Dispastcher.
                 if (remoteMessage.data.containsKey("text")){
                     val text = remoteMessage.data["text"]!!.toString()
                     val sender_id = remoteMessage.data["sender_id"]!!.toString()
@@ -45,10 +45,10 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("msgService", "receiver_id $receiver_id")
                     //val db = MessagesDBHelper(applicationContext)
                     val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
-                    db.pushMessage(mAuth.uid!!, msg)
+                    db.pushMessage(msg)
                     callbackOnMessageReceived()
                 } else {
-                    val unmsgs = db.getUndeliveredMessages(mAuth!!.uid!!)
+                    val unmsgs = db.getUndeliveredMessages()
                     var unmsg : UndeliveredMessage? = null
                     if (unmsgs != null) {
                         for (i in unmsgs) {
@@ -62,7 +62,7 @@ class MessagingService : FirebaseMessagingService() {
                     if (unmsg != null) {
                         val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Calendar.getInstance().time, null, null)
                         db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
-                        db.pushMessage(mAuth.uid!!, msg)
+                        db.pushMessage(msg)
                         Log.i("msgService", msg.toString())
                         callbackOnMessageReceived()
                     } else {

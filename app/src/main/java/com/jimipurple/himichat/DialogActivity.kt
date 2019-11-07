@@ -67,34 +67,37 @@ class DialogActivity : BaseActivity() {
                     Log.i("Dialog:getUser", "result wasn't received")
                 }
             }
-        val allMsgs = db!!.getMessages(mAuth!!.uid!!)
+        val allMsgs = db!!.getMessages()
         val msgs = ArrayList<Message>()
-        val unmsgs = db!!.getUndeliveredMessages(mAuth!!.uid!!)
-        Log.i("DialogMessaging", allMsgs.toString())
-        Log.i("DialogMessaging", msgs.toString())
-        Log.i("DialogMessaging", unmsgs.toString())
+        val unmsgs = db!!.getUndeliveredMessages()
+        Log.i("DialogMessaging", "allMsgs $allMsgs")
+        Log.i("DialogMessaging", "msgs $msgs")
+        Log.i("DialogMessaging", "unmsgs $unmsgs")
         if (allMsgs != null) {
             for (msg in allMsgs) {
                 when (msg) {
                     is ReceivedMessage -> {
-                        if ((msg as ReceivedMessage).receiverId == friend_id!! || (msg as ReceivedMessage).senderId == id) {
+                        if (msg.senderId == friend_id!! && msg.receiverId == id) {
                             msgs.add(msg)
+                            Log.i("DialogMessaging", "ReceivedMessage $msg")
                         }
                     }
                     is SentMessage -> {
-                        if ((msg as SentMessage).senderId == friend_id!! || (msg as SentMessage).receiverId == id) {
+                        if (msg.senderId == id && msg.receiverId == friend_id!!) {
                             msgs.add(msg)
+                            Log.i("DialogMessaging", "SentMessage $msg")
                         }
                     }
                 }
-                msgs.add(msg)
             }
         }
         if (unmsgs != null) {
-            msgs.addAll(unmsgs as ArrayList<Message>)
+            for (msg in unmsgs as ArrayList<Message>) {
+                if ((msg as UndeliveredMessage).receiverId == friend_id!! && (msg as UndeliveredMessage).senderId == id!!) {
+                    msgs.add(msg)
+                }
+            }
         }
-
-
 
         val delete = {msg: Message -> Unit
             Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
@@ -105,9 +108,6 @@ class DialogActivity : BaseActivity() {
         val onHold = {msg: Message -> Unit
             Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
         }
-
-
-
         val adapter = MessageListAdapter(msgs, object : MessageListAdapter.Callback {
             override fun onItemClicked(item: Message) {
                 Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
@@ -120,8 +120,8 @@ class DialogActivity : BaseActivity() {
         val text = messageInput.text.toString()
         val receiverId = friend_id
         val senderId = mAuth!!.uid!!
-        val msg = UndeliveredMessage(receiverId!!, text, db!!.getDeliveredId(mAuth!!.uid!!))
-        db!!.pushMessage(mAuth!!.uid!!, msg)
+        val msg = UndeliveredMessage(senderId, receiverId!!, text, db!!.getDeliveredId())
+        db!!.pushMessage(msg)
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,

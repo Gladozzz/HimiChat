@@ -86,6 +86,19 @@ class FriendsActivity : BaseActivity() {
                 }
 
             }
+//        val docRef = firestore.collection("users").document(mAuth!!.uid!!)
+//        docRef.get()
+//            .addOnSuccessListener { document ->
+//                if (document != null) {
+//                    Log.i("FriendsActivity", "DocumentSnapshot data: ${document.data}")
+//                    document["friends"]
+//                } else {
+//                    Log.i("FriendsActivity", "No such document")
+//                }
+//            }
+//            .addOnFailureListener { exception ->
+//                Log.i("FriendsActivity", "get failed with ", exception)
+//            }
 
         friendsButton.setOnClickListener { friendsButtonOnClick() }
         dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }

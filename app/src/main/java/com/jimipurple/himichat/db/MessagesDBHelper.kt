@@ -13,7 +13,6 @@ import kotlin.collections.ArrayList
 
 object TableMessages : BaseColumns {
     const val TABLE_NAME = "messages"
-    const val COLUMN_NAME_USER_ID = "user_id"
     //const val COLUMN_NAME_DIALOG_ID = "dialog_id"
     const val COLUMN_NAME_TEXT = "text"
     const val COLUMN_NAME_DATE = "date"
@@ -24,8 +23,8 @@ object TableMessages : BaseColumns {
 
 object TableUndeliveredMessages : BaseColumns {
     const val TABLE_NAME = "undelivered_messages"
-    const val COLUMN_NAME_USER_ID = "user_id"
     const val COLUMN_NAME_TEXT = "text"
+    const val COLUMN_NAME_SENDER_ID = "sender_id"
     const val COLUMN_NAME_RECEIVER_ID = "receiver_id"
     const val COLUMN_NAME_DELIVERED_ID = "delivered_id"
 }
@@ -33,7 +32,6 @@ object TableUndeliveredMessages : BaseColumns {
 private const val SQL_CREATE_TABLE_MESSAGES =
     "CREATE TABLE ${TableMessages.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-            "${TableMessages.COLUMN_NAME_USER_ID} ID," +
             //"${TableMessages.COLUMN_NAME_DIALOG_ID} ID," +
             "${TableMessages.COLUMN_NAME_SENDER_ID} TEXT," +
             "${TableMessages.COLUMN_NAME_RECEIVER_ID} TEXT," +
@@ -44,7 +42,7 @@ private const val SQL_CREATE_TABLE_MESSAGES =
 private const val SQL_CREATE_TABLE_UNDELIVERED_MESSAGES =
     "CREATE TABLE ${TableUndeliveredMessages.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-            "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} ID," +
+            "${TableUndeliveredMessages.COLUMN_NAME_SENDER_ID} TEXT," +
             "${TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID} TEXT," +
             "${TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID} INTEGER," +
             "${TableUndeliveredMessages.COLUMN_NAME_TEXT} TEXT)"
@@ -72,11 +70,10 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         onUpgrade(db, oldVersion, newVersion)
     }
-    fun getMessages(uid: String): ArrayList<Message>? {
+    fun getMessages(): ArrayList<Message>? {
         //TODO получение всех сообщений пользователя из бд
         val db = this.readableDatabase
         val projection = arrayOf(BaseColumns._ID,
-            TableMessages.COLUMN_NAME_USER_ID,
             TableMessages.COLUMN_NAME_SENDER_ID,
             TableMessages.COLUMN_NAME_RECEIVER_ID,
             TableMessages.COLUMN_NAME_TEXT,
@@ -84,14 +81,14 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             TableMessages.COLUMN_NAME_PUBLIC_KEY
         )
         // Filter results WHERE "user_id" = 'uid'
-        val selection = "${TableMessages.COLUMN_NAME_USER_ID} = ?"
-        val selectionArgs = arrayOf(uid)
+        //val selection = "${TableMessages.COLUMN_NAME_USER_ID} = ?"
+        //val selectionArgs = arrayOf(uid)
         val sortOrder = "${BaseColumns._ID}"
         val cursor = db.query(
             TableMessages.TABLE_NAME,   // The table to query
             projection,             // The array of columns to return (pass null to get all)
-            selection,              // The columns for the WHERE clause
-            selectionArgs,          // The values for the WHERE clause
+            null,              // The columns for the WHERE clause
+            null,          // The values for the WHERE clause
             null,                   // don't group the rows
             null,                   // don't filter by row groups
             sortOrder               // The sort order
@@ -99,14 +96,12 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         if (cursor.moveToFirst()) {
             val msgs = ArrayList<Message>()
             val idColumn = cursor.getColumnIndex(BaseColumns._ID)
-            val userIdColumn = cursor.getColumnIndex(TableMessages.COLUMN_NAME_USER_ID)
             val senderIdColumn = cursor.getColumnIndex(TableMessages.COLUMN_NAME_SENDER_ID)
             val receiverIdColumn = cursor.getColumnIndex(TableMessages.COLUMN_NAME_RECEIVER_ID)
             val textColumn = cursor.getColumnIndex(TableMessages.COLUMN_NAME_TEXT)
             val dateColumn = cursor.getColumnIndex(TableMessages.COLUMN_NAME_DATE)
             do {
                 val id = cursor.getInt(idColumn)
-                val userId = cursor.getString(userIdColumn)
                 val senderId = cursor.getString(senderIdColumn)
                 val receiverId = cursor.getString(receiverIdColumn)
                 val text = cursor.getString(textColumn)
@@ -126,24 +121,24 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cursor.close()
         return null
     }
-    fun getUndeliveredMessages(uid: String): ArrayList<UndeliveredMessage>? {
+    fun getUndeliveredMessages(): ArrayList<UndeliveredMessage>? {
         //TODO получение всех сообщений пользователя из бд
         val db = this.readableDatabase
         val projection = arrayOf(BaseColumns._ID,
-            TableUndeliveredMessages.COLUMN_NAME_USER_ID,
             TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID,
+            TableUndeliveredMessages.COLUMN_NAME_SENDER_ID,
             TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID,
             TableUndeliveredMessages.COLUMN_NAME_TEXT
         )
         // Filter results WHERE "user_id" = 'uid'
-        val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
-        val selectionArgs = arrayOf(uid)
+       // val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
+        //val selectionArgs = arrayOf(uid)
         val sortOrder = "${BaseColumns._ID}"
         val cursor = db.query(
             TableUndeliveredMessages.TABLE_NAME,   // The table to query
             projection,             // The array of columns to return (pass null to get all)
-            selection,              // The columns for the WHERE clause
-            selectionArgs,          // The values for the WHERE clause
+            null,              // The columns for the WHERE clause
+            null,          // The values for the WHERE clause
             null,                   // don't group the rows
             null,                   // don't filter by row groups
             sortOrder               // The sort order
@@ -151,17 +146,17 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         if (cursor.moveToFirst()) {
             val msgs = ArrayList<UndeliveredMessage>()
             val idColumn = cursor.getColumnIndex(BaseColumns._ID)
-            val userIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_USER_ID)
             val receiverIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID)
+            val senderIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_SENDER_ID)
             val deliveredIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID)
             val textColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_TEXT)
             do {
                 val id = cursor.getInt(idColumn)
-                val userId = cursor.getString(userIdColumn)
                 val receiverId = cursor.getString(receiverIdColumn)
+                val senderId = cursor.getString(senderIdColumn)
                 val deliveredId = cursor.getLong(deliveredIdColumn)
                 val text = cursor.getString(textColumn)
-                val msg = UndeliveredMessage(receiverId, text, deliveredId)
+                val msg = UndeliveredMessage(senderId, receiverId, text, deliveredId)
                 msgs.add(msg)
             } while (cursor.moveToNext())
             return msgs
@@ -173,18 +168,17 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         //TODO получение всех сообщений пользователя из бд
         val db = this.readableDatabase
         val projection = arrayOf(BaseColumns._ID,
-            TableUndeliveredMessages.COLUMN_NAME_USER_ID,
             TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID,
             TableUndeliveredMessages.COLUMN_NAME_TEXT
         )
         // Filter results WHERE "user_id" = 'uid'
-        val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
+        //val selection = "${TableUndeliveredMessages.COLUMN_NAME_USER_ID} = ?"
         val selectionArgs = arrayOf(deliveredId)
         val sortOrder = "${BaseColumns._ID}"
         val cursor = db.query(
             TableUndeliveredMessages.TABLE_NAME,   // The table to query
             projection,             // The array of columns to return (pass null to get all)
-            selection,              // The columns for the WHERE clause
+            null,              // The columns for the WHERE clause
             selectionArgs,          // The values for the WHERE clause
             null,                   // don't group the rows
             null,                   // don't filter by row groups
@@ -193,26 +187,26 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         if (cursor.moveToFirst()) {
             val msgs = ArrayList<UndeliveredMessage>()
             val idColumn = cursor.getColumnIndex(BaseColumns._ID)
-            val userIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_USER_ID)
             val receiverIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID)
+            val senderIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_SENDER_ID)
             val deliveredIdColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID)
             val textColumn = cursor.getColumnIndex(TableUndeliveredMessages.COLUMN_NAME_TEXT)
 
             val id = cursor.getInt(idColumn)
-            val userId = cursor.getString(userIdColumn)
             val receiverId = cursor.getString(receiverIdColumn)
             val dId = cursor.getLong(deliveredIdColumn)
+            val senderId = cursor.getString(deliveredIdColumn)
             val text = cursor.getString(textColumn)
-            val msg = UndeliveredMessage(receiverId, text, dId)
+            val msg = UndeliveredMessage(senderId, receiverId, text, dId)
             msgs.add(msg)
             return msg
         }
         cursor.close()
         return null
     }
-    fun getDeliveredId(uid: String): Long {
+    fun getDeliveredId(): Long {
         var i: Long = 0
-        val msgs = getUndeliveredMessages(uid)
+        val msgs = getUndeliveredMessages()
         if (msgs != null) {
             for (msg in msgs) {
                 i = msg.deliveredId + 1
@@ -247,22 +241,21 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         val db = this.writableDatabase
         val deletedRows = db.delete(TableUndeliveredMessages.TABLE_NAME, selection, selectionArgs)
     }
-    fun pushMessage(uid: String, msg: UndeliveredMessage) {
+    fun pushMessage(msg: UndeliveredMessage) {
         //TOD Добавление сообщения в бд
         val db = this.writableDatabase
         val cv = ContentValues()
-        cv.put(TableUndeliveredMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
         cv.put(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
+        cv.put(TableUndeliveredMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
         cv.put(TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID, msg.deliveredId)
         cv.put(TableUndeliveredMessages.COLUMN_NAME_TEXT, msg.text)
         db!!.insert(TableUndeliveredMessages.TABLE_NAME, null, cv)
         db.close()
     }
-    fun pushMessage(uid: String, msg: ReceivedMessage) {
+    fun pushMessage(msg: ReceivedMessage) {
         //TOD Добавление сообщения в бд
         val db = this.writableDatabase
         val cv = ContentValues()
-        cv.put(TableMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
         cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
         cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
         cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
@@ -272,11 +265,10 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         db!!.insert(TableMessages.TABLE_NAME, null, cv)
         db.close()
     }
-    fun pushMessage(uid: String, msg: SentMessage) {
+    fun pushMessage(msg: SentMessage) {
         //TOD Добавление сообщения в бд
         val db = this.writableDatabase
         val cv = ContentValues()
-        cv.put(TableMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
         cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
         cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
         cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
@@ -294,7 +286,6 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             when (msg) {
                 is ReceivedMessage -> {
                     val cv = ContentValues()
-                    cv.put(TableMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
                     cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
                     cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
                     cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
@@ -305,7 +296,6 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                 }
                 is SentMessage -> {
                     val cv = ContentValues()
-                    cv.put(TableMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
                     cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
                     cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
                     cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
@@ -316,7 +306,6 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                 }
                 is UndeliveredMessage -> {
                     val cv = ContentValues()
-                    cv.put(TableUndeliveredMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
                     cv.put(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
                     cv.put(TableUndeliveredMessages.COLUMN_NAME_TEXT, msg.text)
                     db!!.insert(TableUndeliveredMessages.TABLE_NAME, null, cv)
@@ -341,7 +330,6 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         //TOD Добавление сообщения в бд
         val db = this.writableDatabase
         val cv = ContentValues()
-        cv.put(TableUndeliveredMessages.COLUMN_NAME_USER_ID, mAuth!!.uid!!)
         cv.put(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
         cv.put(TableUndeliveredMessages.COLUMN_NAME_TEXT, msg.text)
         db!!.insert("undelivered_messages", null, cv)

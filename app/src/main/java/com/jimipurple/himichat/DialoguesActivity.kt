@@ -1,6 +1,9 @@
 package com.jimipurple.himichat
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
@@ -12,9 +15,6 @@ import com.jimipurple.himichat.models.*
 import kotlinx.android.synthetic.main.activity_dialogues.*
 import java.util.*
 import kotlin.collections.ArrayList
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import java.text.SimpleDateFormat
 
 
@@ -26,20 +26,31 @@ class DialoguesActivity : BaseActivity() {
     private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var firebaseToken: String  = ""
     private var functions = FirebaseFunctions.getInstance()
-    private var db: MessagesDBHelper =
-        MessagesDBHelper(this)
+    private var db: MessagesDBHelper = MessagesDBHelper(this)
+    private var id : String? = null
     private var currentTime: Date?  = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dialogues)
         mAuth = FirebaseAuth.getInstance()
+        id = mAuth!!.uid!!
         val currentTime = Calendar.getInstance().time
 
-        val allMsgs = db.getMessages(mAuth!!.uid!!)
+        reloadMsgs()
+
+        registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+
+        friendsButton.setOnClickListener { friendsButtonOnClick() }
+        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
+        settingsButton.setOnClickListener { settingsButtonOnClick() }
+    }
+
+    private fun reloadMsgs() {
+        val allMsgs = db.getMessages()
         val msgs = allMsgs
         val dialogs = ArrayList<Dialog>()
-        val undeliveredMsgs = db.getUndeliveredMessages(mAuth!!.uid!!)
+        val undeliveredMsgs = db.getUndeliveredMessages()
         Log.i("msgs", msgs.toString())
         Log.i("unmsgs", undeliveredMsgs.toString())
 
@@ -50,7 +61,7 @@ class DialoguesActivity : BaseActivity() {
                     is UndeliveredMessage -> {
                         var isExist = false
                         for (d in dialogs) {
-                            if (d.friendId == msg.receiverId) {
+                            if (d.friendId == msg.receiverId && id == msg.senderId) {
                                 isExist = true
                                 //break
                             }
@@ -62,7 +73,7 @@ class DialoguesActivity : BaseActivity() {
                     is ReceivedMessage -> {
                         var isExist = false
                         for (d in dialogs) {
-                            if (d.friendId == msg.senderId) {
+                            if (d.friendId == msg.senderId && id == msg.receiverId) {
                                 isExist = true
                             }
                         }
@@ -73,7 +84,7 @@ class DialoguesActivity : BaseActivity() {
                     is SentMessage -> {
                         var isExist = false
                         for (d in dialogs) {
-                            if (d.friendId == msg.receiverId) {
+                            if (d.friendId == msg.receiverId && id == msg.senderId) {
                                 isExist = true
                             }
                         }
@@ -141,10 +152,6 @@ class DialoguesActivity : BaseActivity() {
         val df = SimpleDateFormat("dd-MMM-yyyy")
         val formattedDate = df.format(c)
         Log.i("dateTEST","Current time => $formattedDate")
-
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
     }
 
     private fun friendsButtonOnClick() {
@@ -160,5 +167,16 @@ class DialoguesActivity : BaseActivity() {
     private fun settingsButtonOnClick() {
         val i = Intent(applicationContext, SettingsActivity::class.java)
         startActivity(i)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(FCMReceiver)
+    }
+
+    val FCMReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            reloadMsgs()
+        }
     }
 }

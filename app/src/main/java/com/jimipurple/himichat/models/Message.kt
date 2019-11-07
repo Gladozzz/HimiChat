@@ -4,7 +4,8 @@ import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.Date
 
-abstract class Message(rId: String, txt: String) {
+abstract class Message(sId: String, rId: String, txt: String) {
+    var senderId = sId
     var receiverId = rId
     var text : String = txt
 
@@ -14,8 +15,8 @@ abstract class Message(rId: String, txt: String) {
     }
 }
 
-class ReceivedMessage(sId: String, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(rId, txt) {
-    var senderId = sId
+class ReceivedMessage(sId: String, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+    //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
     var date : Date? = Date()
@@ -44,12 +45,12 @@ class ReceivedMessage(sId: String, rId: String, txt: String, date: Date?, encryp
 
     override fun toString(): String {
         //return super.toString()
-        return "($senderId, $receiverId, $text, ${date!!.day}.${date!!.month}.${date!!.year} ${date!!.hours}:${date!!.minutes}"
+        return "($senderId, $receiverId, $text, ${date!!.day}.${date!!.month}.${date!!.year} ${date!!.hours}:${date!!.minutes})"
     }
 }
 
-class SentMessage(sId: String?, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(rId, txt) {
-    var senderId = sId
+class SentMessage(sId: String, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+    //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
     var date : Date? = Date()
@@ -78,11 +79,11 @@ class SentMessage(sId: String?, rId: String, txt: String, date: Date?, encrypted
 
     override fun toString(): String {
         //return super.toString()
-        return "($senderId, $receiverId, $text, ${date!!.day}.${date!!.month}.${date!!.year} ${date!!.hours}:${date!!.minutes}"
+        return "($senderId, $receiverId, $text, ${date!!.day}.${date!!.month}.${date!!.year} ${date!!.hours}:${date!!.minutes})"
     }
 }
 
-class UndeliveredMessage(rId: String, txt: String, dId: Long) : Message(rId, txt) {
+class UndeliveredMessage(sId: String, rId: String, txt: String, dId: Long) : Message(sId, rId, txt) {
     //var receiverId = rId
     //var text : String = txt
     var deliveredId: Long = dId

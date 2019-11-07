@@ -67,6 +67,21 @@ class LoginActivity : BaseActivity() {
                                 }
                             }
                         successful()
+//                        val userData = mapOf(
+//                            "id" to currentUID,
+//                            "nickname" to nickname,
+//                            "avatar" to "",
+//                            "token" to firebaseToken,
+//                            "real_name" to rn,
+//                            "email" to email
+//                        )
+//                        firestore.collection("users").document(mAuth!!.uid!!)
+//                            .set(userData, SetOptions.merge())
+//                            .addOnSuccessListener {
+//                                Log.i("LoginActivity", "user data successfully written")
+//                                successful()
+//                            }
+//                            .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("auth:failure", "createUserWithEmail:failure", task.exception)
@@ -110,7 +125,16 @@ class LoginActivity : BaseActivity() {
                                     Log.i("setToken", "error " + e.message)
                                 }
                             }
-                        successful()
+                        val tokenData = mapOf(
+                            "token" to token
+                        )
+//                        firestore.collection("users").document(mAuth!!.uid!!)
+//                            .set(tokenData, SetOptions.merge())
+//                            .addOnSuccessListener {
+//                                Log.i("LoginActivity", "token successfully written")
+//                                successful()
+//                            }
+//                            .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing token", e) }
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("auth:signIn", "signInWithEmail:failure", task.exception)
