@@ -7,6 +7,7 @@ import android.content.Intent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
@@ -18,6 +19,7 @@ class MessagingService : FirebaseMessagingService() {
 
     private var callbackOnMessageReceived = {}
     private var mAuth = FirebaseAuth.getInstance()
+    private var functions = FirebaseFunctions.getInstance()
 
     val INTENT_FILTER = "INTENT_FILTER"
 
@@ -104,11 +106,24 @@ class MessagingService : FirebaseMessagingService() {
     private fun sendRegistrationToServer(token: String) : Boolean {
         try {
             val currentUID = FirebaseAuth.getInstance().currentUser?.uid
-            if (currentUID != null) {
-                FirebaseFirestore.getInstance().collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
-            } else {
-                Log.i("messaging:tokenToServer", "user is not registered, but token saved to SharedPreferences")
-            }
+//            if (currentUID != null) {
+//                FirebaseFirestore.getInstance().collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
+//            } else {
+//                Log.i("messaging:tokenToServer", "user is not registered, but token saved to SharedPreferences")
+//            }
+            val data = hashMapOf(
+                "userId" to mAuth!!.uid!!,
+                "token" to token
+            )
+            var res = functions
+                .getHttpsCallable("setToken")
+                .call(data).addOnCompleteListener { task ->
+                    try {
+                        Log.i("setToken", "result " + task.result?.data.toString())
+                    } catch (e: Exception) {
+                        Log.i("setToken", "error " + e.message)
+                    }
+                }
             return true
         } catch (e : Exception) {
             Log.i("messaging:tokenToServer", e.message)

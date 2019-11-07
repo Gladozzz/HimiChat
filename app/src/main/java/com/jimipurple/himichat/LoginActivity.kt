@@ -125,9 +125,9 @@ class LoginActivity : BaseActivity() {
                                     Log.i("setToken", "error " + e.message)
                                 }
                             }
-                        val tokenData = mapOf(
-                            "token" to token
-                        )
+//                        val tokenData = mapOf(
+//                            "token" to token
+//                        )
 //                        firestore.collection("users").document(mAuth!!.uid!!)
 //                            .set(tokenData, SetOptions.merge())
 //                            .addOnSuccessListener {
