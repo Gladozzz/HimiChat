@@ -111,7 +111,11 @@ class LoginActivity : BaseActivity() {
                         //val user = mAuth!!.currentUser
                         val currentUser = mAuth!!.currentUser
                         val currentUID = currentUser!!.uid
-                        val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                        var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                        if (token == "") {
+                            Thread.sleep(200)
+                            token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                        }
                         val data = hashMapOf(
                             "userId" to mAuth!!.uid!!,
                             "token" to token
@@ -125,6 +129,7 @@ class LoginActivity : BaseActivity() {
                                     Log.i("setToken", "error " + e.message)
                                 }
                             }
+                        successful()
 //                        val tokenData = mapOf(
 //                            "token" to token
 //                        )
@@ -180,7 +185,7 @@ class LoginActivity : BaseActivity() {
                             Log.i("setToken", "error " + e.message)
                         }
                     }
-                Log.i("auth:start", "Пользователь авторизован, firebaseToken отправлен")
+                Log.i("auth:start", "Пользователь авторизован, firebaseToken отправлен $token")
                 successful()
             } else {
                 Log.i("auth:start", "Пользователь авторизован, но firebaseToken не найден")

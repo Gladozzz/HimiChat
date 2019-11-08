@@ -111,6 +111,7 @@ class MessagingService : FirebaseMessagingService() {
 //            } else {
 //                Log.i("messaging:tokenToServer", "user is not registered, but token saved to SharedPreferences")
 //            }
+            Log.i("sendToken", "try send token: $token")
             val data = hashMapOf(
                 "userId" to mAuth!!.uid!!,
                 "token" to token
@@ -126,7 +127,7 @@ class MessagingService : FirebaseMessagingService() {
                 }
             return true
         } catch (e : Exception) {
-            Log.i("messaging:tokenToServer", e.message)
+            Log.i("messaging:tokenToServer", "error " + e.toString())
         }
         return false
     }
