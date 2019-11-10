@@ -44,6 +44,7 @@ class DialogActivity : BaseActivity() {
 
         //registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
         MessagingService.setCallbackOnMessageRecieved { reloadMsgs() }
+        MessagingService.isDialog = true
 
         nicknameDialogView.text = nickname
         val url = Uri.parse(avatar)
@@ -80,6 +81,7 @@ class DialogActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         //unregisterReceiver(FCMReceiver)
+        MessagingService.isDialog = false
     }
 
     private fun reloadMsgs() {
