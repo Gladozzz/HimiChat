@@ -8,6 +8,9 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -16,6 +19,9 @@ import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
+import com.squareup.picasso.LruCache
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.*
 
 
@@ -42,41 +48,50 @@ class MessagingService : FirebaseMessagingService() {
                 // For long-running tasks (10 seconds or more) use Firebase Job Dispastcher.
                 if (remoteMessage.data.containsKey("text")){
                     val text = remoteMessage.data["text"]!!.toString()
-                    val avatar = remoteMessage.data["avatar"]!!.toString()
-                    val nickname = remoteMessage.data["nickname"]!!.toString()
+                    //val avatar = remoteMessage.data["avatar"]!!.toString()
+                    //val nickname = remoteMessage.data["nickname"]!!.toString()
                     val sender_id = remoteMessage.data["sender_id"]!!.toString()
                     val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
 
-                    Log.i("msgService", "data ${remoteMessage.data}")
-                    Log.i("msgService", "text $text")
-                    Log.i("msgService", "sender_id $sender_id")
-                    Log.i("msgService", "receiver_id $receiver_id")
-                    Log.i("msgService", "avatar $avatar")
-                    Log.i("msgService", "nickname $nickname")
-                    //val db = MessagesDBHelper(applicationContext)
-                    val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
-                    db.pushMessage(msg)
-                    callbackOnMessageReceived()
-                    if (!isDialog) {
-                        //Picasso.get().load(avatar).get()
-                        // Create an explicit intent for an Activity in your app
-                        val intent = Intent(this, DialogActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
-                        intent.putExtra("friend_id", sender_id)
-                        intent.putExtra("nickname", nickname)
-                        intent.putExtra("avatar", avatar)
-                        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+                    val data = mapOf("id" to sender_id)
+                    functions
+                        .getHttpsCallable("getUser")
+                        .call(data).continueWith { task ->
+                            val result = task.result?.data as HashMap<String, Any>
+                            val nickname = result["nickname"] as String
+                            val avatar = result["avatar"] as String
+                            Log.i("msgService", "data ${remoteMessage.data}")
+                            Log.i("msgService", "text $text")
+                            Log.i("msgService", "sender_id $sender_id")
+                            Log.i("msgService", "receiver_id $receiver_id")
+                            Log.i("msgService", "avatar $avatar")
+                            Log.i("msgService", "nickname $nickname")
+                            //val db = MessagesDBHelper(applicationContext)
+                            val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
+                            db.pushMessage(msg)
+                            callbackOnMessageReceived()
+                            if (!isDialog) {
+                                //Picasso.get().load(avatar).get()
+                                // Create an explicit intent for an Activity in your app
+                                val intent = Intent(this, DialogActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                }
+                                intent.putExtra("friend_id", sender_id)
+                                intent.putExtra("nickname", nickname)
+                                intent.putExtra("avatar", avatar)
+                                val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
-                        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                            .setSmallIcon(R.drawable.send_message)
-                            .setContentTitle(nickname)
-                            .setContentText(text)
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            // Set the intent that will fire when the user taps the notification
-                            .setContentIntent(pendingIntent)
-                            .setAutoCancel(true)
-                    }
+                                val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+                                    .setSmallIcon(R.drawable.send_message)
+                                    .setContentTitle(nickname)
+                                    .setContentText(text)
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                    // Set the intent that will fire when the user taps the notification
+                                    .setContentIntent(pendingIntent)
+                                    .setAutoCancel(true)
+                            }
+                        }
+
                 } else {
                     val unmsgs = db.getUndeliveredMessages()
                     var unmsg : UndeliveredMessage? = null
