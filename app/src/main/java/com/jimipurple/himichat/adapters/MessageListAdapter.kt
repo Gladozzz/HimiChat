@@ -152,6 +152,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
                         try {
                             Log.i("dialogMessage", "result " + task.result?.data.toString())
                             data["text"]
+                            items.remove(item)
                         } catch (e: Exception) {
                             Log.i("dialogMessage", "error " + e.message)
                         }

@@ -160,6 +160,7 @@ class DialogActivity : BaseActivity() {
             }
 
         Log.i("dialogMessage", "data $data")
+        reloadMsgs()
     }
 
     private fun friendsButtonOnClick() {
