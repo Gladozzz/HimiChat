@@ -1,12 +1,16 @@
 package com.jimipurple.himichat
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.ReceivedMessage
@@ -17,9 +21,9 @@ import java.util.*
 
 class MessagingService : FirebaseMessagingService() {
 
-    private var callbackOnMessageReceived = {}
     private var mAuth = FirebaseAuth.getInstance()
     private var functions = FirebaseFunctions.getInstance()
+    private var CHANNEL_ID = "himichat_messages"
 
     val INTENT_FILTER = "INTENT_FILTER"
 
@@ -38,6 +42,8 @@ class MessagingService : FirebaseMessagingService() {
                 // For long-running tasks (10 seconds or more) use Firebase Job Dispastcher.
                 if (remoteMessage.data.containsKey("text")){
                     val text = remoteMessage.data["text"]!!.toString()
+                    val avatar = remoteMessage.data["avatar"]!!.toString()
+                    val nickname = remoteMessage.data["nickname"]!!.toString()
                     val sender_id = remoteMessage.data["sender_id"]!!.toString()
                     val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
 
@@ -45,10 +51,32 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("msgService", "text $text")
                     Log.i("msgService", "sender_id $sender_id")
                     Log.i("msgService", "receiver_id $receiver_id")
+                    Log.i("msgService", "avatar $avatar")
+                    Log.i("msgService", "nickname $nickname")
                     //val db = MessagesDBHelper(applicationContext)
                     val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
                     db.pushMessage(msg)
                     callbackOnMessageReceived()
+                    if (!isDialog) {
+                        //Picasso.get().load(avatar).get()
+                        // Create an explicit intent for an Activity in your app
+                        val intent = Intent(this, DialogActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        intent.putExtra("friend_id", sender_id)
+                        intent.putExtra("nickname", nickname)
+                        intent.putExtra("avatar", avatar)
+                        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+
+                        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.send_message)
+                            .setContentTitle(nickname)
+                            .setContentText(text)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            // Set the intent that will fire when the user taps the notification
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true)
+                    }
                 } else {
                     val unmsgs = db.getUndeliveredMessages()
                     var unmsg : UndeliveredMessage? = null
@@ -93,6 +121,23 @@ class MessagingService : FirebaseMessagingService() {
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
     override fun onNewToken(token: String) {
         Log.i("messagingtoken", "Refreshed token: $token")
 
@@ -132,12 +177,14 @@ class MessagingService : FirebaseMessagingService() {
         return false
     }
 
-    fun setCallbackOnMessageRecieved(callback: () -> Unit) {
-        callbackOnMessageReceived = {callback()}
-    }
 
     companion object {
         const val INTENT_FILTER = "INTENT_FILTER"
         fun getINTENT_FILTER():String { return INTENT_FILTER }
+        private var callbackOnMessageReceived = {}
+        fun setCallbackOnMessageRecieved(callback: () -> Unit) {
+            callbackOnMessageReceived = {callback()}
+        }
+        var isDialog = false
     }
 }

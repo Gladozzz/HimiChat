@@ -50,6 +50,9 @@
     <string name="toast_load_avatar_error">error to load avatar</string>
     <string name="toast_future_feature">Future feature</string>
 
+    <string name="channel_name">HimiChat messages</string>
+    <string name="channel_description">Channel of receiving himichat messages</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

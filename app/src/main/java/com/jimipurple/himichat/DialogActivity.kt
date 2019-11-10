@@ -3,7 +3,6 @@ package com.jimipurple.himichat
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -43,7 +42,8 @@ class DialogActivity : BaseActivity() {
         id = mAuth!!.uid!!
         db = MessagesDBHelper(applicationContext)
 
-        registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+        //registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+        MessagingService.setCallbackOnMessageRecieved { reloadMsgs() }
 
         nicknameDialogView.text = nickname
         val url = Uri.parse(avatar)
@@ -79,7 +79,7 @@ class DialogActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(FCMReceiver)
+        //unregisterReceiver(FCMReceiver)
     }
 
     private fun reloadMsgs() {
