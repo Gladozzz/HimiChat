@@ -14,10 +14,12 @@
             android:layout_gravity="left"
             android:gravity="left">
 
-        <ImageView
-                android:id="@+id/imageView2"
+        <ImageButton
+                android:id="@+id/sendUnreceivedMessageButton"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:padding="0dp"
+                android:scaleType="centerInside"
                 app:srcCompat="@drawable/unreceived" />
 
         <TextView

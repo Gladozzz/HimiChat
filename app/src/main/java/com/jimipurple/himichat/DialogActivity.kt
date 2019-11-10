@@ -4,16 +4,20 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.jimipurple.himichat.adapters.FriendRequestsListAdapter
 import com.jimipurple.himichat.adapters.MessageListAdapter
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
+import com.squareup.picasso.LruCache
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dialog.*
 
 class DialogActivity : BaseActivity() {
@@ -24,7 +28,8 @@ class DialogActivity : BaseActivity() {
     private var functions = FirebaseFunctions.getInstance()
     private var friend_id : String? = null
     private var id : String? = null
-    private var friend : User? = null
+    private var avatar : String? = null
+    private var nickname : String? = null
     private var db : MessagesDBHelper? = null
 
 
@@ -33,10 +38,36 @@ class DialogActivity : BaseActivity() {
         setContentView(R.layout.activity_dialog)
         mAuth = FirebaseAuth.getInstance()
         friend_id = intent.getStringExtra("friend_id")
+        avatar = intent.getStringExtra("avatar")
+        nickname = intent.getStringExtra("nickname")
         id = mAuth!!.uid!!
         db = MessagesDBHelper(applicationContext)
 
         registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+
+        nicknameDialogView.text = nickname
+        val url = Uri.parse(avatar)
+        if (url != null) {
+            val bitmap = LruCache(this)[avatar!!]
+            if (bitmap != null) {
+                avatarDialogView.setImageBitmap(bitmap)
+            } else {
+                Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        avatarDialogView.setImageBitmap(bitmap)
+                        LruCache(applicationContext).set(avatar!!, bitmap!!)
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        Log.i("Profile", "Загрузка изображения не удалась " + avatarDialogView + "\n" + e?.message)
+                    }
+                })
+            }
+        } else {
+            Log.i("Profile", "avatar wasn't received")
+        }
 
         reloadMsgs()
 
@@ -52,21 +83,6 @@ class DialogActivity : BaseActivity() {
     }
 
     private fun reloadMsgs() {
-        val data = mapOf("id" to mAuth!!.uid!!)
-        functions
-            .getHttpsCallable("getUser")
-            .call(data).continueWith { task ->
-                val result = task.result?.data as? HashMap<String, Any>
-                if (result != null) {
-                    if (result["found"] == true) {
-                        friend = User(friend_id!!, result["nickname"] as String, result["realname"] as String, result["avatar"] as String)
-                    } else {
-                        Toast.makeText(applicationContext, resources.getString(R.string.something), Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Log.i("Dialog:getUser", "result wasn't received")
-                }
-            }
         val allMsgs = db!!.getMessages()
         val msgs = ArrayList<Message>()
         val unmsgs = db!!.getUndeliveredMessages()
@@ -108,7 +124,7 @@ class DialogActivity : BaseActivity() {
         val onHold = {msg: Message -> Unit
             Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
         }
-        val adapter = MessageListAdapter(msgs, object : MessageListAdapter.Callback {
+        val adapter = MessageListAdapter(this, msgs, object : MessageListAdapter.Callback {
             override fun onItemClicked(item: Message) {
                 Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
             }

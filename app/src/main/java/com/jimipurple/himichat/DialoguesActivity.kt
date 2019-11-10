@@ -133,6 +133,8 @@ class DialoguesActivity : BaseActivity() {
                     val clickCallback = {dialog: Dialog -> Unit
                         val i = Intent(applicationContext, DialogActivity::class.java)
                         i.putExtra("friend_id", dialog.friendId)
+                        i.putExtra("nickname", dialog.nickname)
+                        i.putExtra("avatar", dialog.avatar)
                         startActivityForResult(i, REQUEST_CODE_DIALOG_ACTIVITY)
                     }
                     val onHoldCallback = {dialog: Dialog -> Unit

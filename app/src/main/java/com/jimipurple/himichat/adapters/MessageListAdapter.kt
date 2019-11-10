@@ -1,17 +1,22 @@
 package com.jimipurple.himichat.adapters
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.R
+import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
 import java.text.SimpleDateFormat
 
 
-class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callback, val deleteCallback: (msg: Message)-> Unit, val editCallback: (msg: Message)-> Unit, val onHoldCallback: (msg: Message)->Unit) : RecyclerView.Adapter<MessageListAdapter.BaseViewHolder>() {
+class MessageListAdapter(val context: Context, var items: ArrayList<Message>, val clickCallback: Callback, val deleteCallback: (msg: Message)-> Unit, val editCallback: (msg: Message)-> Unit, val onHoldCallback: (msg: Message)->Unit) : RecyclerView.Adapter<MessageListAdapter.BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
@@ -115,6 +120,7 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
     inner class UnreceivedMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
         private val text = itemView.findViewById(R.id.unreceivedMessageText) as TextView
+        private val send = itemView.findViewById(R.id.sendUnreceivedMessageButton) as ImageButton
 
         override fun bind(item: Message) {
             text.text = item.text
@@ -122,7 +128,37 @@ class MessageListAdapter(var items: ArrayList<Message>, val clickCallback: Callb
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
             }
+            send.setOnClickListener {
+                val mAuth = FirebaseAuth.getInstance()
+                val functions = FirebaseFunctions.getInstance()
+                val id = mAuth.uid!!
+                val db = MessagesDBHelper(context)
+                val text = item.text
+                val receiverId = item.receiverId
+                val senderId = item.senderId
+                val msg = UndeliveredMessage(senderId, receiverId, text, db.getDeliveredId())
+                db.pushMessage(msg)
+                val data = hashMapOf(
+                    "receiverId" to receiverId,
+                    "senderId" to senderId,
+                    "deliveredId" to msg.deliveredId.toString(),
+                    "text" to text,
+                    "token" to context.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                )
+                Log.i("msgTest", context.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+                var res = functions
+                    .getHttpsCallable("sendMessage")
+                    .call(data).addOnCompleteListener { task ->
+                        try {
+                            Log.i("dialogMessage", "result " + task.result?.data.toString())
+                            data["text"]
+                        } catch (e: Exception) {
+                            Log.i("dialogMessage", "error " + e.message)
+                        }
+                    }
 
+                Log.i("dialogMessage", "data $data")
+            }
             //cancelButton.setOnClickListener {cancelCallback(item)}
         }
     }

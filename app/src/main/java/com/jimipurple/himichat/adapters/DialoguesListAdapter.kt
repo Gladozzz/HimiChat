@@ -53,8 +53,6 @@ class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, v
         fun bind(item: Dialog) {
             name.text = item.nickname
             lastMessage.text = item.lastMessage.text
-            Log.i("Recycler", "all must be ok")
-            Log.i("Recycler", "item $item")
 
             if (item.avatar != null && item.nickname != null) {
                 val url = Uri.parse(item.avatar)
@@ -72,12 +70,12 @@ class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, v
                             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
+                                Log.i("DialoguesListAdapter", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
                             }
                         })
                     }
                 } else {
-                    Log.i("FriendListAdapter", "avatar wasn't received")
+                    Log.i("DialoguesListAdapter", "avatar wasn't received")
                 }
             }
 
