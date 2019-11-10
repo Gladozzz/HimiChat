@@ -48,8 +48,8 @@ class DialogActivity : BaseActivity() {
         //MessagingService.setCallbackOnMessageRecieved { reloadMsgs() }
         MessagingService.isDialog = true
         val linearLayoutManager = LinearLayoutManager(this)
-        linearLayoutManager.setReverseLayout(true);
-        messageList.setLayoutManager(linearLayoutManager);
+        linearLayoutManager.stackFromEnd = true
+        messageList.layoutManager = linearLayoutManager
 
         nicknameDialogView.text = nickname
         val url = Uri.parse(avatar)
