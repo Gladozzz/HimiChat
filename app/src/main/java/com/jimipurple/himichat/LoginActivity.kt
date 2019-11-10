@@ -187,6 +187,7 @@ class LoginActivity : BaseActivity() {
 
     public override fun onStart() {
         super.onStart()
+        createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
         if (currentUser != null){

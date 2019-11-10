@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
@@ -46,6 +47,9 @@ class DialogActivity : BaseActivity() {
         registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
         //MessagingService.setCallbackOnMessageRecieved { reloadMsgs() }
         MessagingService.isDialog = true
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.setReverseLayout(true);
+        messageList.setLayoutManager(linearLayoutManager);
 
         nicknameDialogView.text = nickname
         val url = Uri.parse(avatar)
@@ -133,6 +137,8 @@ class DialogActivity : BaseActivity() {
             }
         }, delete, edit, onHold)
         messageList.adapter = adapter
+//        Thread.sleep(200)
+//        messageList.scrollToPosition(adapter.itemCount)
     }
 
     private fun onSendBtnClick(){
