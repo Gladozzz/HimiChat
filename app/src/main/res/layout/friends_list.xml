@@ -60,6 +60,6 @@
                 android:layout_weight="1"
                 android:padding="0dp"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/send_message" />
+                app:srcCompat="@drawable/ic_friends_list_send" />
     </LinearLayout>
 </LinearLayout>
