@@ -55,6 +55,8 @@ class FriendsActivity : BaseActivity() {
         val sendMsg = {u: User -> Unit
             val i = Intent(applicationContext, DialogActivity::class.java)
             i.putExtra("friend_id", u.id)
+            i.putExtra("avatar", u.avatar)
+            i.putExtra("nickname", u.nickname)
             startActivityForResult(i, REQUEST_CODE_DIALOG_ACTIVITY)
         }
         functions
