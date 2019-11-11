@@ -136,8 +136,8 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
                 val text = item.text
                 val receiverId = item.receiverId
                 val senderId = item.senderId
-                val msg = UndeliveredMessage(senderId, receiverId, text, db.getDeliveredId())
-                db.pushMessage(msg)
+                val msg = UndeliveredMessage(senderId, receiverId, text, (item as UndeliveredMessage).deliveredId)
+                //db.pushMessage(msg)
                 val data = hashMapOf(
                     "receiverId" to receiverId,
                     "senderId" to senderId,

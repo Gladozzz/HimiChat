@@ -121,19 +121,21 @@ class LoginActivity : BaseActivity() {
                             Thread.sleep(200)
                             token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
                         }
-                        val data = hashMapOf(
-                            "userId" to mAuth!!.uid!!,
-                            "token" to token
-                        )
-                        var res = functions
-                            .getHttpsCallable("setToken")
-                            .call(data).addOnCompleteListener { task ->
-                                try {
-                                    Log.i("setToken", "result " + task.result?.data.toString())
-                                } catch (e: Exception) {
-                                    Log.i("setToken", "error " + e.message)
+                        if (token != "") {
+                            val data = hashMapOf(
+                                "userId" to mAuth!!.uid!!,
+                                "token" to token
+                            )
+                            var res = functions
+                                .getHttpsCallable("setToken")
+                                .call(data).addOnCompleteListener { task ->
+                                    try {
+                                        Log.i("setToken", "result " + task.result?.data.toString())
+                                    } catch (e: Exception) {
+                                        Log.i("setToken", "error " + e.message)
+                                    }
                                 }
-                            }
+                        }
                         successful()
 //                        val tokenData = mapOf(
 //                            "token" to token
