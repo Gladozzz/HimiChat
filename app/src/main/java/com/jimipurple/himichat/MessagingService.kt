@@ -71,7 +71,7 @@ class MessagingService : FirebaseMessagingService() {
                             val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
                             db.pushMessage(msg)
                             callbackOnMessageReceived()
-                            if (!isDialog) {
+                            if (!isDialog || isDialog && currentDialog == sender_id) {
                                 //Picasso.get().load(avatar).get()
                                 // Create an explicit intent for an Activity in your app
                                 val intent = Intent(this, DialogActivity::class.java).apply {
@@ -189,5 +189,6 @@ class MessagingService : FirebaseMessagingService() {
             callbackOnMessageReceived = {callback()}
         }
         var isDialog = false
+        var currentDialog = ""
     }
 }

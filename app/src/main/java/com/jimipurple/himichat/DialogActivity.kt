@@ -47,6 +47,7 @@ class DialogActivity : BaseActivity() {
         registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
         //MessagingService.setCallbackOnMessageRecieved { reloadMsgs() }
         MessagingService.isDialog = true
+        MessagingService.currentDialog = friend_id!!
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.stackFromEnd = true
         messageList.layoutManager = linearLayoutManager
@@ -143,33 +144,35 @@ class DialogActivity : BaseActivity() {
 
     private fun onSendBtnClick(){
         val text = messageInput.text.toString()
-        val receiverId = friend_id
-        val senderId = mAuth!!.uid!!
-        val msg = UndeliveredMessage(senderId, receiverId!!, text, db!!.getDeliveredId())
-        db!!.pushMessage(msg)
-        val data = hashMapOf(
-            "receiverId" to receiverId,
-            "senderId" to senderId,
-            "deliveredId" to msg.deliveredId.toString(),
-            "text" to text,
-            "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-        )
-        messageInput.setText("")
-        Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
-        var res = functions
-            .getHttpsCallable("sendMessage")
-            .call(data).addOnCompleteListener { task ->
-                try {
-                    Log.i("dialogMessage", "result " + task.result?.data.toString())
-                    data["text"]
-                } catch (e: Exception) {
-                    Log.i("dialogMessage", "error " + e.message)
+        if (text != "") {
+            val receiverId = friend_id
+            val senderId = mAuth!!.uid!!
+            val msg = UndeliveredMessage(senderId, receiverId!!, text, db!!.getDeliveredId())
+            db!!.pushMessage(msg)
+            val data = hashMapOf(
+                "receiverId" to receiverId,
+                "senderId" to senderId,
+                "deliveredId" to msg.deliveredId.toString(),
+                "text" to text,
+                "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+            )
+            messageInput.setText("")
+            Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+            var res = functions
+                .getHttpsCallable("sendMessage")
+                .call(data).addOnCompleteListener { task ->
+                    try {
+                        Log.i("dialogMessage", "result " + task.result?.data.toString())
+                        data["text"]
+                    } catch (e: Exception) {
+                        Log.i("dialogMessage", "error " + e.message)
+                    }
+                    messageInput.setText("")
                 }
-                messageInput.setText("")
-            }
 
-        Log.i("dialogMessage", "data $data")
-        reloadMsgs()
+            Log.i("dialogMessage", "data $data")
+            reloadMsgs()
+        }
     }
 
     private fun friendsButtonOnClick() {
