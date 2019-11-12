@@ -17,10 +17,11 @@
             android:id="@+id/dialoguesList" app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintVertical_bias="0.0" app:layout_constraintBottom_toTopOf="@+id/dialoguesButton"
             android:layout_marginBottom="8dp"/>
+
     <ImageButton
             android:id="@+id/settingsButton"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -33,7 +34,7 @@
     <ImageButton
             android:id="@+id/dialoguesButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -46,7 +47,7 @@
     <ImageButton
             android:id="@+id/friendsButton"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"

@@ -6,10 +6,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".FriendRequestsActivity" android:background="@color/colorPrimaryDark">
+
     <ImageButton
             android:id="@+id/settingsButton"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -22,7 +23,7 @@
     <ImageButton
             android:id="@+id/dialoguesButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -35,7 +36,7 @@
     <ImageButton
             android:id="@+id/friendsButton"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -65,7 +66,7 @@
     <Button
             android:id="@+id/reсeivedButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_received"
             app:layout_constraintBottom_toTopOf="@+id/friendsButton"
@@ -75,7 +76,7 @@
     <Button
             android:id="@+id/sentButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_sent"
             app:layout_constraintBottom_toTopOf="@+id/settingsButton"

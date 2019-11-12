@@ -22,10 +22,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/friends_list" />
+
     <ImageButton
             android:id="@+id/settingsButton"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -38,7 +39,7 @@
     <ImageButton
             android:id="@+id/dialoguesButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -51,7 +52,7 @@
     <ImageButton
             android:id="@+id/friendsButton"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:backgroundTint="@color/colorPrimaryDark"
             android:padding="0dp"
             android:scaleType="centerInside"
@@ -64,7 +65,7 @@
     <Button
             android:id="@+id/findFriendButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_find_friend"
             app:layout_constraintBottom_toTopOf="@+id/friendsButton"
@@ -74,7 +75,7 @@
     <Button
             android:id="@+id/friendRequestsButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_friend_requests"
             app:layout_constraintBottom_toTopOf="@+id/dialoguesButton"
