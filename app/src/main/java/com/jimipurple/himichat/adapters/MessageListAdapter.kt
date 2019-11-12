@@ -68,7 +68,8 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             text.text = item.text
             //val dateStr = i.date!!.hours.toString() + "." + i.date!!.minutes.toString() + "." + i.date!!.day.toString() + "." + i.date!!.month.toString() + "." + (i.date!!.year + 1900).toString()
             val d = i.date!!.time
-            val df = SimpleDateFormat("dd-MMM-yyyy")
+            //val df = SimpleDateFormat("dd-MMM-yyyy")
+            val df = SimpleDateFormat("HH:mm")
             val formattedDate = df.format(d)
             date.text = formattedDate
             Log.i("Recycler", "all must be ok")
@@ -107,7 +108,8 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             val i = item as SentMessage
             text.text = i.text
             val d = i.date!!.time
-            val df = SimpleDateFormat("dd-MMM-yyyy")
+            //val df = SimpleDateFormat("dd-MMM-yyyy")
+            val df = SimpleDateFormat("HH:mm")
             val formattedDate = df.format(d)
             date.text = formattedDate
 
