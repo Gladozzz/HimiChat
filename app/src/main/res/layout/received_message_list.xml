@@ -14,7 +14,8 @@
             android:layout_marginEnd="70dp"
             android:background="@drawable/received_message_cloud"
             android:gravity="left"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="5dp">
 
         <TextView
                 android:id="@+id/receivedMessageDate"
