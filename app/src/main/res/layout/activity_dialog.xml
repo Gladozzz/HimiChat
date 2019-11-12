@@ -21,9 +21,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/avatarDialogView"
-            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             tools:listitem="@layout/sent_message_list" />
+
     <EditText
             android:id="@+id/messageInput"
             android:layout_width="0dp"
@@ -31,9 +31,13 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:background="@color/colorCloudReceived"
             android:ems="10"
-            android:inputType="text"
+            android:inputType="textMultiLine|text"
+            android:lines="3"
+            android:maxLines="8"
             android:minHeight="70dp"
+            android:minLines="1"
             app:layout_constraintBottom_toTopOf="@+id/friendsButton"
             app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
             app:layout_constraintStart_toStartOf="parent" />
@@ -42,7 +46,7 @@
             android:id="@+id/settingsButton"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:backgroundTint="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:padding="0dp"
             android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -55,7 +59,7 @@
             android:id="@+id/dialoguesButton"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:backgroundTint="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:padding="0dp"
             android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -68,7 +72,7 @@
             android:id="@+id/friendsButton"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:backgroundTint="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:padding="0dp"
             android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -91,26 +95,35 @@
             app:layout_constraintTop_toBottomOf="@+id/messageList"
             app:srcCompat="@drawable/ic_friends_list_send" />
 
-    <ImageView
-            android:id="@+id/avatarDialogView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/defaultavatar" />
-
-    <TextView
-            android:id="@+id/nicknameDialogView"
+    <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:text="nickname"
+            android:layout_height="60dp"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:padding="5dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/avatarDialogView"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+                android:id="@+id/avatarDialogView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/defaultavatar" />
+
+        <TextView
+                android:id="@+id/nicknameDialogView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="nickname"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/avatarDialogView"
+                app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
