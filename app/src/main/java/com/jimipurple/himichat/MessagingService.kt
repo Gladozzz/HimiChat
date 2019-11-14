@@ -24,6 +24,10 @@ import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.*
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 
 class MessagingService : FirebaseMessagingService() {
@@ -33,6 +37,7 @@ class MessagingService : FirebaseMessagingService() {
     private var CHANNEL_ID = "himichat_messages"
 
     val INTENT_FILTER = "INTENT_FILTER"
+    var random = Random()
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
@@ -82,7 +87,7 @@ class MessagingService : FirebaseMessagingService() {
                                 intent.putExtra("avatar", avatar)
                                 val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
-                                val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+                                val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                                     .setSmallIcon(R.drawable.send_message)
                                     .setContentTitle(nickname)
                                     .setContentText(text)
@@ -90,9 +95,11 @@ class MessagingService : FirebaseMessagingService() {
                                     // Set the intent that will fire when the user taps the notification
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true)
-                                with(NotificationManagerCompat.from(this)) {
+                                //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                                with(NotificationManagerCompat.from(applicationContext)) {
                                     // notificationId is a unique int for each notification that you must define
-                                    notify(0, builder.build())
+                                    val m = random.nextInt(9999 - 1000) + 1000
+                                    notify(m, builder.build())
                                 }
                             }
                         }
