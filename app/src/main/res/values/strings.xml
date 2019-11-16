@@ -16,6 +16,7 @@
     <string name="label_rename">Rename field:</string>
 
     <string name="button_sign_out">sign out</string>
+    <string name="button_delete_all_messages">delete all messages</string>
     <string name="button_sign_in">sign in</string>
     <string name="button_register">register</string>
     <string name="button_register_mode">I don\'t have account…</string>

@@ -20,6 +20,7 @@ import com.jimipurple.himichat.models.*
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dialog.*
+import java.util.*
 
 class DialogActivity : BaseActivity() {
 

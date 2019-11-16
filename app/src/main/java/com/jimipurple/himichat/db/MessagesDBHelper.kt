@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.jimipurple.himichat.models.*
 import java.util.*
@@ -106,13 +107,15 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                 val receiverId = cursor.getString(receiverIdColumn)
                 val text = cursor.getString(textColumn)
                 val dateLong = cursor.getLong(dateColumn)
-                val date = Date()
-                date.time = dateLong
+                Log.i("messagesDB", "dateLong $dateLong")
+                val date = Date(dateLong)
+                Log.i("messagesDB", "dateTime $date")
+                //date.time = dateLong
                 if (senderId == mAuth!!.uid!!){
-                    val msg = SentMessage(senderId, receiverId, text, date,null, null)
+                    val msg = SentMessage(senderId, receiverId, text, date.time,null, null)
                     msgs.add(msg)
                 } else if (receiverId == mAuth!!.uid!!) {
-                    val msg = ReceivedMessage(senderId, receiverId, text, date,null, null)
+                    val msg = ReceivedMessage(senderId, receiverId, text, date.time,null, null)
                     msgs.add(msg)
                 }
             } while (cursor.moveToNext())
@@ -120,6 +123,11 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         }
         cursor.close()
         return null
+    }
+    fun deleteAllMessages() {
+        val db = this.writableDatabase
+        db.execSQL("delete from "+ TableUndeliveredMessages.TABLE_NAME);
+        db.execSQL("delete from "+ TableMessages.TABLE_NAME);
     }
     fun getUndeliveredMessages(): ArrayList<UndeliveredMessage>? {
         //TODO получение всех сообщений пользователя из бд

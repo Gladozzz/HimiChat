@@ -93,4 +93,12 @@
             android:background="@color/colorPrimary"
             android:text="@string/button_logout" />
 
+    <Button
+            android:id="@+id/deleteAllMessagesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary"
+            android:text="@string/button_delete_all_messages" />
+
 </LinearLayout>

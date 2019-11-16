@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
+import com.jimipurple.himichat.db.MessagesDBHelper
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
@@ -47,6 +48,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
         super.onViewCreated(view, savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
         loadAvatarButton.setOnClickListener { loadAvatarCallback() }
+        deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
 
         val data = mapOf("id" to mAuth!!.uid!!)
         functions
@@ -102,6 +104,9 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
 //        return fragment
 //    }
 
+    fun deleteAllMessages() {
+        MessagesDBHelper(context!!).deleteAllMessages()
+    }
 
     fun isNicknameValid(nickname: String): Boolean {
         val expression  = "^[a-z0-9_-]{4,15}\$"

@@ -108,6 +108,9 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             val i = item as SentMessage
             text.text = i.text
             val d = i.date!!.time
+            val dateTime = i.date
+            Log.i("messagesAdapter", "dateTime $dateTime")
+            Log.i("messagesAdapter", "dateLong $d")
             //val df = SimpleDateFormat("dd-MMM-yyyy")
             val df = SimpleDateFormat("HH:mm")
             val formattedDate = df.format(d)

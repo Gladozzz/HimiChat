@@ -1,17 +1,10 @@
 package com.jimipurple.himichat
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.net.Uri
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -20,12 +13,7 @@ import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
-import com.squareup.picasso.LruCache
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.*
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
 
@@ -73,7 +61,7 @@ class MessagingService : FirebaseMessagingService() {
                             Log.i("msgService", "avatar $avatar")
                             Log.i("msgService", "nickname $nickname")
                             //val db = MessagesDBHelper(applicationContext)
-                            val msg = ReceivedMessage(sender_id, receiver_id, text, Calendar.getInstance().time, null, null)
+                            val msg = ReceivedMessage(sender_id, receiver_id, text, Date().time, null, null)
                             db.pushMessage(msg)
                             callbackOnMessageReceived()
                             if (!isDialog || isDialog && currentDialog == sender_id) {
@@ -117,7 +105,7 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("msgService", "delivered_id ${remoteMessage.data["delivered_id"]!!}")
                     Log.i("msgService", unmsg.toString())
                     if (unmsg != null) {
-                        val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Calendar.getInstance().time, null, null)
+                        val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
                         db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
                         db.pushMessage(msg)
                         Log.i("msgService", msg.toString())

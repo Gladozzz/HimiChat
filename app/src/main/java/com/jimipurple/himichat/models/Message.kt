@@ -15,7 +15,7 @@ abstract class Message(sId: String, rId: String, txt: String) {
     }
 }
 
-class ReceivedMessage(sId: String, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+class ReceivedMessage(sId: String, rId: String, txt: String, date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
@@ -49,7 +49,7 @@ class ReceivedMessage(sId: String, rId: String, txt: String, date: Date?, encryp
     }
 }
 
-class SentMessage(sId: String, rId: String, txt: String, date: Date?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+class SentMessage(sId: String, rId: String, txt: String, date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
