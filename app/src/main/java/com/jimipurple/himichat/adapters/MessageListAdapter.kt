@@ -119,6 +119,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
             }
             send.setOnClickListener {
+                send.isClickable = false
                 val mAuth = FirebaseAuth.getInstance()
                 val functions = FirebaseFunctions.getInstance()
                 val id = mAuth.uid!!
@@ -143,8 +144,10 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
                             Log.i("dialogMessage", "result " + task.result?.data.toString())
                             data["text"]
                             items.remove(item)
+                            send.isClickable = true
                         } catch (e: Exception) {
                             Log.i("dialogMessage", "error " + e.message)
+                            send.isClickable = true
                         }
                     }
 
