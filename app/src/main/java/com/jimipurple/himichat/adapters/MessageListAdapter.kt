@@ -66,28 +66,13 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
         override fun bind(item: Message) {
             val i = item as ReceivedMessage
             text.text = item.text
-            //val dateStr = i.date!!.hours.toString() + "." + i.date!!.minutes.toString() + "." + i.date!!.day.toString() + "." + i.date!!.month.toString() + "." + (i.date!!.year + 1900).toString()
-            val d = i.date!!.time
-            //val df = SimpleDateFormat("dd-MMM-yyyy")
+            val d = i.date
+            val dateTime = i.date
+            Log.i("messagesAdapter", "dateTime $dateTime")
+            Log.i("messagesAdapter", "dateLong $d")
             val df = SimpleDateFormat("HH:mm")
             val formattedDate = df.format(d)
             date.text = formattedDate
-            Log.i("Recycler", "all must be ok")
-            Log.i("Recycler", "item $i")
-
-//            if (item.avatar.isNotEmpty()) {
-//                Picasso.get().load(item.avatar).into(object : com.squareup.picasso.Target {
-//                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-//                        avatar.setImageBitmap(bitmap)
-//                    }
-//
-//                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-//
-//                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-//                        Log.i("FriendListAdapter", "Загрузка изображения не удалась " + item.avatar + "\n" + e?.message)
-//                    }
-//                })
-//            }
 
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
@@ -107,7 +92,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
         override fun bind(item: Message) {
             val i = item as SentMessage
             text.text = i.text
-            val d = i.date!!.time
+            val d = i.date
             val dateTime = i.date
             Log.i("messagesAdapter", "dateTime $dateTime")
             Log.i("messagesAdapter", "dateLong $d")

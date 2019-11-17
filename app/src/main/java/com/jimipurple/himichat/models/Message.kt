@@ -15,11 +15,10 @@ abstract class Message(sId: String, rId: String, txt: String) {
     }
 }
 
-class ReceivedMessage(sId: String, rId: String, txt: String, date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+class ReceivedMessage(sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
-    var date : Date? = Date()
     var encryptedText : String? = encryptedTxt
     var publicKey : ByteArray? = pubKey
 
@@ -45,15 +44,14 @@ class ReceivedMessage(sId: String, rId: String, txt: String, date: Long?, encryp
 
     override fun toString(): String {
         //return super.toString()
-        return "($senderId, $receiverId, $text, ${date!!.day}.${date!!.month}.${date!!.year} ${date!!.hours}:${date!!.minutes})"
+        return "($senderId, $receiverId, $text, ${date})"
     }
 }
 
-class SentMessage(sId: String, rId: String, txt: String, date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+class SentMessage(sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
-    var date : Date? = Date()
     var encryptedText : String? = encryptedTxt
     var publicKey : ByteArray? = pubKey
 
@@ -79,7 +77,7 @@ class SentMessage(sId: String, rId: String, txt: String, date: Long?, encryptedT
 
     override fun toString(): String {
         //return super.toString()
-        return "($senderId, $receiverId, $text, ${date!!.day}.${date!!.month}.${date!!.year} ${date!!.hours}:${date!!.minutes})"
+        return "($senderId, $receiverId, $text, ${date})"
     }
 }
 

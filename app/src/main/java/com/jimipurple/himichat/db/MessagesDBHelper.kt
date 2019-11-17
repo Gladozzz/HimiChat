@@ -269,7 +269,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
         cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
        // val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
-        cv.put(TableMessages.COLUMN_NAME_DATE, msg.date!!.time)
+        cv.put(TableMessages.COLUMN_NAME_DATE, msg.date)
         db!!.insert(TableMessages.TABLE_NAME, null, cv)
         db.close()
     }
@@ -281,7 +281,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
         cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
         cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
-        val dateLong = msg.date!!.time
+        val dateLong = msg.date
         cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
         cv.put(TableMessages.COLUMN_NAME_DATE, dateLong)
         db!!.insert(TableMessages.TABLE_NAME, null, cv)
@@ -299,7 +299,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                     cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
                     cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
                     // val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
-                    cv.put(TableMessages.COLUMN_NAME_DATE, msg.date!!.time)
+                    cv.put(TableMessages.COLUMN_NAME_DATE, msg.date)
                     db!!.insert(TableMessages.TABLE_NAME, null, cv)
                 }
                 is SentMessage -> {
@@ -308,7 +308,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                     cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
                     cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
                     cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, msg.publicKey)
-                    val dateLong = msg.date!!.time
+                    val dateLong = msg.date
                     cv.put("date", dateLong)
                     db!!.insert(TableMessages.TABLE_NAME, null, cv)
                 }

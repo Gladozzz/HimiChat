@@ -21,6 +21,8 @@ import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dialog.*
 import java.util.*
+import com.google.firebase.functions.FirebaseFunctionsException
+
 
 class DialogActivity : BaseActivity() {
 
@@ -162,13 +164,23 @@ class DialogActivity : BaseActivity() {
             var res = functions
                 .getHttpsCallable("sendMessage")
                 .call(data).addOnCompleteListener { task ->
-                    try {
-                        Log.i("dialogMessage", "result " + task.result?.data.toString())
-                        data["text"]
-                    } catch (e: Exception) {
-                        Log.i("dialogMessage", "error " + e.message)
+                    if (!task.isSuccessful) {
+                        val e = task.exception
+                        if (e is FirebaseFunctionsException) {
+                            val code = e.code
+                            val details = e.details
+                            Log.i("dialogMessage", "error to send " + e.details)
+                        }
+                        // ...
+                    } else {
+                        try {
+                            Log.i("dialogMessage", "result " + task.result?.data.toString())
+                            data["text"]
+                        } catch (e: Exception) {
+                            Log.i("dialogMessage", "error " + e.message)
+                        }
+                        messageInput.setText("")
                     }
-                    messageInput.setText("")
                 }
 
             Log.i("dialogMessage", "data $data")
