@@ -3,18 +3,29 @@ package com.jimipurple.himichat
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Bundle
-import android.view.View
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_login.*
-import android.widget.Toast
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
-import java.util.regex.Pattern
+import android.view.View
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.functions.FirebaseFunctions
+import com.jimipurple.himichat.encryption.Entity
+import kotlinx.android.synthetic.main.activity_login.*
+import org.whispersystems.libsignal.IdentityKeyPair
+import org.whispersystems.libsignal.SignalProtocolAddress
+import org.whispersystems.libsignal.ecc.Curve
+import org.whispersystems.libsignal.ecc.ECKeyPair
+import org.whispersystems.libsignal.ecc.ECPublicKey
+import org.whispersystems.libsignal.state.PreKeyBundle
+import org.whispersystems.libsignal.state.PreKeyRecord
+import org.whispersystems.libsignal.state.SignalProtocolStore
+import org.whispersystems.libsignal.state.SignedPreKeyRecord
+import org.whispersystems.libsignal.state.impl.InMemorySignalProtocolStore
+import org.whispersystems.libsignal.util.KeyHelper
+import java.util.regex.Pattern
 
 
 class LoginActivity : BaseActivity() {
@@ -189,6 +200,7 @@ class LoginActivity : BaseActivity() {
 
     public override fun onStart() {
         super.onStart()
+        generateKeys()
         createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
@@ -290,10 +302,14 @@ class LoginActivity : BaseActivity() {
         finish()
     }
 
+
+    private var store: SignalProtocolStore? = null
+    private val preKey: PreKeyBundle? = null
+    private var address: SignalProtocolAddress? = null
+
+
     private fun generateKeys() {
         //TODO Сделать переход на активити генерации ключей
-        val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
-        startActivity(newIntent)
-        finish()
+        Entity(1, 314159, "alice")
     }
 }

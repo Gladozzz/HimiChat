@@ -120,7 +120,7 @@ class DialogActivity : BaseActivity() {
         }
         if (unmsgs != null) {
             for (msg in unmsgs as ArrayList<Message>) {
-                if ((msg as UndeliveredMessage).receiverId == friend_id!! && (msg as UndeliveredMessage).senderId == id!!) {
+                if ((msg as UndeliveredMessage).receiverId == friend_id!! && (msg).senderId == id!!) {
                     msgs.add(msg)
                 }
             }
@@ -161,7 +161,7 @@ class DialogActivity : BaseActivity() {
             )
             messageInput.setText("")
             Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
-            var res = functions
+            functions
                 .getHttpsCallable("sendMessage")
                 .call(data).addOnCompleteListener { task ->
                     if (!task.isSuccessful) {
@@ -169,7 +169,7 @@ class DialogActivity : BaseActivity() {
                         if (e is FirebaseFunctionsException) {
                             val code = e.code
                             val details = e.details
-                            Log.i("dialogMessage", "error to send " + e.details)
+                            Log.i("dialogMessage", "error to send $details \n$code")
                         }
                         // ...
                     } else {
