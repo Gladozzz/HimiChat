@@ -9,13 +9,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.FirebaseFunctionsException
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
 import java.util.*
-
-
+import kotlin.concurrent.thread
 
 
 class MessagingService : FirebaseMessagingService() {
@@ -40,7 +40,7 @@ class MessagingService : FirebaseMessagingService() {
 
             if (/* Check if data needs to be processed by long running job */ true) {
                 // For long-running tasks (10 seconds or more) use Firebase Job Dispastcher.
-                if (remoteMessage.data.containsKey("text")){
+                if (remoteMessage.data["type"] == "message"){
                     val text = remoteMessage.data["text"]!!.toString()
                     //val avatar = remoteMessage.data["avatar"]!!.toString()
                     //val nickname = remoteMessage.data["nickname"]!!.toString()
@@ -62,37 +62,52 @@ class MessagingService : FirebaseMessagingService() {
                             Log.i("msgService", "nickname $nickname")
                             //val db = MessagesDBHelper(applicationContext)
                             val msg = ReceivedMessage(sender_id, receiver_id, text, Date().time, null, null)
-                            db.pushMessage(msg)
-                            callbackOnMessageReceived()
-                            if (!isDialog || isDialog && currentDialog == sender_id) {
-                                //Picasso.get().load(avatar).get()
-                                // Create an explicit intent for an Activity in your app
-                                val intent = Intent(this, DialogActivity::class.java).apply {
-                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            thread(start = true) {
+                                db.pushMessage(msg)
+                                val data1 = mapOf(
+                                    "senderId" to remoteMessage.data["senderId"]!!,
+                                    "deliveredId" to remoteMessage.data["delivered_id"]!!,
+                                    "text" to text,
+                                    "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                                )
+                                Log.i("msgService", "hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+                                functions.getHttpsCallable("confirmDelivery").call(data1).continueWith { task ->
+                                    Log.i("msgService", "confirmDelivery")
                                 }
-                                intent.putExtra("friend_id", sender_id)
-                                intent.putExtra("nickname", nickname)
-                                intent.putExtra("avatar", avatar)
-                                val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+                                if (isDialog) {
+                                    callbackOnMessageReceived()
+                                }
+                                if (!isDialog || isDialog && currentDialog != sender_id) {
+                                    Log.i("msgService", "notifed")
+                                    //Picasso.get().load(avatar).get()
+                                    // Create an explicit intent for an Activity in your app
+                                    val intent = Intent(this, DialogActivity::class.java).apply {
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    }
+                                    intent.putExtra("friend_id", sender_id)
+                                    intent.putExtra("nickname", nickname)
+                                    intent.putExtra("avatar", avatar)
+                                    val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
-                                val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                    .setSmallIcon(R.drawable.send_message)
-                                    .setContentTitle(nickname)
-                                    .setContentText(text)
-                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                    // Set the intent that will fire when the user taps the notification
-                                    .setContentIntent(pendingIntent)
-                                    .setAutoCancel(true)
-                                //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
-                                with(NotificationManagerCompat.from(applicationContext)) {
-                                    // notificationId is a unique int for each notification that you must define
-                                    val m = random.nextInt(9999 - 1000) + 1000
-                                    notify(m, builder.build())
+                                    val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                                        .setSmallIcon(R.drawable.send_message)
+                                        .setContentTitle(nickname)
+                                        .setContentText(text)
+                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                        // Set the intent that will fire when the user taps the notification
+                                        .setContentIntent(pendingIntent)
+                                        .setAutoCancel(true)
+                                    //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                                    with(NotificationManagerCompat.from(applicationContext)) {
+                                        // notificationId is a unique int for each notification that you must define
+                                        val m = random.nextInt(9999 - 1000) + 1000
+                                        notify(m, builder.build())
+                                    }
                                 }
                             }
                         }
-
-                } else {
+                }
+                if (remoteMessage.data["type"] == "confirmDelivery"){
                     val unmsgs = db.getUndeliveredMessages()
                     var unmsg : UndeliveredMessage? = null
                     if (unmsgs != null) {
@@ -122,7 +137,6 @@ class MessagingService : FirebaseMessagingService() {
                 // Handle message within 10 seconds
                 //handleNow()
             }
-
         }
 
         // Check if message contains a notification payload.

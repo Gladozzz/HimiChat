@@ -1,5 +1,9 @@
 package com.jimipurple.himichat
 
+//import org.whispersystems.libsignal.SignalProtocolAddress
+//import org.whispersystems.libsignal.state.PreKeyBundle
+//import org.whispersystems.libsignal.state.SignalProtocolStore
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -12,19 +16,10 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
-import com.jimipurple.himichat.encryption.Entity
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
+import com.jimipurple.himichat.encryption.Encryption
 import kotlinx.android.synthetic.main.activity_login.*
-import org.whispersystems.libsignal.IdentityKeyPair
-import org.whispersystems.libsignal.SignalProtocolAddress
-import org.whispersystems.libsignal.ecc.Curve
-import org.whispersystems.libsignal.ecc.ECKeyPair
-import org.whispersystems.libsignal.ecc.ECPublicKey
-import org.whispersystems.libsignal.state.PreKeyBundle
-import org.whispersystems.libsignal.state.PreKeyRecord
-import org.whispersystems.libsignal.state.SignalProtocolStore
-import org.whispersystems.libsignal.state.SignedPreKeyRecord
-import org.whispersystems.libsignal.state.impl.InMemorySignalProtocolStore
-import org.whispersystems.libsignal.util.KeyHelper
 import java.util.regex.Pattern
 
 
@@ -206,8 +201,8 @@ class LoginActivity : BaseActivity() {
         val currentUser = mAuth!!.currentUser
         if (currentUser != null){
             val currentUID = currentUser.uid
-            val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-            if (token.isNotEmpty()) {
+            val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+            if (token != "empty") {
                 //firestore.collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
                 val data = hashMapOf(
                     "userId" to mAuth!!.uid!!,
@@ -226,6 +221,13 @@ class LoginActivity : BaseActivity() {
                 successful()
             } else {
                 Log.i("auth:start", "Пользователь авторизован, но firebaseToken не найден")
+                FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener(
+                    this
+                ) { instanceIdResult: InstanceIdResult ->
+                    val newToken = instanceIdResult.token
+                    Log.e("auth:start", "newToken $newToken")
+                    applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("firebaseToken", newToken).apply()
+                }
                 successful()
             }
         } else {
@@ -303,13 +305,22 @@ class LoginActivity : BaseActivity() {
     }
 
 
-    private var store: SignalProtocolStore? = null
-    private val preKey: PreKeyBundle? = null
-    private var address: SignalProtocolAddress? = null
-
-
     private fun generateKeys() {
         //TODO Сделать переход на активити генерации ключей
-        Entity(1, 314159, "alice")
+        val kp1 = Encryption.genereateKeyPair()
+        val kp2 = Encryption.genereateKeyPair()
+        //val sig = Encryption.generateSignature()
+        val text = "Clear text"
+        val shSec1 = Encryption.calculateSharedSecret(kp2.publicKey, kp1.privateKey)
+        val shSec2 = Encryption.calculateSharedSecret(kp1.publicKey, kp2.privateKey)
+        if (shSec1.contentEquals(shSec2)) {
+            Log.i("generateKeys", "Shared secret working")
+        } else {
+            Log.i("generateKeys", "Shared secret not working")
+        }
+        val encrypted = Encryption.encrypt(shSec1, text)
+        Log.i("generateKeys", "encrypted $encrypted")
+        val decrypted = Encryption.decrypt(shSec1, encrypted)
+        Log.i("generateKeys", "decrypted $decrypted")
     }
 }
