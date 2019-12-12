@@ -206,7 +206,7 @@ class DialogActivity : BaseActivity() {
 
     val FCMReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            reloadMsgs()
+            //reloadMsgs()
         }
     }
 }

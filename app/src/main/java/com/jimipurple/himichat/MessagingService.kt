@@ -50,7 +50,7 @@ class MessagingService : FirebaseMessagingService() {
                     val data = mapOf("id" to sender_id)
                     functions
                         .getHttpsCallable("getUser")
-                        .call(data).continueWith { task ->
+                        .call(data).addOnCompleteListener() { task ->
                             val result = task.result?.data as HashMap<String, Any>
                             val nickname = result["nickname"] as String
                             val avatar = result["avatar"] as String
@@ -62,23 +62,23 @@ class MessagingService : FirebaseMessagingService() {
                             Log.i("msgService", "nickname $nickname")
                             //val db = MessagesDBHelper(applicationContext)
                             val msg = ReceivedMessage(sender_id, receiver_id, text, Date().time, null, null)
-                            thread(start = true) {
+                            val data1 = mapOf(
+                                "senderId" to sender_id,
+                                "deliveredId" to remoteMessage.data["delivered_id"]!!,
+                                "text" to text,
+                                "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                            )
+                                Log.i("testqwe", "testqwe")
+                                Log.i("msgService", msg.toString())
                                 db.pushMessage(msg)
-                                val data1 = mapOf(
-                                    "senderId" to remoteMessage.data["senderId"]!!,
-                                    "deliveredId" to remoteMessage.data["delivered_id"]!!,
-                                    "text" to text,
-                                    "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
-                                )
-                                Log.i("msgService", "hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-                                functions.getHttpsCallable("confirmDelivery").call(data1).continueWith { task ->
+                                functions.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener() { task ->
                                     Log.i("msgService", "confirmDelivery")
                                 }
                                 if (isDialog) {
                                     callbackOnMessageReceived()
                                 }
                                 if (!isDialog || isDialog && currentDialog != sender_id) {
-                                    Log.i("msgService", "notifed")
+                                    Log.i("msgServiceTread", "notifed")
                                     //Picasso.get().load(avatar).get()
                                     // Create an explicit intent for an Activity in your app
                                     val intent = Intent(this, DialogActivity::class.java).apply {
@@ -104,7 +104,6 @@ class MessagingService : FirebaseMessagingService() {
                                         notify(m, builder.build())
                                     }
                                 }
-                            }
                         }
                 }
                 if (remoteMessage.data["type"] == "confirmDelivery"){
