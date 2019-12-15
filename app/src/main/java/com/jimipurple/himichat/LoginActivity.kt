@@ -122,12 +122,33 @@ class LoginActivity : BaseActivity() {
                         //val user = mAuth!!.currentUser
                         val currentUser = mAuth!!.currentUser
                         val currentUID = currentUser!!.uid
-                        var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                        var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
                         if (token == "") {
                             Thread.sleep(200)
-                            token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-                        }
-                        if (token != "") {
+                            token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                            FirebaseInstanceId.getInstance().instanceId
+                                .addOnSuccessListener(
+                                    this
+                                ) { instanceIdResult: InstanceIdResult ->
+                                    val newToken = instanceIdResult.token
+                                    Log.e("auth:signIn", newToken)
+                                    applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                                        .edit().putString("firebaseToken", newToken).apply()
+                                    val data = hashMapOf(
+                                        "userId" to mAuth!!.uid!!,
+                                        "token" to token
+                                    )
+                                    var res = functions
+                                        .getHttpsCallable("setToken")
+                                        .call(data).addOnCompleteListener { task ->
+                                            try {
+                                                Log.i("setToken", "result " + task.result?.data.toString())
+                                            } catch (e: Exception) {
+                                                Log.i("setToken", "error " + e.message)
+                                            }
+                                        }
+                                }
+                        } else {
                             val data = hashMapOf(
                                 "userId" to mAuth!!.uid!!,
                                 "token" to token

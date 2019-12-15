@@ -48,7 +48,7 @@ class DialogActivity : BaseActivity() {
         db = MessagesDBHelper(applicationContext)
 
         registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
-        MessagingService.setCallbackOnMessageRecieved { reloadMsgs() }
+//        MessagingService.setCallbackOnMessageRecieved { reloadMsgs() }
         MessagingService.isDialog = true
         MessagingService.currentDialog = friend_id!!
         val linearLayoutManager = LinearLayoutManager(this)
@@ -90,7 +90,7 @@ class DialogActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         MessagingService.isDialog = false
-        MessagingService.setCallbackOnMessageRecieved {  }
+//        MessagingService.setCallbackOnMessageRecieved {  }
         unregisterReceiver(FCMReceiver)
     }
 
@@ -206,7 +206,7 @@ class DialogActivity : BaseActivity() {
 
     val FCMReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            //reloadMsgs()
+            reloadMsgs()
         }
     }
 }
