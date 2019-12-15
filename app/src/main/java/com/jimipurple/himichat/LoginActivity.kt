@@ -122,10 +122,10 @@ class LoginActivity : BaseActivity() {
                         //val user = mAuth!!.currentUser
                         val currentUser = mAuth!!.currentUser
                         val currentUID = currentUser!!.uid
-                        var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                        var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
                         if (token == "") {
                             Thread.sleep(200)
-                            token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                            token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
                             FirebaseInstanceId.getInstance().instanceId
                                 .addOnSuccessListener(
                                     this
@@ -136,7 +136,7 @@ class LoginActivity : BaseActivity() {
                                         .edit().putString("firebaseToken", newToken).apply()
                                     val data = hashMapOf(
                                         "userId" to mAuth!!.uid!!,
-                                        "token" to token
+                                        "token" to newToken
                                     )
                                     var res = functions
                                         .getHttpsCallable("setToken")
@@ -216,14 +216,38 @@ class LoginActivity : BaseActivity() {
 
     public override fun onStart() {
         super.onStart()
+
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnSuccessListener(
+                this
+            ) { instanceIdResult: InstanceIdResult ->
+                val newToken = instanceIdResult.token
+                Log.i("auth:start", newToken)
+//                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+//                    .edit().putString("firebaseToken", newToken).apply()
+//                val data = hashMapOf(
+//                    "userId" to mAuth!!.uid!!,
+//                    "token" to newToken
+//                )
+//                var res = functions
+//                    .getHttpsCallable("setToken")
+//                    .call(data).addOnCompleteListener { task ->
+//                        try {
+//                            Log.i("setToken", "result " + task.result?.data.toString())
+//                        } catch (e: Exception) {
+//                            Log.i("setToken", "error " + e.message)
+//                        }
+//                    }
+            }
+
         generateKeys()
         createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
         if (currentUser != null){
             val currentUID = currentUser.uid
-            val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
-            if (token != "empty") {
+            val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+            if (token != "") {
                 //firestore.collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
                 val data = hashMapOf(
                     "userId" to mAuth!!.uid!!,

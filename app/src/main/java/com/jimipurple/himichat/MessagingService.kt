@@ -29,12 +29,12 @@ class MessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.i("messaging", "From: " + remoteMessage.from!!)
+        Log.i("msgService", "From: " + remoteMessage.from!!)
 
         val db = MessagesDBHelper(applicationContext)
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
-            Log.i("messaging", "Message data payload: " + remoteMessage.data)
+            Log.i("msgService", "Message data payload: " + remoteMessage.data)
 
             //TODO Сделать обработку сообщений
 
@@ -140,10 +140,10 @@ class MessagingService : FirebaseMessagingService() {
 
         // Check if message contains a notification payload.
         if (remoteMessage.notification != null) {
-            Log.i("messaging:onMessage", "Message Notification Body: " + remoteMessage.notification!!.body!!)
+            Log.i("msgService:onMessage", "Message Notification Body: " + remoteMessage.notification!!.body!!)
         }
 
-        Log.i("messaging:onMessage", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+        Log.i("msgService:onMessage", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
@@ -183,7 +183,7 @@ class MessagingService : FirebaseMessagingService() {
                 }
             return true
         } catch (e : Exception) {
-            Log.i("messaging:tokenToServer", "error " + e.toString())
+            Log.i("msgService:tokenSend", "error " + e.toString())
         }
         return false
     }
