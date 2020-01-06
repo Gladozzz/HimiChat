@@ -22,6 +22,10 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_dialog.*
 import java.util.*
 import com.google.firebase.functions.FirebaseFunctionsException
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 
 
 class DialogActivity : BaseActivity() {
@@ -153,39 +157,161 @@ class DialogActivity : BaseActivity() {
             val senderId = mAuth!!.uid!!
             val msg = UndeliveredMessage(senderId, receiverId!!, text, db!!.getDeliveredId())
             db!!.pushMessage(msg)
+            reloadMsgs()
+            var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
             val data = hashMapOf(
                 "receiverId" to receiverId,
                 "senderId" to senderId,
                 "deliveredId" to msg.deliveredId.toString(),
                 "text" to text,
-                "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                "token" to token
             )
-            messageInput.setText("")
-            Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
-            functions
-                .getHttpsCallable("sendMessage")
-                .call(data).addOnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        val e = task.exception
-                        if (e is FirebaseFunctionsException) {
-                            val code = e.code
-                            val details = e.details
-                            Log.i("dialogMessage", "error to send $details \n$code")
+            if (token == "") {
+                Log.i("dialogMessage", "data $data")
+                    //db!!.pushMessage(msg)
+                    val data = hashMapOf(
+                        "receiverId" to receiverId,
+                        "senderId" to senderId,
+                        "deliveredId" to msg.deliveredId.toString(),
+                        "text" to text,
+                        "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                    )
+                    messageInput.setText("")
+                    Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+                    functions
+                        .getHttpsCallable("sendMessage")
+                        .call(data).addOnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                val e = task.exception
+                                if (e is FirebaseFunctionsException) {
+                                    val code = e.code
+                                    val details = e.details
+                                    Log.i("dialogMessage", "error to send $details \n$code")
+                                }
+                            } else {
+                                try {
+                                    Log.i("dialogMessage", "result " + task.result?.data.toString())
+                                    data["text"]
+                                } catch (e: Exception) {
+                                    Log.i("dialogMessage", "sendMessage error " + e.message)
+                                }
+                                messageInput.setText("")
+                            }
                         }
-                        // ...
-                    } else {
-                        try {
-                            Log.i("dialogMessage", "result " + task.result?.data.toString())
-                            data["text"]
-                        } catch (e: Exception) {
-                            Log.i("dialogMessage", "error " + e.message)
-                        }
-                        messageInput.setText("")
-                    }
-                }
 
-            Log.i("dialogMessage", "data $data")
-            reloadMsgs()
+                    Log.i("dialogMessage", "data $data")
+                    reloadMsgs()
+
+//                    db!!.pushMessage(msg)
+//                    reloadMsgs()
+//                    var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+//                    val data = hashMapOf(
+//                        "receiverId" to receiverId,
+//                        "senderId" to senderId,
+//                        "deliveredId" to msg.deliveredId.toString(),
+//                        "text" to text,
+//                        "token" to token
+//                    )
+//                    messageInput.setText("")
+//                    Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+//                    val data1 = hashMapOf(
+//                        "id" to id
+//                    )
+//                    functions
+//                        .getHttpsCallable("getToken")
+//                        .call(data1).addOnCompleteListener { task ->
+//                            if (!task.isSuccessful) {
+//                                val e = task.exception
+//                                if (e is FirebaseFunctionsException) {
+//                                    val code = e.code
+//                                    val details = e.details
+//                                    Log.i("dialogMessage", "error to send $details \n$code")
+//                                }
+//                            } else {
+//                                Log.i("dialogMessage", "data $data")
+//                                try {
+//                                    Log.i("dialogMessage", "result " + task.result?.data.toString())
+//                                    val receiverToken = data["token"]
+//                                    //data["token"] = receiverToken
+//                                    val fm = FirebaseMessaging.getInstance()
+//                                    fm.send(RemoteMessage.Builder("${receiverToken}@fcm.googleapis.com")
+//                                        .setData(data)
+//                                        .setMessageId(data["deliveredId"]!!)
+//                                        .setMessageType("data")
+//                                        .build())
+//
+//                                } catch (e: Exception) {
+//                                    Log.i("dialogMessage", "getToken error " + e.message)
+//                                }
+//                                messageInput.setText("")
+//                            }
+//                        }
+            } else {
+                //db!!.pushMessage(msg)
+                reloadMsgs()
+                val data = hashMapOf(
+                    "receiverId" to receiverId,
+                    "senderId" to senderId,
+                    "deliveredId" to msg.deliveredId.toString(),
+                    "text" to text,
+                    "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                )
+                messageInput.setText("")
+                Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+                functions
+                    .getHttpsCallable("sendMessage")
+                    .call(data).addOnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            val e = task.exception
+                            if (e is FirebaseFunctionsException) {
+                                val code = e.code
+                                val details = e.details
+                                Log.i("dialogMessage", "error to send $details \n$code")
+                            }
+                        } else {
+                            try {
+                                Log.i("dialogMessage", "result " + task.result?.data.toString())
+                                data["text"]
+                            } catch (e: Exception) {
+                                Log.i("dialogMessage", "sendMessage error " + e.message)
+                            }
+                            messageInput.setText("")
+                        }
+                    }
+
+//                val data1 = hashMapOf(
+//                    "id" to id
+//                )
+//                functions
+//                    .getHttpsCallable("getToken")
+//                    .call(data1).addOnCompleteListener { task ->
+//                        if (!task.isSuccessful) {
+//                            val e = task.exception
+//                            if (e is FirebaseFunctionsException) {
+//                                val code = e.code
+//                                val details = e.details
+//                                Log.i("dialogMessage", "error to send $details \n$code")
+//                            }
+//                        } else {
+//                            try {
+//                                Log.i("dialogMessage", "result " + task.result?.data.toString())
+//                                val dat = task.result?.data as HashMap<String, Any>
+//                                val receiverToken = dat["token"]
+//                                //data["token"] = receiverToken
+//                                val fm = FirebaseMessaging.getInstance()
+//                                fm.send(RemoteMessage.Builder("${receiverToken}@fcm.googleapis.com")
+//                                    .setData(data)
+//                                    .setMessageId(data["deliveredId"]!!)
+//                                    //.setMessageType("data")
+//                                    .build())
+//
+//                                Log.i("dialogMessage", "data $data")
+//                            } catch (e: Exception) {
+//                                Log.i("dialogMessage", "getToken error " + e.message)
+//                            }
+//                        }
+//                    }
+            }
         }
     }
 

@@ -34,43 +34,6 @@
           ]
         }
       }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:195021957274:android:4adc6027bd3cfa9d",
-        "android_client_info": {
-          "package_name": "com.jmipurple.himichat"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "195021957274-c49e875oqrj06ddb1n3ek7m0j7gtabq1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.jmipurple.himichat",
-            "certificate_hash": "dd10cd295fe631fbf32a93668478e1a3bc432144"
-          }
-        },
-        {
-          "client_id": "195021957274-muvnttjq4se528aibof5tqsq6vtaqkeb.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyATD3ue_mkCrGaTXp63OgiaNio3auv2eWI"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "195021957274-muvnttjq4se528aibof5tqsq6vtaqkeb.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
     }
   ],
   "configuration_version": "1"

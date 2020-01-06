@@ -68,8 +68,7 @@ class MessagingService : FirebaseMessagingService() {
                                 "text" to text,
                                 "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
                             )
-                                Log.i("testqwe", "testqwe")
-                                Log.i("msgService", msg.toString())
+                                Log.i("msgService", "message pushed to the db $msg")
                                 db.pushMessage(msg)
                                 functions.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener() { task ->
                                     Log.i("msgService", "confirmDelivery")
@@ -149,6 +148,31 @@ class MessagingService : FirebaseMessagingService() {
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
+    override fun onMessageSent(p0: String) {
+        super.onMessageSent(p0)
+        val db = MessagesDBHelper(applicationContext)
+        val unmsgs = db.getUndeliveredMessages()
+        var unmsg : UndeliveredMessage? = null
+        if (unmsgs != null) {
+            for (i in unmsgs) {
+                if (i.deliveredId == p0.toLong()) {
+                    unmsg = i
+                }
+            }
+        }
+        Log.i("msgService", "delivered_id $p0")
+        Log.i("msgService", unmsg.toString())
+        if (unmsg != null) {
+            val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
+            db.removeUndeliveredMessage(p0.toString())
+            db.pushMessage(msg)
+            Log.i("msgService", msg.toString())
+            callbackOnMessageReceived()
+        } else {
+            Log.i("msgService", "undelivered message wasn't found")
+        }
+    }
+
     override fun onNewToken(token: String) {
         Log.i("messagingtoken", "Refreshed token: $token")
 
@@ -168,8 +192,13 @@ class MessagingService : FirebaseMessagingService() {
 //                Log.i("messaging:tokenToServer", "user is not registered, but token saved to SharedPreferences")
 //            }
             Log.i("sendToken", "try send token: $token")
+            var uid = mAuth.uid
+            while (uid == null) {
+                Thread.sleep(100)
+                uid = mAuth.uid
+            }
             val data = hashMapOf(
-                "userId" to mAuth!!.uid!!,
+                "userId" to uid,
                 "token" to token
             )
             var res = functions

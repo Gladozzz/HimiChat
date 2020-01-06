@@ -203,7 +203,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             val id = cursor.getInt(idColumn)
             val receiverId = cursor.getString(receiverIdColumn)
             val dId = cursor.getLong(deliveredIdColumn)
-            val senderId = cursor.getString(deliveredIdColumn)
+            val senderId = cursor.getString(senderIdColumn)
             val text = cursor.getString(textColumn)
             val msg = UndeliveredMessage(senderId, receiverId, text, dId)
             msgs.add(msg)

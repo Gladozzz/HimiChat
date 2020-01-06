@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
+import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.Encryption
 import kotlinx.android.synthetic.main.activity_login.*
 import java.util.regex.Pattern
@@ -30,6 +31,7 @@ class LoginActivity : BaseActivity() {
     private var firebaseToken: String  = ""
     private var functions = FirebaseFunctions.getInstance()
     private var CHANNEL_ID = "himichat_messages"
+    private var keydb = KeysDBHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,9 +66,9 @@ class LoginActivity : BaseActivity() {
                         user["id"] = currentUID
                         user["nickname"] = nickname
                         user["avatar"] = ""
-                        user["token"] = firebaseToken
                         user["real_name"] = rn
                         user["email"] = email
+                        user["public_key"] = email
                         //firestore.collection("users").document(currentUID).set(user
                         var res = functions
                             .getHttpsCallable("setUser")
@@ -77,12 +79,18 @@ class LoginActivity : BaseActivity() {
                                     Log.i("setUser", "error " + e.message)
                                 }
                             }
+                        pushTokenToServer()
+                        var kp = keydb.getKeyPair(currentUID)
+                        if (kp == null) {
+                            generateKeys()
+                            kp = keydb.getKeyPair(currentUID)
+                        }
+                        pushKeysToServer(String(kp!!.publicKey, Charsets.UTF_8))
                         successful()
 //                        val userData = mapOf(
 //                            "id" to currentUID,
 //                            "nickname" to nickname,
 //                            "avatar" to "",
-//                            "token" to firebaseToken,
 //                            "real_name" to rn,
 //                            "email" to email
 //                        )
@@ -122,58 +130,14 @@ class LoginActivity : BaseActivity() {
                         //val user = mAuth!!.currentUser
                         val currentUser = mAuth!!.currentUser
                         val currentUID = currentUser!!.uid
-                        var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-                        if (token == "") {
-                            Thread.sleep(200)
-                            token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-                            FirebaseInstanceId.getInstance().instanceId
-                                .addOnSuccessListener(
-                                    this
-                                ) { instanceIdResult: InstanceIdResult ->
-                                    val newToken = instanceIdResult.token
-                                    Log.e("auth:signIn", newToken)
-                                    applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
-                                        .edit().putString("firebaseToken", newToken).apply()
-                                    val data = hashMapOf(
-                                        "userId" to mAuth!!.uid!!,
-                                        "token" to newToken
-                                    )
-                                    var res = functions
-                                        .getHttpsCallable("setToken")
-                                        .call(data).addOnCompleteListener { task ->
-                                            try {
-                                                Log.i("setToken", "result " + task.result?.data.toString())
-                                            } catch (e: Exception) {
-                                                Log.i("setToken", "error " + e.message)
-                                            }
-                                        }
-                                }
-                        } else {
-                            val data = hashMapOf(
-                                "userId" to mAuth!!.uid!!,
-                                "token" to token
-                            )
-                            var res = functions
-                                .getHttpsCallable("setToken")
-                                .call(data).addOnCompleteListener { task ->
-                                    try {
-                                        Log.i("setToken", "result " + task.result?.data.toString())
-                                    } catch (e: Exception) {
-                                        Log.i("setToken", "error " + e.message)
-                                    }
-                                }
+                        pushTokenToServer()
+                        var kp = keydb.getKeyPair(currentUID)
+                        if (kp == null) {
+                            generateKeys()
+                            kp = keydb.getKeyPair(currentUID)
                         }
+                        pushKeysToServer(String(kp!!.publicKey, Charsets.UTF_8))
                         successful()
-//                        val tokenData = mapOf(
-//                            "token" to token
-//                        )
-//                        firestore.collection("users").document(mAuth!!.uid!!)
-//                            .set(tokenData, SetOptions.merge())
-//                            .addOnSuccessListener {
-//                                Log.i("LoginActivity", "token successfully written")
-//                                successful()
-//                            }
-//                            .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing token", e) }
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("auth:signIn", "signInWithEmail:failure", task.exception)
@@ -191,8 +155,6 @@ class LoginActivity : BaseActivity() {
                         ).show()
                         //successful()
                     }
-
-                    // ...
                 }
         }
     }
@@ -216,65 +178,25 @@ class LoginActivity : BaseActivity() {
 
     public override fun onStart() {
         super.onStart()
-
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnSuccessListener(
-                this
-            ) { instanceIdResult: InstanceIdResult ->
-                val newToken = instanceIdResult.token
-                Log.i("auth:start", newToken)
-//                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
-//                    .edit().putString("firebaseToken", newToken).apply()
-//                val data = hashMapOf(
-//                    "userId" to mAuth!!.uid!!,
-//                    "token" to newToken
-//                )
-//                var res = functions
-//                    .getHttpsCallable("setToken")
-//                    .call(data).addOnCompleteListener { task ->
-//                        try {
-//                            Log.i("setToken", "result " + task.result?.data.toString())
-//                        } catch (e: Exception) {
-//                            Log.i("setToken", "error " + e.message)
-//                        }
-//                    }
-            }
-
-        generateKeys()
         createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
         if (currentUser != null){
             val currentUID = currentUser.uid
-            val token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-            if (token != "") {
-                //firestore.collection("users").document(currentUID).set(mapOf("token" to token), SetOptions.merge())
-                val data = hashMapOf(
-                    "userId" to mAuth!!.uid!!,
-                    "token" to token
-                )
-                var res = functions
-                    .getHttpsCallable("setToken")
-                    .call(data).addOnCompleteListener { task ->
-                        try {
-                            Log.i("setToken", "result " + task.result?.data.toString())
-                        } catch (e: Exception) {
-                            Log.i("setToken", "error " + e.message)
-                        }
-                    }
-                Log.i("auth:start", "Пользователь авторизован, firebaseToken отправлен $token")
-                successful()
-            } else {
-                Log.i("auth:start", "Пользователь авторизован, но firebaseToken не найден")
-                FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener(
-                    this
-                ) { instanceIdResult: InstanceIdResult ->
-                    val newToken = instanceIdResult.token
-                    Log.e("auth:start", "newToken $newToken")
-                    applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("firebaseToken", newToken).apply()
-                }
-                successful()
+
+            //check keys
+            val keysDB = KeysDBHelper(applicationContext)
+            var kp = keydb.getKeyPair(currentUID)
+            if (kp == null) {
+                generateKeys()
+                kp = keydb.getKeyPair(currentUID)
             }
+            pushKeysToServer(String(kp!!.publicKey, Charsets.UTF_8))
+
+            //updating token
+            pushTokenToServer()
+
+            successful()
         } else {
             Log.i("auth:start", "Пользователь не авторизован")
         }
@@ -331,41 +253,58 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun successful() {
-        val data = hashMapOf(
-            "userId" to mAuth!!.uid!!,
-            "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-        )
-        var res = functions
-            .getHttpsCallable("setToken")
-            .call(data).addOnCompleteListener { task ->
-                try {
-                    Log.i("setToken", "result " + task.result?.data.toString())
-                } catch (e: Exception) {
-                    Log.i("setToken", "error " + e.message)
-                }
-            }
         val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
         startActivity(newIntent)
         finish()
     }
 
+    private fun generateKeys(): String {
+        val kp = Encryption.genereateKeyPair()
+        keydb.pushKeyPair(mAuth!!.uid!!, kp)
+        return String(kp.publicKey, Charsets.UTF_8)
+    }
 
-    private fun generateKeys() {
-        //TODO Сделать переход на активити генерации ключей
-        val kp1 = Encryption.genereateKeyPair()
-        val kp2 = Encryption.genereateKeyPair()
-        //val sig = Encryption.generateSignature()
-        val text = "Clear text"
-        val shSec1 = Encryption.calculateSharedSecret(kp2.publicKey, kp1.privateKey)
-        val shSec2 = Encryption.calculateSharedSecret(kp1.publicKey, kp2.privateKey)
-        if (shSec1.contentEquals(shSec2)) {
-            Log.i("generateKeys", "Shared secret working")
-        } else {
-            Log.i("generateKeys", "Shared secret not working")
-        }
-        val encrypted = Encryption.encrypt(shSec1, text)
-        Log.i("generateKeys", "encrypted $encrypted")
-        val decrypted = Encryption.decrypt(shSec1, encrypted)
-        Log.i("generateKeys", "decrypted $decrypted")
+    private fun pushKeysToServer(key: String) {
+        val data = hashMapOf(
+            "userId" to mAuth!!.uid!!,
+            "publicKey" to key
+        )
+        val test = key.toByteArray(Charsets.UTF_8)
+        Log.i("setPublicKey", "setPublicKey data $data")
+        functions
+            .getHttpsCallable("setPublicKey")
+            .call(data).addOnCompleteListener { task ->
+                try {
+                    Log.i("setPublicKey", "setPublicKey result " + task.result?.data.toString())
+                } catch (e: Exception) {
+                    Log.i("setPublicKey", "setPublicKey error " + e.message)
+                }
+            }
+    }
+
+    private fun pushTokenToServer() {
+        val uid = mAuth!!.uid
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnSuccessListener(
+                this
+            ) { instanceIdResult: InstanceIdResult ->
+                val newToken = instanceIdResult.token
+                Log.i("auth:start", newToken)
+                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                    .edit().putString("firebaseToken", newToken).apply()
+                val data = hashMapOf(
+                    "userId" to uid,
+                    "token" to newToken
+                )
+                var res = functions
+                    .getHttpsCallable("setToken")
+                    .call(data).addOnCompleteListener { task ->
+                        try {
+                            Log.i("setToken", "setToken result " + task.result?.data.toString())
+                        } catch (e: Exception) {
+                            Log.i("setToken", "setToken error " + e.message)
+                        }
+                    }
+            }
     }
 }
