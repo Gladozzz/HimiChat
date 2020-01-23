@@ -105,7 +105,13 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
 
             itemView.setOnClickListener {
                 itemView.showContextMenu()
-                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+            }
+
+            itemView.setOnLongClickListener {
+//                itemView.showContextMenu()
+//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+                true
             }
 
             //blockButton.setOnClickListener {blockCallback(i)}
@@ -133,7 +139,13 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
 
             itemView.setOnClickListener {
                 itemView.showContextMenu()
-                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+            }
+
+            itemView.setOnLongClickListener {
+                //                itemView.showContextMenu()
+//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+                true
             }
         }
     }
@@ -148,7 +160,13 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
 
             itemView.setOnClickListener {
                 itemView.showContextMenu()
-                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+            }
+
+            itemView.setOnLongClickListener {
+                //                itemView.showContextMenu()
+//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+                true
             }
             send.setOnClickListener {
                 send.isClickable = false
