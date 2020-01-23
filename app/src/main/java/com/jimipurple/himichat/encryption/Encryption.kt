@@ -9,7 +9,7 @@ import javax.crypto.spec.SecretKeySpec
 
 
 object Encryption {
-    fun genereateKeyPair(): Curve25519KeyPair {
+    fun generateKeyPair(): Curve25519KeyPair {
         val cipher = Curve25519.getInstance(Curve25519.BEST)
         return Curve25519.getInstance(Curve25519.BEST).generateKeyPair()
     }

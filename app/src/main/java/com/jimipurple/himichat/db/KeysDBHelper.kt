@@ -12,6 +12,7 @@ import com.jimipurple.himichat.encryption.CurveKeyPair
 import org.json.JSONArray
 import org.json.JSONObject
 import org.whispersystems.curve25519.Curve25519KeyPair
+import java.security.PublicKey
 import java.util.*
 
 
@@ -55,8 +56,14 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
         db.execSQL(SQL_CREATE_TABLE_SIG)
     }
 
+    /**
+     * Method of removing old key and pushing new one
+     * @param uid Firebase Authentication ID of the current user, which will set new encryption keys in a database key
+     * @param data new key pair for encryption
+     */
     @Throws(SQLiteException::class)
     fun pushKeyPair(uid: String, data: Curve25519KeyPair) {
+
         val db = this.writableDatabase
 
         // Define 'where' part of query.
@@ -67,14 +74,8 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
         val deletedRows = db.delete(TableKeyPairs.TABLE_NAME, selection, selectionArgs)
 
         val cv = ContentValues()
-        var json = JSONObject()
-        json.put("blob", JSONArray(data.publicKey))
-        var arrayList = json.toString()
-        cv.put(TableKeyPairs.COLUMN_NAME_PUBLIC_KEY, arrayList)
-        json = JSONObject()
-        json.put("blob", JSONArray(data.privateKey))
-        arrayList = json.toString()
-        cv.put(TableKeyPairs.COLUMN_NAME_PRIVATE_KEY, arrayList)
+        cv.put(TableKeyPairs.COLUMN_NAME_PUBLIC_KEY, data.publicKey)
+        cv.put(TableKeyPairs.COLUMN_NAME_PRIVATE_KEY, data.privateKey)
         cv.put(TableKeyPairs.COLUMN_NAME_USER_ID, uid)
         db.insert(TableKeyPairs.TABLE_NAME, null, cv)
     }
@@ -122,14 +123,52 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
     }
 
     @Throws(SQLiteException::class)
+    fun getKeyPair(publicKey: ByteArray): CurveKeyPair? {
+        val db = this.readableDatabase
+        val cv = ContentValues()
+        val projection = arrayOf(BaseColumns._ID,
+            TableKeyPairs.COLUMN_NAME_USER_ID,
+            TableKeyPairs.COLUMN_NAME_PUBLIC_KEY,
+            TableKeyPairs.COLUMN_NAME_PRIVATE_KEY
+        )
+        val sortOrder = "${BaseColumns._ID}"
+        val cursor = db.query(
+            TableKeyPairs.TABLE_NAME,   // The table to query
+            projection,             // The array of columns to return (pass null to get all)
+            null,              // The columns for the WHERE clause
+            null,          // The values for the WHERE clause
+            null,                   // don't group the rows
+            null,                   // don't filter by row groups
+            sortOrder               // The sort order
+        )
+        if (cursor.moveToFirst()) {
+            val idColumn = cursor.getColumnIndex(BaseColumns._ID)
+            val userIdColumn = cursor.getColumnIndex(TableKeyPairs.COLUMN_NAME_USER_ID)
+            val publicKeyColumn = cursor.getColumnIndex(TableKeyPairs.COLUMN_NAME_PUBLIC_KEY)
+            val privateKeyColumn = cursor.getColumnIndex(TableKeyPairs.COLUMN_NAME_PRIVATE_KEY)
+
+            var kp: CurveKeyPair? = null
+
+            do {
+                val id = cursor.getInt(idColumn)
+                val userId = cursor.getString(userIdColumn)
+                val pubKey = cursor.getBlob(publicKeyColumn)
+                val privateKey = cursor.getBlob(privateKeyColumn)
+                if (pubKey!!.contentEquals(publicKey)) {
+                    kp = CurveKeyPair(publicKey, privateKey)
+                }
+            } while (cursor.moveToNext())
+            return kp
+        }
+        cursor.close()
+        return null
+    }
+
+    @Throws(SQLiteException::class)
     fun pushSignature(uid: String, data: ByteArray) {
         val db = this.writableDatabase
         val cv = ContentValues()
-
-        var json = JSONObject()
-        json.put("blob", JSONArray(data))
-        var arrayList = json.toString()
-        cv.put(TableSignatures.COLUMN_NAME_SIGNATURE, arrayList)
+        cv.put(TableSignatures.COLUMN_NAME_SIGNATURE, data)
 
         cv.put(TableSignatures.COLUMN_NAME_USER_ID, uid)
         db.insert(TableSignatures.TABLE_NAME, null, cv)

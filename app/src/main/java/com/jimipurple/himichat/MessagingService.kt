@@ -5,12 +5,15 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.content.Intent
+import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
+import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.db.MessagesDBHelper
+import com.jimipurple.himichat.encryption.Encryption
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
@@ -104,6 +107,89 @@ class MessagingService : FirebaseMessagingService() {
                                     }
                                 }
                         }
+                }
+                if (remoteMessage.data["type"] == "encrypted-message"){
+                    val encrypted_text = remoteMessage.data["encrypted_text"]!!.toString()
+                    //val avatar = remoteMessage.data["avatar"]!!.toString()
+                    //val nickname = remoteMessage.data["nickname"]!!.toString()
+                    val sender_id = remoteMessage.data["sender_id"]!!.toString()
+                    val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
+                    val sender_public_key = remoteMessage.data["sender_public_key"]!!.toString()
+                    val receiver_public_key = remoteMessage.data["receiver_public_key"]!!.toString()
+                    val signature = remoteMessage.data["signature"]!!.toString()
+
+                    val kp = KeysDBHelper(applicationContext).getKeyPair(Base64.decode(receiver_public_key, Base64.DEFAULT))
+                    if (kp != null) {
+                        val data = mapOf("id" to sender_id)
+                        functions
+                            .getHttpsCallable("getUser")
+                            .call(data).addOnCompleteListener { task ->
+                                val sharedSecret = Encryption.calculateSharedSecret(Base64.decode(sender_public_key, Base64.DEFAULT), kp.privateKey)
+                                Log.i("sharedSecret", "data ${Base64.encodeToString(sharedSecret, Base64.DEFAULT)}")
+                                val text = Encryption.decrypt(sharedSecret, Base64.decode(encrypted_text, Base64.DEFAULT))
+                                val isSignatureValid = Encryption.verifySignature(text.toByteArray(Charsets.UTF_8), Base64.decode(sender_public_key, Base64.DEFAULT), Base64.decode(signature, Base64.DEFAULT))
+                                //TODO Сделать обработку после проверки подписи
+
+                                val result = task.result?.data as HashMap<String, Any>
+                                val nickname = result["nickname"] as String
+                                val avatar = result["avatar"] as String
+                                Log.i("msgService", "data ${remoteMessage.data}")
+                                Log.i("msgService", "encrypted_text $encrypted_text")
+                                Log.i("msgService", "text $text")
+                                Log.i("msgService", "sender_id $sender_id")
+                                Log.i("msgService", "receiver_id $receiver_id")
+                                Log.i("msgService", "avatar $avatar")
+                                Log.i("msgService", "nickname $nickname")
+                                Log.i("msgService", "sender_public_key $sender_public_key")
+                                Log.i("msgService", "receiver_public_key $receiver_public_key")
+                                Log.i("msgService", "signature $signature")
+                                //val db = MessagesDBHelper(applicationContext)
+                                val msg = ReceivedMessage(sender_id, receiver_id, text, Date().time, null, null)
+                                val data1 = mapOf(
+                                    "senderId" to sender_id,
+                                    "deliveredId" to remoteMessage.data["delivered_id"]!!,
+                                    "text" to text,
+                                    "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                                )
+                                Log.i("msgService", "message pushed to the db $msg")
+                                db.pushMessage(msg)
+                                functions.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener { task ->
+                                    Log.i("msgService", "confirmDelivery")
+                                }
+                                if (isDialog) {
+                                    callbackOnMessageReceived()
+                                }
+                                if (!isDialog || isDialog && currentDialog != sender_id) {
+                                    Log.i("msgServiceTread", "notifed")
+                                    //Picasso.get().load(avatar).get()
+                                    // Create an explicit intent for an Activity in your app
+                                    val intent = Intent(this, DialogActivity::class.java).apply {
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    }
+                                    intent.putExtra("friend_id", sender_id)
+                                    intent.putExtra("nickname", nickname)
+                                    intent.putExtra("avatar", avatar)
+                                    val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+
+                                    val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                                        .setSmallIcon(R.drawable.send_message)
+                                        .setContentTitle(nickname)
+                                        .setContentText(text)
+                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                        // Set the intent that will fire when the user taps the notification
+                                        .setContentIntent(pendingIntent)
+                                        .setAutoCancel(true)
+                                    //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                                    with(NotificationManagerCompat.from(applicationContext)) {
+                                        // notificationId is a unique int for each notification that you must define
+                                        val m = random.nextInt(9999 - 1000) + 1000
+                                        notify(m, builder.build())
+                                    }
+                                }
+                            }
+                    } else {
+                        //TODO Добавление сообщения в диалог с оповещениемс об ошибке расшифрования
+                    }
                 }
                 if (remoteMessage.data["type"] == "confirmDelivery"){
                     val unmsgs = db.getUndeliveredMessages()

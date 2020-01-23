@@ -1,19 +1,17 @@
 package com.jimipurple.himichat
 
-//import org.whispersystems.libsignal.SignalProtocolAddress
-//import org.whispersystems.libsignal.state.PreKeyBundle
-//import org.whispersystems.libsignal.state.SignalProtocolStore
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
@@ -85,7 +83,7 @@ class LoginActivity : BaseActivity() {
                             generateKeys()
                             kp = keydb.getKeyPair(currentUID)
                         }
-                        pushKeysToServer(String(kp!!.publicKey, Charsets.UTF_8))
+                        pushKeysToServer(kp!!.publicKey)
                         successful()
 //                        val userData = mapOf(
 //                            "id" to currentUID,
@@ -134,9 +132,10 @@ class LoginActivity : BaseActivity() {
                         var kp = keydb.getKeyPair(currentUID)
                         if (kp == null) {
                             generateKeys()
+                            Log.i("auth:signIn", "New key's generated")
                             kp = keydb.getKeyPair(currentUID)
                         }
-                        pushKeysToServer(String(kp!!.publicKey, Charsets.UTF_8))
+                        pushKeysToServer(kp!!.publicKey)
                         successful()
                     } else {
                         // If sign in fails, display a message to the user.
@@ -189,9 +188,10 @@ class LoginActivity : BaseActivity() {
             var kp = keydb.getKeyPair(currentUID)
             if (kp == null) {
                 generateKeys()
+                Log.i("auth:start", "New key's generated")
                 kp = keydb.getKeyPair(currentUID)
             }
-            pushKeysToServer(String(kp!!.publicKey, Charsets.UTF_8))
+            pushKeysToServer(kp!!.publicKey)
 
             //updating token
             pushTokenToServer()
@@ -252,36 +252,49 @@ class LoginActivity : BaseActivity() {
         return matcher.matches()
     }
 
+    //moment when authentication, token check and keys check are successful
     private fun successful() {
+        val kp = Encryption.generateKeyPair()
+        val test1 = Base64.encodeToString(kp.publicKey, Base64.DEFAULT)
+        val test2 = Base64.decode(test1, Base64.DEFAULT)
+        var test3 = test2.size
+        Log.i("keys_TEST", "pub ${kp.publicKey.contentToString()}")
+        Log.i("keys_TEST", "test1 $test1")
+        Log.i("keys_TEST", "test2 ${test2.contentToString()}")
+        Log.i("keys_TEST", "test3 $test3")
         val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
         startActivity(newIntent)
         finish()
     }
 
+    //Generating new key pair and removing old
     private fun generateKeys(): String {
-        val kp = Encryption.genereateKeyPair()
+        val kp = Encryption.generateKeyPair()
         keydb.pushKeyPair(mAuth!!.uid!!, kp)
-        return String(kp.publicKey, Charsets.UTF_8)
+        return kp.publicKey.toString(Charsets.ISO_8859_1)
     }
 
-    private fun pushKeysToServer(key: String) {
-        val data = hashMapOf(
-            "userId" to mAuth!!.uid!!,
-            "publicKey" to key
-        )
-        val test = key.toByteArray(Charsets.UTF_8)
-        Log.i("setPublicKey", "setPublicKey data $data")
-        functions
-            .getHttpsCallable("setPublicKey")
-            .call(data).addOnCompleteListener { task ->
-                try {
-                    Log.i("setPublicKey", "setPublicKey result " + task.result?.data.toString())
-                } catch (e: Exception) {
-                    Log.i("setPublicKey", "setPublicKey error " + e.message)
-                }
-            }
+    //Pushing Public Key from KeysDB to Firebase Firestore
+    private fun pushKeysToServer(key: ByteArray) {
+//        val data = hashMapOf(
+//            "userId" to mAuth!!.uid!!,
+//            "publicKey" to key
+//        )
+//        val test = key.toByteArray(Charsets.ISO_8859_1)
+//        Log.i("setPublicKey", "setPublicKey data $data")
+//        functions
+//            .getHttpsCallable("setPublicKey")
+//            .call(data).addOnCompleteListener { task ->
+//                try {
+//                    Log.i("setPublicKey", "setPublicKey result " + task.result?.data.toString())
+//                } catch (e: Exception) {
+//                    Log.i("setPublicKey", "setPublicKey error " + e.message)
+//                }
+//            }
+        firestore.collection("users").document(mAuth!!.uid!!).update("public_key", Blob.fromBytes(key))
     }
 
+    //Pushing FCM token to Firestore. Using when token is absent in Preferences
     private fun pushTokenToServer() {
         val uid = mAuth!!.uid
         FirebaseInstanceId.getInstance().instanceId
