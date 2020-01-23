@@ -30,6 +30,10 @@
     <string name="button_load_avatar">Load avatar</string>
     <string name="loadRenameButton">Rename</string>
 
+    <string name="context_menu_item_remove">Remove</string>
+<!--    <string name="context_menu_item_remove">Remove</string>-->
+<!--    <string name="context_menu_item_remove">Remove</string>-->
+
 
     <string name="toast_auth_error">Authentication failed.</string>
     <string name="toast_auth_error_wrong_password">Wrong password</string>

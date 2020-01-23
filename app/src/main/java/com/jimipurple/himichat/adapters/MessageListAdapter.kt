@@ -43,6 +43,35 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.bind(items[position])
         Log.i("Recycler", "items $items")
+
+        when (holder.itemViewType) {
+            ItemViewType.RECEIVED_MESSAGE -> {
+                holder.itemView.setOnCreateContextMenuListener { contextMenu, _, _ ->
+                    contextMenu.add(context.getString(R.string.context_menu_item_remove)).setOnMenuItemClickListener {
+                        deleteCallback(items[position])
+                        true
+                    }
+                }
+            }
+
+            ItemViewType.SENT_MESSAGE -> {
+                holder.itemView.setOnCreateContextMenuListener { contextMenu, _, _ ->
+                    contextMenu.add(context.getString(R.string.context_menu_item_remove)).setOnMenuItemClickListener {
+                        deleteCallback(items[position])
+                        true
+                    }
+                }
+            }
+
+            else -> {
+                holder.itemView.setOnCreateContextMenuListener { contextMenu, _, _ ->
+                    contextMenu.add(context.getString(R.string.context_menu_item_remove)).setOnMenuItemClickListener {
+                        deleteCallback(items[position])
+                        true
+                    }
+                }
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -75,6 +104,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             date.text = formattedDate
 
             itemView.setOnClickListener {
+                itemView.showContextMenu()
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
             }
 
@@ -102,6 +132,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             date.text = formattedDate
 
             itemView.setOnClickListener {
+                itemView.showContextMenu()
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
             }
         }
@@ -116,6 +147,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             text.text = item.text
 
             itemView.setOnClickListener {
+                itemView.showContextMenu()
                 if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
             }
             send.setOnClickListener {
