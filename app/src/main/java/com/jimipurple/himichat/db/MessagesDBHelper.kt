@@ -112,10 +112,10 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                 Log.i("messagesDB", "dateTime $date")
                 //date.time = dateLong
                 if (senderId == mAuth!!.uid!!){
-                    val msg = SentMessage(senderId, receiverId, text, date.time,null, null)
+                    val msg = SentMessage(id, senderId, receiverId, text, date.time,null, null)
                     msgs.add(msg)
                 } else if (receiverId == mAuth!!.uid!!) {
-                    val msg = ReceivedMessage(senderId, receiverId, text, date.time,null, null)
+                    val msg = ReceivedMessage(id, senderId, receiverId, text, date.time,null, null)
                     msgs.add(msg)
                 }
             } while (cursor.moveToNext())
@@ -128,6 +128,19 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         val db = this.writableDatabase
         db.execSQL("delete from "+ TableUndeliveredMessages.TABLE_NAME);
         db.execSQL("delete from "+ TableMessages.TABLE_NAME);
+    }
+    fun deleteMessage(message: Message) {
+        if (message is ReceivedMessage || message is SentMessage){
+            // Define 'where' part of query.
+            val selection = "${BaseColumns._ID} LIKE ?"
+            // Specify arguments in placeholder order.
+            val selectionArgs = arrayOf(message.id.toString())
+            // Issue SQL statement.
+            val db = this.writableDatabase
+            val deletedRows = db.delete(TableMessages.TABLE_NAME, selection, selectionArgs)
+        } else {
+            deleteUndeliveredMessage((message as UndeliveredMessage).deliveredId.toString())
+        }
     }
     fun getUndeliveredMessages(): ArrayList<UndeliveredMessage>? {
         //TODO получение всех сообщений пользователя из бд
@@ -240,7 +253,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
 //        db.close()
 //        return ArrayList<String>(), ArrayList<Message>()
 //    }
-    fun removeUndeliveredMessage(deliveredId: String) {
+    fun deleteUndeliveredMessage(deliveredId: String) {
         // Define 'where' part of query.
         val selection = "${TableUndeliveredMessages.COLUMN_NAME_DELIVERED_ID} LIKE ?"
         // Specify arguments in placeholder order.

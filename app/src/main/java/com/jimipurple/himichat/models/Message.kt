@@ -4,7 +4,8 @@ import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.Date
 
-abstract class Message(sId: String, rId: String, txt: String) {
+abstract class Message(mid: Int?, sId: String, rId: String, txt: String) {
+    var id = mid
     var senderId = sId
     var receiverId = rId
     var text : String = txt
@@ -15,7 +16,7 @@ abstract class Message(sId: String, rId: String, txt: String) {
     }
 }
 
-class ReceivedMessage(sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+class ReceivedMessage(mid: Int?, sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(mid, sId, rId, txt) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
@@ -48,7 +49,7 @@ class ReceivedMessage(sId: String, rId: String, txt: String, var date: Long?, en
     }
 }
 
-class SentMessage(sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(sId, rId, txt) {
+class SentMessage(mid: Int?, sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(mid, sId, rId, txt) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
@@ -81,7 +82,7 @@ class SentMessage(sId: String, rId: String, txt: String, var date: Long?, encryp
     }
 }
 
-class UndeliveredMessage(sId: String, rId: String, txt: String, dId: Long) : Message(sId, rId, txt) {
+class UndeliveredMessage(sId: String, rId: String, txt: String, dId: Long) : Message(null, sId, rId, txt) {
     //var receiverId = rId
     //var text : String = txt
     var deliveredId: Long = dId

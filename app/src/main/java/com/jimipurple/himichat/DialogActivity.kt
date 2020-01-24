@@ -142,7 +142,9 @@ class DialogActivity : BaseActivity() {
         }
 
         val delete = {msg: Message -> Unit
-            Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
+            db!!.deleteMessage(msg)
+            Thread.sleep(50)
+            reloadMsgs()
         }
         val edit = {msg: Message -> Unit
             Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()

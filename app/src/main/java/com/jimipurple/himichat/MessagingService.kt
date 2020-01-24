@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.FirebaseFunctionsException
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.encryption.Encryption
@@ -18,7 +17,6 @@ import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
 import java.util.*
-import kotlin.concurrent.thread
 
 
 class MessagingService : FirebaseMessagingService() {
@@ -64,7 +62,7 @@ class MessagingService : FirebaseMessagingService() {
                             Log.i("msgService", "avatar $avatar")
                             Log.i("msgService", "nickname $nickname")
                             //val db = MessagesDBHelper(applicationContext)
-                            val msg = ReceivedMessage(sender_id, receiver_id, text, Date().time, null, null)
+                            val msg = ReceivedMessage(null, sender_id, receiver_id, text, Date().time, null, null)
                             val data1 = mapOf(
                                 "senderId" to sender_id,
                                 "deliveredId" to remoteMessage.data["delivered_id"]!!,
@@ -144,7 +142,7 @@ class MessagingService : FirebaseMessagingService() {
                                 Log.i("msgService", "receiver_public_key $receiver_public_key")
                                 Log.i("msgService", "signature $signature")
                                 //val db = MessagesDBHelper(applicationContext)
-                                val msg = ReceivedMessage(sender_id, receiver_id, text, Date().time, null, null)
+                                val msg = ReceivedMessage(null, sender_id, receiver_id, text, Date().time, null, null)
                                 val data1 = mapOf(
                                     "senderId" to sender_id,
                                     "deliveredId" to remoteMessage.data["delivered_id"]!!,
@@ -204,8 +202,8 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("msgService", "delivered_id ${remoteMessage.data["delivered_id"]!!}")
                     Log.i("msgService", unmsg.toString())
                     if (unmsg != null) {
-                        val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
-                        db.removeUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
+                        val msg = SentMessage(null, mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
+                        db.deleteUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
                         db.pushMessage(msg)
                         Log.i("msgService", msg.toString())
                         callbackOnMessageReceived()
@@ -249,8 +247,8 @@ class MessagingService : FirebaseMessagingService() {
         Log.i("msgService", "delivered_id $p0")
         Log.i("msgService", unmsg.toString())
         if (unmsg != null) {
-            val msg = SentMessage(mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
-            db.removeUndeliveredMessage(p0.toString())
+            val msg = SentMessage(null, mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
+            db.deleteUndeliveredMessage(p0.toString())
             db.pushMessage(msg)
             Log.i("msgService", msg.toString())
             callbackOnMessageReceived()
