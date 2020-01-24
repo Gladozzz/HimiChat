@@ -3,17 +3,46 @@ package com.jimipurple.himichat
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
+import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.common.util.VisibleForTesting
 
+
 @SuppressLint("Registered")
 open class BaseActivity : AppCompatActivity() {
+
+    protected var mMyApp: MyApp? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mMyApp = this.applicationContext as MyApp
+    }
 
     @VisibleForTesting
     val progressDialog by lazy {
         ProgressDialog(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mMyApp!!.currentActivity = this
+    }
+
+    override fun onPause() {
+        clearReferences()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        clearReferences()
+        super.onDestroy()
+    }
+
+    private fun clearReferences() {
+        val currActivity = mMyApp!!.currentActivity
+        if (this == currActivity) mMyApp!!.currentActivity = null
     }
 
     fun showProgressDialog() {

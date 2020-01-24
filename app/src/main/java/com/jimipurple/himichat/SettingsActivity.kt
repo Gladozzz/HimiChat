@@ -9,9 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_settings.*
 import android.util.Log
 import com.google.firebase.functions.FirebaseFunctions
-import kotlinx.android.synthetic.main.activity_settings.dialoguesButton
-import kotlinx.android.synthetic.main.activity_settings.friendsButton
-import kotlinx.android.synthetic.main.activity_settings.settingsButton
 import android.app.Activity
 import android.provider.MediaStore
 import android.content.pm.PackageManager
@@ -26,6 +23,8 @@ import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.jimipurple.himichat.adapters.SettingsPageAdapter
+import kotlinx.android.synthetic.main.activity_friend_requests.*
+import kotlinx.android.synthetic.main.activity_settings.navComponent
 import java.io.File
 
 
@@ -60,9 +59,9 @@ class SettingsActivity : BaseActivity() {
         viewpager_main.adapter = fragmentAdapter
         SettingsTabs.setupWithViewPager(viewpager_main)
 
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
+        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
+        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
+        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
     }
 
     private fun logoutButtonOnClick() {

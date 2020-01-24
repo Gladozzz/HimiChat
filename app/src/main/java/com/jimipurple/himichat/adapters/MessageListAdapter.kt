@@ -103,16 +103,9 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             val formattedDate = df.format(d)
             date.text = formattedDate
 
-            itemView.setOnClickListener {
-                itemView.showContextMenu()
+//            itemView.setOnClickListener {
 //                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
-            }
-
-            itemView.setOnLongClickListener {
-//                itemView.showContextMenu()
-//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
-                true
-            }
+//            }
 
             //blockButton.setOnClickListener {blockCallback(i)}
 
@@ -137,16 +130,9 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             val formattedDate = df.format(d)
             date.text = formattedDate
 
-            itemView.setOnClickListener {
-                itemView.showContextMenu()
+//            itemView.setOnClickListener {
 //                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
-            }
-
-            itemView.setOnLongClickListener {
-                //                itemView.showContextMenu()
-//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
-                true
-            }
+//            }
         }
     }
 
@@ -158,16 +144,9 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
         override fun bind(item: Message) {
             text.text = item.text
 
-            itemView.setOnClickListener {
-                itemView.showContextMenu()
+//            itemView.setOnClickListener {
 //                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
-            }
-
-            itemView.setOnLongClickListener {
-                //                itemView.showContextMenu()
-//                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
-                true
-            }
+//            }
             send.setOnClickListener {
                 send.isClickable = false
                 val mAuth = FirebaseAuth.getInstance()

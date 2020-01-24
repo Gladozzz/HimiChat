@@ -41,9 +41,9 @@ class DialoguesActivity : BaseActivity() {
 
         registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
 
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
+        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
+        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
+        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
     }
 
     private fun reloadMsgs() {

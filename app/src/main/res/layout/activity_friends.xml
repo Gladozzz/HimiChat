@@ -23,44 +23,13 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/friends_list" />
 
-    <ImageButton
-            android:id="@+id/settingsButton"
-            android:layout_width="0dp"
+    <com.jimipurple.himichat.NavComponent
+            android:id="@+id/navComponent"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:padding="0dp"
-            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/dialoguesButton"
-            app:srcCompat="@drawable/ic_nav_settings" />
-
-    <ImageButton
-            android:id="@+id/dialoguesButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:padding="0dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/settingsButton"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/friendsButton"
-            app:srcCompat="@drawable/ic_nav_dialogs" />
-
-    <ImageButton
-            android:id="@+id/friendsButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:padding="0dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/dialoguesButton"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_nav_friends" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     <Button
             android:id="@+id/findFriendButton"
@@ -68,7 +37,7 @@
             android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_find_friend"
-            app:layout_constraintBottom_toTopOf="@+id/friendsButton"
+            app:layout_constraintBottom_toTopOf="@+id/navComponent"
             app:layout_constraintEnd_toStartOf="@+id/friendRequestsButton"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -78,7 +47,7 @@
             android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_friend_requests"
-            app:layout_constraintBottom_toTopOf="@+id/dialoguesButton"
+            app:layout_constraintBottom_toTopOf="@+id/navComponent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/findFriendButton" />

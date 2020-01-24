@@ -28,9 +28,9 @@ class FriendRequestsActivity : BaseActivity() {
 
         reсeivedButton.setOnClickListener { receivedButtonOnClick() }
         sentButton.setOnClickListener { sentButtonOnClick() }
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
+        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
+        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
+        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
     }
 
     private fun hashMapToFriendRequest(h : ArrayList<HashMap<String, Any>>, received: Boolean) : ArrayList<FriendRequest> {

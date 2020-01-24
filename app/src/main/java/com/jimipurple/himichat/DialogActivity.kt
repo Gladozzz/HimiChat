@@ -34,6 +34,8 @@ import com.google.firebase.messaging.RemoteMessage
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.CurveKeyPair
 import com.jimipurple.himichat.encryption.Encryption
+import kotlinx.android.synthetic.main.activity_dialog.navComponent
+import kotlinx.android.synthetic.main.activity_dialogues.*
 
 //passion is a key bro (⌐■_■)
 class DialogActivity : BaseActivity() {
@@ -94,9 +96,9 @@ class DialogActivity : BaseActivity() {
         reloadMsgs()
 
         sendMessageButton.setOnClickListener { onSendBtnClick() }
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
+        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
+        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
+        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
     }
 
     override fun onDestroy() {

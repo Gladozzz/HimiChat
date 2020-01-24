@@ -9,10 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.adapters.FriendsListAdapter
 import com.jimipurple.himichat.models.*
+import kotlinx.android.synthetic.main.activity_dialogues.*
 import kotlinx.android.synthetic.main.activity_friends.*
-import kotlinx.android.synthetic.main.activity_friends.dialoguesButton
-import kotlinx.android.synthetic.main.activity_friends.friendsButton
-import kotlinx.android.synthetic.main.activity_friends.settingsButton
+import kotlinx.android.synthetic.main.activity_friends.navComponent
 
 class FriendsActivity : BaseActivity() {
 
@@ -102,9 +101,9 @@ class FriendsActivity : BaseActivity() {
 //                Log.i("FriendsActivity", "get failed with ", exception)
 //            }
 
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
+        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
+        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
+        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
         findFriendButton.setOnClickListener { findFriendButtonOnClick() }
         friendRequestsButton.setOnClickListener { friendRequestsButtonOnClick() }
     }

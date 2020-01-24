@@ -12,7 +12,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_dialogues.*
 import kotlinx.android.synthetic.main.activity_find_friend.*
+import kotlinx.android.synthetic.main.activity_find_friend.navComponent
 import kotlinx.android.synthetic.main.activity_find_friend.nicknameEdit
 import kotlinx.android.synthetic.main.activity_find_friend.realNameEdit
 import kotlinx.android.synthetic.main.activity_find_friend.realNameLabel
@@ -35,9 +37,9 @@ class FindFriendActivity : BaseActivity() {
 
         mAuth = FirebaseAuth.getInstance()
 
-        friendsButton.setOnClickListener { friendsButtonOnClick() }
-        dialoguesButton.setOnClickListener { dialoguesButtonOnClick() }
-        settingsButton.setOnClickListener { settingsButtonOnClick() }
+        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
+        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
+        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
         findButton.setOnClickListener { findButtonOnClick() }
         inviteButton.setOnClickListener { inviteButtonOnClick() }
 

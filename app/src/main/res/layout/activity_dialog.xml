@@ -31,55 +31,24 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:background="@color/colorCloudSent"
+            android:background="@color/colorPrimary"
             android:ems="10"
             android:inputType="textMultiLine|text"
             android:lines="3"
             android:maxLines="8"
             android:minHeight="70dp"
             android:minLines="1"
-            app:layout_constraintBottom_toTopOf="@+id/friendsButton"
+            app:layout_constraintBottom_toTopOf="@+id/navComponent"
             app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
             app:layout_constraintStart_toStartOf="parent" />
 
-    <ImageButton
-            android:id="@+id/settingsButton"
-            android:layout_width="0dp"
+    <com.jimipurple.himichat.NavComponent
+            android:id="@+id/navComponent"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@color/colorPrimary"
-            android:padding="0dp"
-            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/dialoguesButton"
-            app:srcCompat="@drawable/ic_nav_settings" />
-
-    <ImageButton
-            android:id="@+id/dialoguesButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:background="@color/colorPrimary"
-            android:padding="0dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/settingsButton"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/friendsButton"
-            app:srcCompat="@drawable/ic_nav_dialogs" />
-
-    <ImageButton
-            android:id="@+id/friendsButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:background="@color/colorPrimary"
-            android:padding="0dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/dialoguesButton"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_nav_friends" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
             android:id="@+id/sendMessageButton"
@@ -90,7 +59,7 @@
             android:background="@color/colorPrimary"
             android:padding="10dp"
             android:scaleType="centerInside"
-            app:layout_constraintBottom_toTopOf="@+id/settingsButton"
+            app:layout_constraintBottom_toTopOf="@+id/navComponent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/messageList"
             app:srcCompat="@drawable/ic_friends_list_send" />
@@ -99,7 +68,7 @@
             android:id="@+id/linearLayout"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorPrimaryDark"
             android:orientation="horizontal"
             android:padding="5dp"
             app:layout_constraintEnd_toEndOf="parent"
