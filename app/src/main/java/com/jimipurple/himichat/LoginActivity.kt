@@ -10,6 +10,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,18 +25,21 @@ import java.util.regex.Pattern
 
 class LoginActivity : BaseActivity() {
 
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
+//    private var mAuth: FirebaseAuth? = null
+//    private var firestore: FirebaseFirestore? = null
+//    private var firebaseToken: String  = ""
+//    private var functions: FirebaseFunctions? = null
     private var CHANNEL_ID = "himichat_messages"
     private var keydb = KeysDBHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        FirebaseApp.initializeApp(applicationContext)
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+        functions = FirebaseFunctions.getInstance()
         firebaseToken = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")!!
 
         registerModeButton.setOnClickListener { setRegisterMode() }
@@ -68,7 +72,7 @@ class LoginActivity : BaseActivity() {
                         user["email"] = email
                         user["public_key"] = email
                         //firestore.collection("users").document(currentUID).set(user
-                        var res = functions
+                        var res = functions!!
                             .getHttpsCallable("setUser")
                             .call(user).addOnCompleteListener { task ->
                                 try {
@@ -291,7 +295,7 @@ class LoginActivity : BaseActivity() {
 //                    Log.i("setPublicKey", "setPublicKey error " + e.message)
 //                }
 //            }
-        firestore.collection("users").document(mAuth!!.uid!!).update("public_key", Blob.fromBytes(key))
+        firestore!!.collection("users").document(mAuth!!.uid!!).update("public_key", Blob.fromBytes(key))
     }
 
     //Pushing FCM token to Firestore. Using when token is absent in Preferences
@@ -309,7 +313,7 @@ class LoginActivity : BaseActivity() {
                     "userId" to uid,
                     "token" to newToken
                 )
-                var res = functions
+                var res = functions!!
                     .getHttpsCallable("setToken")
                     .call(data).addOnCompleteListener { task ->
                         try {

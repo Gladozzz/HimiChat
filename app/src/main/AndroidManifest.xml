@@ -1,50 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.jimipurple.himichat">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.jimipurple.himichat">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
+            android:name=".MyApp"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-            android:name=".MyApp"
-            >
+            tools:node="replace">
 
-        <activity android:name=".FriendRequestsActivity">
-        </activity>
-        <activity android:name=".FindFriendActivity">
-        </activity>
-        <activity android:name=".SettingsActivity">
-        </activity>
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+
+        <activity
+                android:name=".NavigationActivity"
+                android:label="@string/title_activity_navigation"
+                android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".FriendRequestsActivity" />
+        <activity android:name=".FindFriendActivity" />
+        <activity android:name=".SettingsActivity" />
 
         <service
                 android:name=".MessagingService"
                 android:enabled="true"
                 android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <activity android:name=".DialogActivity">
-        </activity>
-        <activity android:name=".FriendsActivity">
-        </activity>
-        <activity android:name=".DialoguesActivity">
-        </activity>
+        <activity android:name=".DialogActivity" />
+        <activity android:name=".FriendsActivity" />
+        <activity android:name=".DialoguesActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name="com.google.firebase.components.ComponentDiscoveryService" >
+            <meta-data
+                    android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
+                    android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data
+                    android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+                    android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data
+                    android:name="com.google.firebase.components:com.google.firebase.iid.Registrar"
+                    android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data
+                    android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+                    android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data
+                    android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
+                    android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data
+                    android:name="com.google.firebase.components:com.google.firebase.functions.FunctionsRegistrar"
+                    android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data
+                    android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
+                    android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
     </application>
 
 </manifest>

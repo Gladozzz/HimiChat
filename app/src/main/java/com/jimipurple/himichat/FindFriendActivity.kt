@@ -24,10 +24,10 @@ import kotlinx.serialization.*
 
 class FindFriendActivity : BaseActivity() {
 
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
+//    private var mAuth: FirebaseAuth? = null
+//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+//    private var firebaseToken: String  = ""
+//    private var functions = FirebaseFunctions.getInstance()
 
     var foundId = "" // id найденного пользователя
 
@@ -74,7 +74,7 @@ class FindFriendActivity : BaseActivity() {
                     "nickname" to nickname
                 )
                 var id = ""
-                var res = functions
+                var res = functions!!
                     .getHttpsCallable("findUser")
                     .call(data).addOnCompleteListener { task ->
                         try {
@@ -87,7 +87,7 @@ class FindFriendActivity : BaseActivity() {
                                 data = hashMapOf(
                                     "id" to id
                                 )
-                                var res1 = functions
+                                var res1 = functions!!
                                     .getHttpsCallable("getUser")
                                     .call(data).addOnCompleteListener { task1 ->
                                         try {
@@ -179,7 +179,7 @@ class FindFriendActivity : BaseActivity() {
                 Log.i("inviteUser", "id of inviting user $foundId")
                 Log.i("inviteUser", "uid $uid")
                 //firestore.collection("users").document(foundId).set(data, SetOptions.merge())
-                functions
+                functions!!
                     .getHttpsCallable("inviteUser")
                     .call(data)
                     .continueWith { task ->

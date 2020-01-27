@@ -27,9 +27,6 @@ import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import java.io.File
-import kotlinx.android.synthetic.main.activity_settings.dialoguesButton
-import kotlinx.android.synthetic.main.activity_settings.friendsButton
-import kotlinx.android.synthetic.main.activity_settings.settingsButton
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import kotlinx.io.ByteArrayOutputStream
 

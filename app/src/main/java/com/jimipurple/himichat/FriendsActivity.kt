@@ -16,10 +16,10 @@ import kotlinx.android.synthetic.main.activity_friends.navComponent
 class FriendsActivity : BaseActivity() {
 
     val REQUEST_CODE_DIALOG_ACTIVITY = 1
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
+//    private var mAuth: FirebaseAuth? = null
+//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+//    private var firebaseToken: String  = ""
+//    private var functions = FirebaseFunctions.getInstance()
 
     private fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
         val u : ArrayList<User> = ArrayList<User>()
@@ -40,7 +40,7 @@ class FriendsActivity : BaseActivity() {
         val data = mapOf("id" to mAuth!!.uid!!)
         val profile = {u: User -> Unit
             val data1 = mapOf("inviterId" to mAuth!!.uid, "id" to u.id)
-            functions
+            functions!!
                 .getHttpsCallable("getUser")
                 .call(data1).continueWith { task ->
                     val result = task.result?.data as HashMap<String, Any>
@@ -58,14 +58,14 @@ class FriendsActivity : BaseActivity() {
             i.putExtra("nickname", u.nickname)
             startActivityForResult(i, REQUEST_CODE_DIALOG_ACTIVITY)
         }
-        functions
+        functions!!
             .getHttpsCallable("getFriends")
             .call(data).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
                 if (result["found"] as Boolean) {
                     val friends = result["friends"] as ArrayList<String>
                     val data1 = mapOf("ids" to friends)
-                    functions
+                    functions!!
                         .getHttpsCallable("getUsers")
                         .call(data1).continueWith { task ->
                             val result1 = task.result?.data as HashMap<String, Any>

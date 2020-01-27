@@ -8,15 +8,30 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.common.util.VisibleForTesting
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
 
 
 @SuppressLint("Registered")
 open class BaseActivity : AppCompatActivity() {
 
+    protected var mAuth: FirebaseAuth? = null
+    protected var firestore: FirebaseFirestore? = null
+    protected var firebaseToken: String  = ""
+    protected var functions: FirebaseFunctions? = null
+
     protected var mMyApp: MyApp? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(applicationContext)
+        mAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+        functions = FirebaseFunctions.getInstance()
+        firebaseToken = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")!!
+
         mMyApp = this.applicationContext as MyApp
     }
 

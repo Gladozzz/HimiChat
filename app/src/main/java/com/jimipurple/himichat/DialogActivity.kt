@@ -40,10 +40,10 @@ import kotlinx.android.synthetic.main.activity_dialogues.*
 //passion is a key bro (⌐■_■)
 class DialogActivity : BaseActivity() {
 
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
+//    private var mAuth: FirebaseAuth? = null
+//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+//    private var firebaseToken: String  = ""
+//    private var functions = FirebaseFunctions.getInstance()
     private var friend_id : String? = null
     private var id : String? = null
     private var avatar : String? = null
@@ -212,7 +212,7 @@ class DialogActivity : BaseActivity() {
 //                        }
 //                    }
 //                }
-            firestore.collection("users").document(receiverId).get().addOnCompleteListener(this, OnCompleteListener<DocumentSnapshot>() {
+            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(this, OnCompleteListener<DocumentSnapshot>() {
                     if (it.isSuccessful) {
                         val result = it.result?.get("public_key") as Blob?
                         val kp = KeysDBHelper(applicationContext).getKeyPair(mAuth!!.uid!!)
@@ -248,7 +248,7 @@ class DialogActivity : BaseActivity() {
         )
 //        messageInput.setText("")
         Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
-        functions
+        functions!!
             .getHttpsCallable("sendMessage")
             .call(data).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -322,7 +322,7 @@ class DialogActivity : BaseActivity() {
         )
         Log.i("sendEncryptedMessage", "data $data")
         messageInput.setText("")
-        functions
+        functions!!
             .getHttpsCallable("sendEncryptedMessage")
             .call(data).addOnCompleteListener { task ->
                 Log.i("sendEncryptedMessage", "sendEncryptedMessage complete")

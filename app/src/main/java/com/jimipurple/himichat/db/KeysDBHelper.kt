@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import android.util.Log
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.jimipurple.himichat.encryption.CurveKeyPair
 import org.json.JSONArray
@@ -50,10 +51,13 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
     DATABASE_VERSION
 ) {
 
-    private var mAuth: FirebaseAuth? = FirebaseAuth.getInstance()
+    private var c = context
+    private var mAuth: FirebaseAuth? = null
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(SQL_CREATE_TABLE_KEYS)
         db.execSQL(SQL_CREATE_TABLE_SIG)
+        FirebaseApp.initializeApp(c)
+        mAuth = FirebaseAuth.getInstance()
     }
 
     /**

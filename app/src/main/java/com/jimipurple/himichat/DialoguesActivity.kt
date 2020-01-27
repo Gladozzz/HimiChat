@@ -22,10 +22,10 @@ class DialoguesActivity : BaseActivity() {
 
     private var REQUEST_CODE_DIALOG_ACTIVITY: Int = 0
 
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
+//    private var mAuth: FirebaseAuth? = null
+//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+//    private var firebaseToken: String  = ""
+//    private var functions = FirebaseFunctions.getInstance()
     private var db: MessagesDBHelper = MessagesDBHelper(this)
     private var id : String? = null
     private var currentTime: Date?  = null
@@ -110,7 +110,7 @@ class DialoguesActivity : BaseActivity() {
             ids.add(d.friendId)
         }
         val data = mapOf("ids" to ids)
-        functions
+        functions!!
             .getHttpsCallable("getUsers")
             .call(data).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>

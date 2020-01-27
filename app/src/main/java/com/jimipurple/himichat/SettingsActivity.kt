@@ -34,11 +34,11 @@ class SettingsActivity : BaseActivity() {
     private val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2
     private val GET_FROM_GALLERY = 3
 
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+//    private var mAuth: FirebaseAuth? = null
+//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var storage: FirebaseStorage = FirebaseStorage.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
+//    private var firebaseToken: String  = ""
+//    private var functions = FirebaseFunctions.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,7 +141,7 @@ class SettingsActivity : BaseActivity() {
             val rawImage : RequestCreator?
             val setAvatar = {uri: Uri -> Unit
                 val dataForJson = mapOf("id" to mAuth!!.uid, "avatar" to uri.toString())
-                functions
+                functions!!
                     .getHttpsCallable("setAvatar")
                         .call(dataForJson).addOnCompleteListener { task1 ->
                             try {

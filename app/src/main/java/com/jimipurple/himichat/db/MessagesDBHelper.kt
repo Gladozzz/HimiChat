@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import android.util.Log
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.jimipurple.himichat.models.*
 import java.util.*
@@ -56,10 +57,13 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
     DATABASE_VERSION
 ) {
 
-    private var mAuth: FirebaseAuth? = FirebaseAuth.getInstance()
+    private var c = context
+    private var mAuth: FirebaseAuth? = null
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(SQL_CREATE_TABLE_MESSAGES)
         db.execSQL(SQL_CREATE_TABLE_UNDELIVERED_MESSAGES)
+        FirebaseApp.initializeApp(c)
+        mAuth = FirebaseAuth.getInstance()
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // This database is only a cache for online data, so its upgrade policy is

@@ -13,10 +13,10 @@ import kotlinx.android.synthetic.main.activity_friend_requests.*
 
 class FriendRequestsActivity : BaseActivity() {
 
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
+//    private var mAuth: FirebaseAuth? = null
+//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+//    private var firebaseToken: String  = ""
+//    private var functions = FirebaseFunctions.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +50,7 @@ class FriendRequestsActivity : BaseActivity() {
 
     private val block = {fr: FriendRequest -> Unit
         val data1 = mapOf("accepterId" to mAuth!!.uid, "id" to fr.id)
-        functions
+        functions!!
             .getHttpsCallable("blockFriendRequest")
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
@@ -63,7 +63,7 @@ class FriendRequestsActivity : BaseActivity() {
     }
     private val accept = {fr: FriendRequest -> Unit
         val data1 = mapOf("accepterId" to mAuth!!.uid, "id" to fr.id)
-        functions
+        functions!!
             .getHttpsCallable("acceptFriendRequest")
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
@@ -76,7 +76,7 @@ class FriendRequestsActivity : BaseActivity() {
     }
     private val profile = {fr: FriendRequest -> Unit
         val data1 = mapOf("inviterId" to mAuth!!.uid, "id" to fr.id)
-        functions
+        functions!!
             .getHttpsCallable("acceptFriendRequest")
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
@@ -89,7 +89,7 @@ class FriendRequestsActivity : BaseActivity() {
     }
     private val cancel = { fr: FriendRequest -> Unit
         val data1 = mapOf("inviterId" to mAuth!!.uid, "id" to fr.id)
-        functions
+        functions!!
             .getHttpsCallable("cancelFriendRequest")
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
@@ -112,7 +112,7 @@ class FriendRequestsActivity : BaseActivity() {
         friendRequests.adapter = adapter
         reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
         sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
-        functions
+        functions!!
             .getHttpsCallable("getInvites")
             .call(data).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
@@ -123,7 +123,7 @@ class FriendRequestsActivity : BaseActivity() {
                         //TODO 1123123
                         Log.i("received_inv", "received $received")
                         val data1 = mapOf("ids" to received)
-                        functions
+                        functions!!
                             .getHttpsCallable("getUsers")
                             .call(data1).continueWith { task ->
                                 val result1 = task.result?.data as HashMap<String, Any>
@@ -147,7 +147,7 @@ class FriendRequestsActivity : BaseActivity() {
                         //TODO 1123123
                         Log.i("received_inv", "users $received")
                         val data1 = mapOf("id" to received)
-                        functions
+                        functions!!
                             .getHttpsCallable("getUser")
                             .call(data).continueWith { task ->
                                 val result1 = task.result?.data as HashMap<String, Any>
@@ -180,7 +180,7 @@ class FriendRequestsActivity : BaseActivity() {
         friendRequests.adapter = adapter
         reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
         sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
-        functions
+        functions!!
             .getHttpsCallable("getInvites")
             .call(data).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
@@ -191,7 +191,7 @@ class FriendRequestsActivity : BaseActivity() {
                         //TODO 1123123
                         Log.i("sent_inv", "received $sent")
                         val data1 = mapOf("ids" to sent)
-                        functions
+                        functions!!
                             .getHttpsCallable("getUsers")
                             .call(data1).continueWith { task ->
                                 val result1 = task.result?.data as HashMap<String, Any>
@@ -215,7 +215,7 @@ class FriendRequestsActivity : BaseActivity() {
                         //TODO 1123123
                         Log.i("sent_inv", "users $sent")
                         val data1 = mapOf("id" to sent)
-                        functions
+                        functions!!
                             .getHttpsCallable("getUser")
                             .call(data).continueWith { task ->
                                 val result1 = task.result?.data as HashMap<String, Any>
