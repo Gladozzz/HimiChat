@@ -21,16 +21,25 @@ import java.util.*
 
 class MessagingService : FirebaseMessagingService() {
 
-    private var mAuth = FirebaseAuth.getInstance()
-    private var functions = FirebaseFunctions.getInstance()
+    private var mAuth: FirebaseAuth? = null
+    private var functions: FirebaseFunctions? = null
     private var CHANNEL_ID = "himichat_messages"
 
     val INTENT_FILTER = "INTENT_FILTER"
-    var random = Random()
+    var random: Random? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        Log.i("msgService", "onCreate")
+        random = Random()
+    }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.i("msgService", "From: " + remoteMessage.from!!)
+
+        mAuth = FirebaseAuth.getInstance()
+        functions = FirebaseFunctions.getInstance()
 
         val db = MessagesDBHelper(applicationContext)
         // Check if message contains a data payload.
@@ -49,7 +58,7 @@ class MessagingService : FirebaseMessagingService() {
                     val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
 
                     val data = mapOf("id" to sender_id)
-                    functions
+                    functions!!
                         .getHttpsCallable("getUser")
                         .call(data).addOnCompleteListener() { task ->
                             val result = task.result?.data as HashMap<String, Any>
@@ -71,7 +80,7 @@ class MessagingService : FirebaseMessagingService() {
                             )
                                 Log.i("msgService", "message pushed to the db $msg")
                                 db.pushMessage(msg)
-                                functions.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener() { task ->
+                                functions!!.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener() { task ->
                                     Log.i("msgService", "confirmDelivery")
                                 }
                                 if (isDialog) {
@@ -100,7 +109,7 @@ class MessagingService : FirebaseMessagingService() {
                                     //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
                                     with(NotificationManagerCompat.from(applicationContext)) {
                                         // notificationId is a unique int for each notification that you must define
-                                        val m = random.nextInt(9999 - 1000) + 1000
+                                        val m = random!!.nextInt(9999 - 1000) + 1000
                                         notify(m, builder.build())
                                     }
                                 }
@@ -119,7 +128,7 @@ class MessagingService : FirebaseMessagingService() {
                     val kp = KeysDBHelper(applicationContext).getKeyPair(Base64.decode(receiver_public_key, Base64.DEFAULT))
                     if (kp != null) {
                         val data = mapOf("id" to sender_id)
-                        functions
+                        functions!!
                             .getHttpsCallable("getUser")
                             .call(data).addOnCompleteListener { task ->
                                 val sharedSecret = Encryption.calculateSharedSecret(Base64.decode(sender_public_key, Base64.DEFAULT), kp.privateKey)
@@ -151,7 +160,7 @@ class MessagingService : FirebaseMessagingService() {
                                 )
                                 Log.i("msgService", "message pushed to the db $msg")
                                 db.pushMessage(msg)
-                                functions.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener { task ->
+                                functions!!.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener { task ->
                                     Log.i("msgService", "confirmDelivery")
                                 }
                                 if (isDialog) {
@@ -180,7 +189,7 @@ class MessagingService : FirebaseMessagingService() {
                                     //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
                                     with(NotificationManagerCompat.from(applicationContext)) {
                                         // notificationId is a unique int for each notification that you must define
-                                        val m = random.nextInt(9999 - 1000) + 1000
+                                        val m = random!!.nextInt(9999 - 1000) + 1000
                                         notify(m, builder.build())
                                     }
                                 }
@@ -202,7 +211,7 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("msgService", "delivered_id ${remoteMessage.data["delivered_id"]!!}")
                     Log.i("msgService", unmsg.toString())
                     if (unmsg != null) {
-                        val msg = SentMessage(null, mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
+                        val msg = SentMessage(null, mAuth!!.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
                         db.deleteUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
                         db.pushMessage(msg)
                         Log.i("msgService", msg.toString())
@@ -247,7 +256,7 @@ class MessagingService : FirebaseMessagingService() {
         Log.i("msgService", "delivered_id $p0")
         Log.i("msgService", unmsg.toString())
         if (unmsg != null) {
-            val msg = SentMessage(null, mAuth.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
+            val msg = SentMessage(null, mAuth!!.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
             db.deleteUndeliveredMessage(p0.toString())
             db.pushMessage(msg)
             Log.i("msgService", msg.toString())
@@ -268,6 +277,9 @@ class MessagingService : FirebaseMessagingService() {
     }
 
     private fun sendRegistrationToServer(token: String) : Boolean {
+
+        mAuth = FirebaseAuth.getInstance()
+        functions = FirebaseFunctions.getInstance()
         try {
             val currentUID = FirebaseAuth.getInstance().currentUser?.uid
 //            if (currentUID != null) {
@@ -276,16 +288,16 @@ class MessagingService : FirebaseMessagingService() {
 //                Log.i("messaging:tokenToServer", "user is not registered, but token saved to SharedPreferences")
 //            }
             Log.i("sendToken", "try send token: $token")
-            var uid = mAuth.uid
+            var uid = mAuth!!.uid
             while (uid == null) {
                 Thread.sleep(100)
-                uid = mAuth.uid
+                uid = mAuth!!.uid
             }
             val data = hashMapOf(
                 "userId" to uid,
                 "token" to token
             )
-            var res = functions
+            var res = functions!!
                 .getHttpsCallable("setToken")
                 .call(data).addOnCompleteListener { task ->
                     try {

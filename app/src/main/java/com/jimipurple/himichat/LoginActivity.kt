@@ -35,7 +35,7 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        FirebaseApp.initializeApp(applicationContext)
+//        FirebaseApp.initializeApp(applicationContext)
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
@@ -181,6 +181,7 @@ class LoginActivity : BaseActivity() {
 
     public override fun onStart() {
         super.onStart()
+//        startService(Intent(this, MessagingService::class.java))
         createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
@@ -258,15 +259,18 @@ class LoginActivity : BaseActivity() {
 
     //moment when authentication, token check and keys check are successful
     private fun successful() {
-        val kp = Encryption.generateKeyPair()
-        val test1 = Base64.encodeToString(kp.publicKey, Base64.DEFAULT)
-        val test2 = Base64.decode(test1, Base64.DEFAULT)
-        var test3 = test2.size
-        Log.i("keys_TEST", "pub ${kp.publicKey.contentToString()}")
-        Log.i("keys_TEST", "test1 $test1")
-        Log.i("keys_TEST", "test2 ${test2.contentToString()}")
-        Log.i("keys_TEST", "test3 $test3")
-        val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
+//        val kp = Encryption.generateKeyPair()
+//        val test1 = Base64.encodeToString(kp.publicKey, Base64.DEFAULT)
+//        val test2 = Base64.decode(test1, Base64.DEFAULT)
+//        var test3 = test2.size
+//        Log.i("keys_TEST", "pub ${kp.publicKey.contentToString()}")
+//        Log.i("keys_TEST", "test1 $test1")
+//        Log.i("keys_TEST", "test2 ${test2.contentToString()}")
+//        Log.i("keys_TEST", "test3 $test3")
+//        val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
+//        startActivity(newIntent)
+//        finish()
+        val newIntent = Intent(applicationContext, NavigationActivity::class.java)
         startActivity(newIntent)
         finish()
     }

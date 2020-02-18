@@ -1,44 +1,42 @@
-package com.jimipurple.himichat
+package com.jimipurple.himichat.ui.friends
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
+import com.jimipurple.himichat.*
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_find_friend.*
-import kotlinx.android.synthetic.main.fragment_find_friend.nicknameEdit
-import kotlinx.android.synthetic.main.fragment_find_friend.realNameEdit
-import kotlinx.android.synthetic.main.fragment_find_friend.realNameLabel
+import kotlinx.serialization.UnstableDefault
 import java.util.regex.Pattern
-import kotlinx.serialization.*
 
 
-class FindFriendActivity : BaseActivity() {
-
-//    private var mAuth: FirebaseAuth? = null
-//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//    private var firebaseToken: String  = ""
-//    private var functions = FirebaseFunctions.getInstance()
+class FindFriendFragment : BaseFragment() {
 
     var foundId = "" // id найденного пользователя
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_find_friend, container, false)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_find_friend)
 
-//        mAuth = FirebaseAuth.getInstance()
+    }
 
-//        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
-//        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
-//        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         findButton.setOnClickListener { findButtonOnClick() }
         inviteButton.setOnClickListener { inviteButtonOnClick() }
-
-
     }
 
     @UnstableDefault
@@ -86,7 +84,7 @@ class FindFriendActivity : BaseActivity() {
                                                 null
                                             }
                                             if (avatar != null) {
-                                                val bitmap = LruCache(this)[avatar]
+                                                val bitmap = LruCache(c!!)[avatar]
                                                 if (bitmap != null) {
                                                     avatarView.setImageBitmap(bitmap)
                                                 } else {
@@ -137,7 +135,7 @@ class FindFriendActivity : BaseActivity() {
                                     }
                             } else {
                                 Log.i("findUser:find", "Пользователь с ником $nickname не найден")
-                                Toast.makeText(this, R.string.toast_user_nickname_not_found, Toast.LENGTH_LONG).show()
+                                Toast.makeText(c!!, R.string.toast_user_nickname_not_found, Toast.LENGTH_LONG).show()
                             }
                         } catch (e: Exception) {
                             Log.i("findUser:find", "error " + e.message)
@@ -145,7 +143,7 @@ class FindFriendActivity : BaseActivity() {
                         //messageInput.setText("")
                     }
             } else {
-                Toast.makeText(this, R.string.toast_nickname_not_valid, Toast.LENGTH_SHORT).show()
+                Toast.makeText(c!!, R.string.toast_nickname_not_valid, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -168,22 +166,22 @@ class FindFriendActivity : BaseActivity() {
                         // propagated down.
                         val result = task.result?.data as HashMap<String, Any>
                         if (result["invite"] == true) {
-                            Toast.makeText(this, R.string.toast_invite_successful, Toast.LENGTH_LONG).show()
+                            Toast.makeText(c!!, R.string.toast_invite_successful, Toast.LENGTH_LONG).show()
                         } else if (result["invite"] == false) {
                             if (result["reason"] == "already invited") {
-                                Toast.makeText(this, R.string.toast_invite_already, Toast.LENGTH_LONG).show()
+                                Toast.makeText(c!!, R.string.toast_invite_already, Toast.LENGTH_LONG).show()
                             } else if (result["reason"] == "already invited you") {
-                                Toast.makeText(this, R.string.toast_invite_already_you, Toast.LENGTH_LONG).show()
+                                Toast.makeText(c!!, R.string.toast_invite_already_you, Toast.LENGTH_LONG).show()
                             }
                         }
                     }
             }
             mAuth!!.uid == foundId -> {
-                Toast.makeText(this, R.string.toast_selfinvite, Toast.LENGTH_LONG).show()
+                Toast.makeText(c!!, R.string.toast_selfinvite, Toast.LENGTH_LONG).show()
                 Log.i("inviteUser::failure", "foundId == uid")
             }
             else -> {
-                Toast.makeText(this, R.string.toast_no_found_user, Toast.LENGTH_LONG).show()
+                Toast.makeText(c!!, R.string.toast_no_found_user, Toast.LENGTH_LONG).show()
                 Log.i("inviteUser::failure", "foundId is empty")
             }
         }

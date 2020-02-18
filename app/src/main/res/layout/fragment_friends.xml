@@ -23,21 +23,13 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/friends_list" />
 
-    <com.jimipurple.himichat.NavComponent
-            android:id="@+id/navComponent"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
     <Button
             android:id="@+id/findFriendButton"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_find_friend"
-            app:layout_constraintBottom_toTopOf="@+id/navComponent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/friendRequestsButton"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -47,7 +39,7 @@
             android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_friend_requests"
-            app:layout_constraintBottom_toTopOf="@+id/navComponent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/findFriendButton" />

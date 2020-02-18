@@ -1,4 +1,4 @@
-package com.jimipurple.himichat
+package com.jimipurple.himichat.ui.dialog
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,16 +10,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.adapters.MessageListAdapter
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
@@ -27,64 +26,63 @@ import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_dialog.*
 import com.google.firebase.functions.FirebaseFunctionsException
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.iid.InstanceIdResult
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.RemoteMessage
+import com.jimipurple.himichat.*
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.CurveKeyPair
 import com.jimipurple.himichat.encryption.Encryption
-//import kotlinx.android.synthetic.main.fragment_dialog.navComponent
 
 //passion is a key bro (⌐■_■)
-class DialogActivity : BaseActivity() {
+class DialogFragment : BaseFragment() {
 
-//    private var mAuth: FirebaseAuth? = null
+    //    private var mAuth: FirebaseAuth? = null
 //    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 //    private var firebaseToken: String  = ""
 //    private var functions = FirebaseFunctions.getInstance()
-    private var friend_id : String? = null
-    private var id : String? = null
-    private var avatar : String? = null
-    private var nickname : String? = null
     private var db : MessagesDBHelper? = null
+    private var id: String? = null
+    private var friend_id: String? = null
+    private var avatar: String? = null
+    private var nickname: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_dialog)
-        mAuth = FirebaseAuth.getInstance()
-        friend_id = intent.getStringExtra("friend_id")
-        avatar = intent.getStringExtra("avatar")
-        nickname = intent.getStringExtra("nickname")
-        id = mAuth!!.uid!!
-        db = MessagesDBHelper(applicationContext)
+//        c.setContentView(R.layout.fragment_dialog)
+    }
 
-        registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
-        MessagingService.setCallbackOnMessageRecieved { runOnUiThread {reloadMsgs()} }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        mAuth = FirebaseAuth.getInstance()
+        id = mAuth!!.uid!!
+        db = MessagesDBHelper(c!!)
+        friend_id = arguments!!["friend_id"] as String
+        avatar = arguments!!["avatar"] as String
+        nickname = arguments!!["nickname"] as String
+
+        activity!!.registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+        MessagingService.setCallbackOnMessageRecieved { activity!!.runOnUiThread { reloadMsgs() } }
         MessagingService.isDialog = true
         MessagingService.currentDialog = friend_id!!
-        val linearLayoutManager = LinearLayoutManager(this)
+        val linearLayoutManager = LinearLayoutManager(c)
         linearLayoutManager.stackFromEnd = true
         messageList.layoutManager = linearLayoutManager
 
         nicknameDialogView.text = nickname
         val url = Uri.parse(avatar)
         if (url != null) {
-            val bitmap = LruCache(this)[avatar!!]
+            val bitmap = LruCache(c!!)[avatar!!]
             if (bitmap != null) {
                 avatarDialogView.setImageBitmap(bitmap)
             } else {
                 Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         avatarDialogView.setImageBitmap(bitmap)
-                        LruCache(applicationContext).set(avatar!!, bitmap!!)
+                        LruCache(c!!).set(avatar!!, bitmap!!)
                     }
 
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                        Log.i("Profile", "Загрузка изображения не удалась " + avatarDialogView + "\n" + e?.message)
                     }
                 })
             }
@@ -95,16 +93,21 @@ class DialogActivity : BaseActivity() {
         reloadMsgs()
 
         sendMessageButton.setOnClickListener { onSendBtnClick() }
-//        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
-//        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
-//        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_dialog, container, false)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         MessagingService.isDialog = false
-        MessagingService.setCallbackOnMessageRecieved {  }
-        unregisterReceiver(FCMReceiver)
+        MessagingService.setCallbackOnMessageRecieved { }
+        activity!!.unregisterReceiver(FCMReceiver)
     }
 
     fun reloadMsgs() {
@@ -118,13 +121,13 @@ class DialogActivity : BaseActivity() {
             for (msg in allMsgs) {
                 when (msg) {
                     is ReceivedMessage -> {
-                        if (msg.senderId == friend_id!! && msg.receiverId == id) {
+                        if (msg.senderId == friend_id && msg.receiverId == id) {
                             msgs.add(msg)
                             Log.i("DialogMessaging", "ReceivedMessage $msg")
                         }
                     }
                     is SentMessage -> {
-                        if (msg.senderId == id && msg.receiverId == friend_id!!) {
+                        if (msg.senderId == id && msg.receiverId == friend_id) {
                             msgs.add(msg)
                             Log.i("DialogMessaging", "SentMessage $msg")
                         }
@@ -134,7 +137,7 @@ class DialogActivity : BaseActivity() {
         }
         if (unmsgs != null) {
             for (msg in unmsgs as ArrayList<Message>) {
-                if ((msg as UndeliveredMessage).receiverId == friend_id!! && (msg).senderId == id!!) {
+                if ((msg as UndeliveredMessage).receiverId == friend_id && (msg).senderId == id!!) {
                     msgs.add(msg)
                 }
             }
@@ -146,14 +149,14 @@ class DialogActivity : BaseActivity() {
             reloadMsgs()
         }
         val edit = {msg: Message -> Unit
-            Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
+            Toast.makeText(c,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
         }
         val onHold = {msg: Message -> Unit
-            Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
+            Toast.makeText(c,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
         }
-        val adapter = MessageListAdapter(this, msgs, object : MessageListAdapter.Callback {
+        val adapter = MessageListAdapter(c!!, msgs, object : MessageListAdapter.Callback {
             override fun onItemClicked(item: Message) {
-                Toast.makeText(applicationContext,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
+                Toast.makeText(c,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
             }
         }, delete, edit, onHold)
         messageList.adapter = adapter
@@ -169,7 +172,7 @@ class DialogActivity : BaseActivity() {
             val msg = UndeliveredMessage(senderId, receiverId!!, text, db!!.getDeliveredId())
             db!!.pushMessage(msg)
             reloadMsgs()
-            var token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+            var token = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
             val data = hashMapOf(
                 "receiverId" to receiverId,
                 "senderId" to senderId,
@@ -181,7 +184,7 @@ class DialogActivity : BaseActivity() {
                 Log.i("dialogMessage", "data $data")
 
                 //TODO here i should refresh token
-                token = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+                token = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
 
                 Log.i("msgTest", data["token"])
             }
@@ -211,24 +214,24 @@ class DialogActivity : BaseActivity() {
 //                        }
 //                    }
 //                }
-            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(this, OnCompleteListener<DocumentSnapshot>() {
-                    if (it.isSuccessful) {
-                        val result = it.result?.get("public_key") as Blob?
-                        val kp = KeysDBHelper(applicationContext).getKeyPair(mAuth!!.uid!!)
-                        if (result != null && kp != null) {
-                            val pk = result.toBytes()
-                            sendEncryptedMessage(receiverId, senderId, text, msg, kp, pk)
-                            Log.i("dialogMessage", "sendEncryptedMessage data $data")
+            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(activity!!, OnCompleteListener<DocumentSnapshot>() {
+                if (it.isSuccessful) {
+                    val result = it.result?.get("public_key") as Blob?
+                    val kp = KeysDBHelper(c!!).getKeyPair(mAuth!!.uid!!)
+                    if (result != null && kp != null) {
+                        val pk = result.toBytes()
+                        sendEncryptedMessage(receiverId, senderId, text, msg, kp, pk)
+                        Log.i("dialogMessage", "sendEncryptedMessage data $data")
 //                            reloadMsgs()
-                        } else {
-                            sendMessage(receiverId, senderId, text, msg)
-                            Log.i("dialogMessage", "sendMessage data $data")
-//                            reloadMsgs()
-                        }
                     } else {
-                        Log.i("dialogMessage", "Error getting documents.", it.exception);
+                        sendMessage(receiverId, senderId, text, msg)
+                        Log.i("dialogMessage", "sendMessage data $data")
+//                            reloadMsgs()
                     }
+                } else {
+                    Log.i("dialogMessage", "Error getting documents.", it.exception)
                 }
+            }
             )
             //sendMessage(receiverId, senderId, text, msg)
             //Log.i("dialogMessage", "data $data")
@@ -243,10 +246,10 @@ class DialogActivity : BaseActivity() {
             "senderId" to senderId,
             "deliveredId" to msg.deliveredId.toString(),
             "text" to text,
-            "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+            "token" to c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
         )
 //        messageInput.setText("")
-        Log.i("msgTest", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+        Log.i("msgTest", c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
         functions!!
             .getHttpsCallable("sendMessage")
             .call(data).addOnCompleteListener { task ->
@@ -314,7 +317,7 @@ class DialogActivity : BaseActivity() {
             "senderId" to senderId,
             "deliveredId" to msg.deliveredId.toString(),
             "encryptedText" to Base64.encodeToString(encryptedText, Base64.DEFAULT),
-            "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""),
+            "token" to c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""),
             "senderPublicKey" to Base64.encodeToString(keyPair.publicKey, Base64.DEFAULT),
             "receiverPublicKey" to Base64.encodeToString(receiverPublicKey, Base64.DEFAULT),
             "signature" to Base64.encodeToString(signature, Base64.DEFAULT)
@@ -348,17 +351,17 @@ class DialogActivity : BaseActivity() {
     }
 
     private fun friendsButtonOnClick() {
-        val i = Intent(applicationContext, FriendsActivity::class.java)
+        val i = Intent(c, FriendsActivity::class.java)
         startActivity(i)
     }
 
     private fun dialoguesButtonOnClick() {
-        val i = Intent(applicationContext, DialoguesActivity::class.java)
+        val i = Intent(c, DialoguesActivity::class.java)
         startActivity(i)
     }
 
     private fun settingsButtonOnClick() {
-        val i = Intent(applicationContext, SettingsActivity::class.java)
+        val i = Intent(c, SettingsActivity::class.java)
         startActivity(i)
     }
 

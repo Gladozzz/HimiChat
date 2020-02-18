@@ -7,14 +7,6 @@
         android:layout_height="match_parent"
         tools:context=".FriendRequestsActivity" android:background="@color/colorPrimaryDark">
 
-    <com.jimipurple.himichat.NavComponent
-            android:id="@+id/navComponent"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendRequests"
             android:layout_width="0dp"
@@ -38,7 +30,7 @@
             android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_received"
-            app:layout_constraintBottom_toTopOf="@+id/navComponent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sentButton"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -48,7 +40,7 @@
             android:layout_height="40dp"
             android:background="@color/colorPrimary"
             android:text="@string/button_sent"
-            app:layout_constraintBottom_toTopOf="@+id/navComponent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/reсeivedButton" />
 

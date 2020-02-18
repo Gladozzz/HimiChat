@@ -64,6 +64,8 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         db.execSQL(SQL_CREATE_TABLE_UNDELIVERED_MESSAGES)
         FirebaseApp.initializeApp(c)
         mAuth = FirebaseAuth.getInstance()
+        Log.i("huitenka", "1123123123123123123123123")
+        Log.i("huitenka", "123 " + mAuth!!.uid!!)
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // This database is only a cache for online data, so its upgrade policy is
@@ -77,6 +79,9 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
     }
     fun getMessages(): ArrayList<Message>? {
         //TODO получение всех сообщений пользователя из бд
+
+        mAuth = FirebaseAuth.getInstance()
+
         val db = this.readableDatabase
         val projection = arrayOf(BaseColumns._ID,
             TableMessages.COLUMN_NAME_SENDER_ID,
@@ -126,12 +131,14 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             return msgs
         }
         cursor.close()
+        db.close()
         return null
     }
     fun deleteAllMessages() {
         val db = this.writableDatabase
         db.execSQL("delete from "+ TableUndeliveredMessages.TABLE_NAME);
         db.execSQL("delete from "+ TableMessages.TABLE_NAME);
+        db.close()
     }
     fun deleteMessage(message: Message) {
         if (message is ReceivedMessage || message is SentMessage){
@@ -142,6 +149,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             // Issue SQL statement.
             val db = this.writableDatabase
             val deletedRows = db.delete(TableMessages.TABLE_NAME, selection, selectionArgs)
+            db.close()
         } else {
             deleteUndeliveredMessage((message as UndeliveredMessage).deliveredId.toString())
         }
@@ -187,6 +195,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             return msgs
         }
         cursor.close()
+        db.close()
         return null
     }
     fun getUndeliveredMessage(deliveredId: String): UndeliveredMessage? {
@@ -227,6 +236,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
             return msg
         }
         cursor.close()
+        db.close()
         return null
     }
     fun getDeliveredId(): Long {
@@ -265,6 +275,7 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         // Issue SQL statement.
         val db = this.writableDatabase
         val deletedRows = db.delete(TableUndeliveredMessages.TABLE_NAME, selection, selectionArgs)
+        db.close()
     }
     fun pushMessage(msg: UndeliveredMessage) {
         //TOD Добавление сообщения в бд

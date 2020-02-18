@@ -4,14 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.navigation.findNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.adapters.FriendsListAdapter
 import com.jimipurple.himichat.models.*
-import kotlinx.android.synthetic.main.activity_dialogues.*
-import kotlinx.android.synthetic.main.activity_friends.*
-import kotlinx.android.synthetic.main.activity_friends.navComponent
+import kotlinx.android.synthetic.main.fragment_friends.*
 
 class FriendsActivity : BaseActivity() {
 
@@ -33,7 +30,7 @@ class FriendsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_friends)
+        setContentView(R.layout.fragment_friends)
 
         mAuth = FirebaseAuth.getInstance()
 
@@ -52,11 +49,12 @@ class FriendsActivity : BaseActivity() {
                 }
         }
         val sendMsg = {u: User -> Unit
-            val i = Intent(applicationContext, DialogActivity::class.java)
-            i.putExtra("friend_id", u.id)
-            i.putExtra("avatar", u.avatar)
-            i.putExtra("nickname", u.nickname)
-            startActivityForResult(i, REQUEST_CODE_DIALOG_ACTIVITY)
+            val b = Bundle()
+            b.putString("friend_id", u.id)
+            b.putString("nickname", u.nickname)
+            b.putString("avatar", u.avatar)
+            val navController = findNavController(R.id.nav_host_fragment)
+            navController.navigate(R.id.nav_dialog, b)
         }
         functions!!
             .getHttpsCallable("getFriends")
@@ -75,12 +73,14 @@ class FriendsActivity : BaseActivity() {
                                 val unfound = result1["unfound"] as ArrayList<String>
                                 Log.i("FriendList", "users $users")
                                 Log.i("FriendList", "unfound $unfound")
+                                Log.i("FriendList", "wtf")
                                 val adapter = FriendsListAdapter(this, hashMapToUser(users), object : FriendsListAdapter.Callback {
                                     override fun onItemClicked(item: User) {
                                         profile(item)
                                     }
                                 }, sendMsg)
                                 FriendsList.adapter = adapter
+                                Log.i("FriendList", "wtf")
                                 //friendRequests.layoutManager = LinearLayoutManager(this)
                             }
                         }
@@ -100,27 +100,8 @@ class FriendsActivity : BaseActivity() {
 //            .addOnFailureListener { exception ->
 //                Log.i("FriendsActivity", "get failed with ", exception)
 //            }
-
-        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
-        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
-        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
         findFriendButton.setOnClickListener { findFriendButtonOnClick() }
         friendRequestsButton.setOnClickListener { friendRequestsButtonOnClick() }
-    }
-
-    private fun friendsButtonOnClick() {
-        val i = Intent(applicationContext, FriendsActivity::class.java)
-        startActivity(i)
-    }
-
-    private fun dialoguesButtonOnClick() {
-        val i = Intent(applicationContext, DialoguesActivity::class.java)
-        startActivity(i)
-    }
-
-    private fun settingsButtonOnClick() {
-        val i = Intent(applicationContext, SettingsActivity::class.java)
-        startActivity(i)
     }
 
     private fun findFriendButtonOnClick() {

@@ -17,6 +17,7 @@ import com.google.firebase.functions.FirebaseFunctions
 @SuppressLint("Registered")
 open class BaseActivity : AppCompatActivity() {
 
+    protected val cacheSize = 200 * 1024 * 1024 // 200MiB
     protected var mAuth: FirebaseAuth? = null
     protected var firestore: FirebaseFirestore? = null
     protected var firebaseToken: String  = ""

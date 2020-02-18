@@ -5,10 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock.sleep
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_settings.*
+import kotlinx.android.synthetic.main.fragment_settings.*
 import android.util.Log
-import com.google.firebase.functions.FirebaseFunctions
 import android.app.Activity
 import android.provider.MediaStore
 import android.content.pm.PackageManager
@@ -23,8 +21,6 @@ import kotlinx.io.ByteArrayOutputStream
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.jimipurple.himichat.adapters.SettingsPageAdapter
-import kotlinx.android.synthetic.main.activity_friend_requests.*
-import kotlinx.android.synthetic.main.activity_settings.navComponent
 import java.io.File
 
 
@@ -42,7 +38,7 @@ class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        setContentView(R.layout.fragment_settings)
 
         mAuth = FirebaseAuth.getInstance()
 
@@ -59,9 +55,9 @@ class SettingsActivity : BaseActivity() {
         viewpager_main.adapter = fragmentAdapter
         SettingsTabs.setupWithViewPager(viewpager_main)
 
-        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
-        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
-        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
+//        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
+//        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
+//        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
     }
 
     private fun logoutButtonOnClick() {

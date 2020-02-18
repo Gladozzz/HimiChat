@@ -1,37 +1,19 @@
-package com.jimipurple.himichat
+package com.jimipurple.himichat.ui.settings
 
 
-import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
-import android.os.SystemClock
-import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.RequestCreator
-import java.io.File
-import kotlinx.android.synthetic.main.profile_settings_fragment.*
-import kotlinx.io.ByteArrayOutputStream
+import com.jimipurple.himichat.R
 
 
-class PrivacySettingsFragment : Fragment() {
+class DesignSettingsFragment : Fragment() {
 
     private var mAuth: FirebaseAuth? = null
     private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()

@@ -1,4 +1,4 @@
-package com.jimipurple.himichat
+package com.jimipurple.himichat.ui.settings
 
 
 import android.content.Intent
@@ -13,15 +13,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
+import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.squareup.picasso.LruCache
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
-import java.lang.Exception
 import java.util.regex.Pattern
 
 
@@ -50,6 +52,17 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
         loadAvatarButton.setOnClickListener { loadAvatarCallback() }
         deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
 
+        updateAvatar()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.profile_settings_fragment, container, false)
+    }
+    fun updateAvatar() {
         val data = mapOf("id" to mAuth!!.uid!!)
         functions
             .getHttpsCallable("getUser")
@@ -69,31 +82,33 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
                     if (bitmap != null) {
                         avatarView.setImageBitmap(bitmap)
                     } else {
-                        Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                avatarView.setImageBitmap(bitmap)
-                                LruCache(context!!).set(url.toString(), bitmap!!)
-                            }
+                        Glide.with(this)
+                            .asBitmap()
+                            .load(url)
+                            .into(object : CustomTarget<Bitmap>(){
+                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                    avatarView.setImageBitmap(resource)
+                                    LruCache(context!!).set(url.toString(), resource)
+                                    Log.i("Profile", "bitmap from $url is loaded and set to imageView")
+                                }
+                                override fun onLoadCleared(placeholder: Drawable?) {
+                                    // this is called when imageView is cleared on lifecycle call or for
+                                    // some other reason.
+                                    // if you are referencing the bitmap somewhere else too other than this imageView
+                                    // clear it here as you can no longer have the bitmap
+//                                    avatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
+                                }
 
-                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                                Log.i("Profile", "Загрузка изображения не удалась " + avatarView + "\n" + e?.message)
-                            }
-                        })
+                                override fun onLoadFailed(errorDrawable: Drawable?) {
+                                    super.onLoadFailed(errorDrawable)
+                                    Log.e("Profile", "Загрузка изображения не удалась $url")
+                                }
+                            })
                     }
                 } else {
                     Log.i("Profile", "avatar wasn't received")
                 }
             }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.profile_settings_fragment, container, false)
     }
 
 //    fun newInstance(page: Int): ProfileSettingsFragment {

@@ -1,28 +1,34 @@
-package com.jimipurple.himichat
+package com.jimipurple.himichat.ui.friends
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.functions.FirebaseFunctions
+import com.jimipurple.himichat.*
 import com.jimipurple.himichat.adapters.FriendRequestsListAdapter
-import com.jimipurple.himichat.models.*
+import com.jimipurple.himichat.models.FriendRequest
 import kotlinx.android.synthetic.main.fragment_friend_requests.*
 
-class FriendRequestsActivity : BaseActivity() {
 
-//    private var mAuth: FirebaseAuth? = null
-//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//    private var firebaseToken: String  = ""
-//    private var functions = FirebaseFunctions.getInstance()
+class FriendRequestsFragment : BaseFragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_friend_requests, container, false)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_friend_requests)
 
-//        mAuth = FirebaseAuth.getInstance()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         receivedButtonOnClick()
 
@@ -52,9 +58,9 @@ class FriendRequestsActivity : BaseActivity() {
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
                 if (result["block"] == true) {
-                    Toast.makeText(applicationContext, resources.getString(R.string.toast_block_invite_complete) + " ${fr.nickname} ", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, resources.getString(R.string.toast_block_invite_complete) + " ${fr.nickname} ", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(applicationContext, resources.getString(R.string.toast_block_invite_error) + " ${fr.nickname} ", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, resources.getString(R.string.toast_block_invite_error) + " ${fr.nickname} ", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -65,9 +71,9 @@ class FriendRequestsActivity : BaseActivity() {
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
                 if (result["accept"] == true) {
-                    Toast.makeText(applicationContext, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(applicationContext, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -78,9 +84,9 @@ class FriendRequestsActivity : BaseActivity() {
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
                 if (result["accept"] == true) {
-                    Toast.makeText(applicationContext, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(applicationContext, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -91,9 +97,9 @@ class FriendRequestsActivity : BaseActivity() {
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
                 if (result["cancel"] == true) {
-                    Toast.makeText(applicationContext, "${fr.nickname} " + resources.getString(R.string.toast_cancel_invite_complete), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_cancel_invite_complete), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(applicationContext, "${fr.nickname} " + resources.getString(R.string.toast_cancel_invite_error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_cancel_invite_error), Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -101,7 +107,7 @@ class FriendRequestsActivity : BaseActivity() {
     private fun receivedButtonOnClick() {
         val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
-        val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+        val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
             override fun onItemClicked(item: FriendRequest) {
                 profile(item)
             }
@@ -130,7 +136,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["unfound"] as ArrayList<String>
                                     Log.i("received_inv", "users $users")
                                     Log.i("received_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }
@@ -153,7 +159,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["found"] as ArrayList<String>
                                     Log.i("received_inv", "users $users")
                                     Log.i("received_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }
@@ -169,7 +175,7 @@ class FriendRequestsActivity : BaseActivity() {
     private fun sentButtonOnClick() {
         val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
-        val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+        val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
             override fun onItemClicked(item: FriendRequest) {
                 profile(item)
             }
@@ -198,7 +204,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["unfound"] as ArrayList<String>
                                     Log.i("sent_inv", "users $users")
                                     Log.i("sent_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }
@@ -221,7 +227,7 @@ class FriendRequestsActivity : BaseActivity() {
                                     val unfound = result1["found"] as ArrayList<String>
                                     Log.i("sent_inv", "users $users")
                                     Log.i("sent_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(this, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+                                    val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
                                         override fun onItemClicked(item: FriendRequest) {
                                             profile(item)
                                         }

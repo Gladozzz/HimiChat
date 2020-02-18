@@ -1,4 +1,4 @@
-package com.jimipurple.himichat
+package com.jimipurple.himichat.ui.dialogues
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,53 +6,59 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
-import androidx.navigation.findNavController
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.functions.FirebaseFunctions
+import com.jimipurple.himichat.*
 import com.jimipurple.himichat.adapters.DialoguesListAdapter
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
-import com.jimipurple.himichat.ui.dialog.DialogFragment
 import kotlinx.android.synthetic.main.fragment_dialogues.*
 import java.util.*
 import kotlin.collections.ArrayList
 import java.text.SimpleDateFormat
 
 
-class DialoguesActivity : BaseActivity() {
+class DialoguesFragment : BaseFragment() {
 
     private var REQUEST_CODE_DIALOG_ACTIVITY: Int = 0
 
-//    private var mAuth: FirebaseAuth? = null
+    //    private var mAuth: FirebaseAuth? = null
 //    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 //    private var firebaseToken: String  = ""
 //    private var functions = FirebaseFunctions.getInstance()
-    private var db: MessagesDBHelper = MessagesDBHelper(this)
+    private var db: MessagesDBHelper? = null
     private var id : String? = null
     private var currentTime: Date?  = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_dialogues)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_dialogues, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+//        setContentView(R.layout.fragment_dialogues)
+        db = MessagesDBHelper(c!!)
         mAuth = FirebaseAuth.getInstance()
         id = mAuth!!.uid!!
         val currentTime = Calendar.getInstance().time
 
         reloadMsgs()
 
-        registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
-
-//        (navComponent as NavComponent).friendsButton!!.setOnClickListener { friendsButtonOnClick() }
-//        (navComponent as NavComponent).dialoguesButton!!.setOnClickListener { dialoguesButtonOnClick() }
-//        (navComponent as NavComponent).settingsButton!!.setOnClickListener { settingsButtonOnClick() }
+        activity!!.registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
     }
 
     private fun reloadMsgs() {
-        val allMsgs = db.getMessages()
+        val allMsgs = db!!.getMessages()
         val msgs = allMsgs
         val dialogs = ArrayList<Dialog>()
-        val undeliveredMsgs = db.getUndeliveredMessages()
+        val undeliveredMsgs = db!!.getUndeliveredMessages()
         Log.i("msgs", msgs.toString())
         Log.i("unmsgs", undeliveredMsgs.toString())
 
@@ -137,13 +143,13 @@ class DialoguesActivity : BaseActivity() {
                         b.putString("friend_id", dialog.friendId)
                         b.putString("nickname", dialog.nickname)
                         b.putString("avatar", dialog.avatar)
-                        val navController = findNavController(R.id.nav_host_fragment)
+                        val navController = findNavController()
                         navController.navigate(R.id.nav_dialog, b)
                     }
                     val onHoldCallback = {dialog: Dialog -> Unit
-//                        dialoguesButtonOnClick()
+                        dialoguesButtonOnClick()
                     }
-                    dialoguesList.adapter = DialoguesListAdapter(this, dialogs,  object : DialoguesListAdapter.Callback {
+                    dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
                         override fun onItemClicked(item: Dialog) {
                             clickCallback(item)
                         }
@@ -159,9 +165,24 @@ class DialoguesActivity : BaseActivity() {
         Log.i("dateTEST","Current time => $formattedDate")
     }
 
+    private fun friendsButtonOnClick() {
+        val i = Intent(c, FriendsActivity::class.java)
+        startActivity(i)
+    }
+
+    private fun dialoguesButtonOnClick() {
+        val i = Intent(c, DialoguesActivity::class.java)
+        startActivity(i)
+    }
+
+    private fun settingsButtonOnClick() {
+        val i = Intent(c, SettingsActivity::class.java)
+        startActivity(i)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(FCMReceiver)
+        activity!!.unregisterReceiver(FCMReceiver)
     }
 
     val FCMReceiver = object : BroadcastReceiver() {

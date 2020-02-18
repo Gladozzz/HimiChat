@@ -12,14 +12,6 @@
         android:paddingRight="20dp"
         tools:context=".FindFriendActivity">
 
-    <com.jimipurple.himichat.NavComponent
-            android:id="@+id/navComponent"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
     <EditText
             android:id="@+id/nicknameEdit"
             android:layout_width="0dp"

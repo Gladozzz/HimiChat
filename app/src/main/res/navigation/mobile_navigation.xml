@@ -3,41 +3,68 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/mobile_navigation"
-        app:startDestination="@+id/nav_home">
+        app:startDestination="@+id/nav_dialogues">
 
     <fragment
-            android:id="@+id/nav_home"
-            android:name="com.jimipurple.himichat.ui.home.HomeFragment"
-            android:label="@string/menu_home"
-            tools:layout="@layout/fragment_home" />
+            android:id="@+id/nav_dialogues"
+            android:name="com.jimipurple.himichat.ui.dialogues.DialoguesFragment"
+            android:label="@string/menu_dialogues"
+            tools:layout="@layout/fragment_dialogues" >
+        <action
+                android:id="@+id/action_nav_dialogues_to_nav_dialog"
+                app:destination="@id/nav_dialog" />
+    </fragment>
 
     <fragment
-            android:id="@+id/nav_gallery"
-            android:name="com.jimipurple.himichat.ui.gallery.GalleryFragment"
-            android:label="@string/menu_gallery"
-            tools:layout="@layout/fragment_gallery" />
+            android:id="@+id/nav_dialog"
+            android:name="com.jimipurple.himichat.ui.dialog.DialogFragment"
+            android:label="@string/menu_dialog"
+            tools:layout="@layout/fragment_dialog">
+
+            <argument
+                    android:name="friend_id"
+                    app:argType="string"/>
+        <argument
+                android:name="nickname"
+                app:argType="string"/>
+        <argument
+                android:name="avatar"
+                app:argType="string"/>
+    </fragment>
 
     <fragment
-            android:id="@+id/nav_slideshow"
-            android:name="com.jimipurple.himichat.ui.slideshow.SlideshowFragment"
-            android:label="@string/menu_slideshow"
-            tools:layout="@layout/fragment_slideshow" />
+            android:id="@+id/nav_friends"
+            android:name="com.jimipurple.himichat.ui.friends.FriendsFragment"
+            android:label="@string/menu_friends"
+            tools:layout="@layout/fragment_friends" >
+        <action
+                android:id="@+id/action_nav_friends_to_nav_dialog"
+                app:destination="@id/nav_dialog" />
+        <action
+                android:id="@+id/action_nav_friends_to_nav_find_friend"
+                app:destination="@id/nav_find_friend" />
+        <action
+                android:id="@+id/action_nav_friends_to_nav_friend_requests"
+                app:destination="@id/nav_friend_requests" />
+    </fragment>
 
     <fragment
-            android:id="@+id/nav_tools"
-            android:name="com.jimipurple.himichat.ui.tools.ToolsFragment"
-            android:label="@string/menu_tools"
-            tools:layout="@layout/fragment_tools" />
+            android:id="@+id/nav_find_friend"
+            android:name="com.jimipurple.himichat.ui.friends.FindFriendFragment"
+            android:label="@string/menu_find_friend"
+            tools:layout="@layout/fragment_find_friend" >
+    </fragment>
 
     <fragment
-            android:id="@+id/nav_share"
-            android:name="com.jimipurple.himichat.ui.share.ShareFragment"
-            android:label="@string/menu_share"
-            tools:layout="@layout/fragment_share" />
+            android:id="@+id/nav_friend_requests"
+            android:name="com.jimipurple.himichat.ui.friends.FriendRequestsFragment"
+            android:label="@string/menu_find_friend"
+            tools:layout="@layout/fragment_friend_requests" >
+    </fragment>
 
     <fragment
-            android:id="@+id/nav_send"
-            android:name="com.jimipurple.himichat.ui.send.SendFragment"
-            android:label="@string/menu_send"
-            tools:layout="@layout/fragment_send" />
+            android:id="@+id/nav_settings"
+            android:name="com.jimipurple.himichat.ui.settings.SettingsFragment"
+            android:label="@string/menu_settings"
+            tools:layout="@layout/fragment_settings" />
 </navigation>

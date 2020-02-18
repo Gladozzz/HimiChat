@@ -11,17 +11,21 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.jimipurple.himichat.R
-import com.squareup.picasso.Picasso
 import com.jimipurple.himichat.models.*
 import com.squareup.picasso.LruCache
-import java.lang.Exception
 
 
 class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val clickCallback: Callback, val sendMessageButtonOnClick: (u: User)-> Unit) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendHolder {
+        Log.i("FriendListAdapter", "items $items")
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.friends_list, parent, false)
         return FriendHolder(view)
@@ -31,7 +35,7 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val c
 
     override fun onBindViewHolder(holder: FriendHolder, position: Int) {
         holder.bind(items[position])
-        Log.i("Recycler", "items $items")
+        Log.i("FriendListAdapter", "onBindViewHolder")
     }
 
     inner class FriendHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -44,28 +48,35 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val c
         fun bind(item: User) {
             name.text = item.nickname
             realName.text = item.realName
-            Log.i("Recycler", "all must be ok")
-            Log.i("Recycler", "item $item")
 
             if (item.avatar.isNotEmpty()) {
                 val url = Uri.parse(item.avatar)
                 if (url != null) {
-                    val bitmap = LruCache(context)[item.avatar]
+                    val bitmap = LruCache(context.applicationContext)[item.avatar]
                     if (bitmap != null) {
                         avatar.setImageBitmap(bitmap)
                     } else {
-                        Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                avatar.setImageBitmap(bitmap)
-                                LruCache(context).set(url.toString(), bitmap!!)
-                            }
+                        Glide.with(context)
+                            .asBitmap()
+                            .load(url)
+                            .into(object : CustomTarget<Bitmap>(){
+                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                    avatar.setImageBitmap(resource)
+                                    LruCache(context.applicationContext).set(url.toString(), resource)
+                                }
+                                override fun onLoadCleared(placeholder: Drawable?) {
+                                    // this is called when imageView is cleared on lifecycle call or for
+                                    // some other reason.
+                                    // if you are referencing the bitmap somewhere else too other than this imageView
+                                    // clear it here as you can no longer have the bitmap
+//                                    avatar.setImageBitmap(ResourcesCompat.getDrawable(context.resources, R.drawable.defaultavatar, null)!!.toBitmap())
+                                }
 
-                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                                Log.i("FriendListAdapter", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
-                            }
-                        })
+                                override fun onLoadFailed(errorDrawable: Drawable?) {
+                                    super.onLoadFailed(errorDrawable)
+                                    Log.e("FriendListAdapter", "Загрузка изображения не удалась $url")
+                                }
+                            })
                     }
                 } else {
                     Log.i("FriendListAdapter", "avatar wasn't received")
