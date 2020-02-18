@@ -28,15 +28,9 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.models.User
-import androidx.collection.LruCache
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
-import com.jimipurple.himichat.adapters.FriendsListAdapter
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
-import kotlinx.android.synthetic.main.fragment_friends.*
 import com.squareup.picasso.LruCache as PicLruCache
-import kotlinx.android.synthetic.main.nav_header_navigation2.*
-import java.net.URL
 
 class NavigationActivity : BaseActivity() {
 
