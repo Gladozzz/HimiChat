@@ -100,10 +100,10 @@ class FriendsFragment : BaseFragment() {
             navController.navigate(R.id.nav_dialog, b)
         }
 
-        val db = SharedPreferencesUtility(c!!.applicationContext)
-        val arr = db.getListString("friends")
-        val users = stringsToUsers(arr)
+        val pref = SharedPreferencesUtility(c!!.applicationContext)
+        val arr = pref.getListString("friends")
         if (arr != null) {
+            val users = stringsToUsers(arr)
             val adapter = FriendsListAdapter(c!!.applicationContext, users, object : FriendsListAdapter.Callback {
                 override fun onItemClicked(item: User) {
                     profile(item)
@@ -135,7 +135,7 @@ class FriendsFragment : BaseFragment() {
                                 Log.i("FriendList", "unfound $unfound")
                                 val arr1 = hashMapToUser(users)
                                 val strings = usersToStrings(arr1)
-                                db.putListString("friends", strings)
+                                pref.putListString("friends", strings)
                                 val adapter = FriendsListAdapter(c!!.applicationContext, arr1, object : FriendsListAdapter.Callback {
                                     override fun onItemClicked(item: User) {
                                         profile(item)

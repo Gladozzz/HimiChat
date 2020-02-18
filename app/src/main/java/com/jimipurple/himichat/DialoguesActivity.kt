@@ -7,14 +7,19 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.gson.Gson
 import com.jimipurple.himichat.adapters.DialoguesListAdapter
+import com.jimipurple.himichat.adapters.FriendsListAdapter
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
 import com.jimipurple.himichat.ui.dialog.DialogFragment
+import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import kotlinx.android.synthetic.main.fragment_dialogues.*
+import kotlinx.android.synthetic.main.fragment_friends.*
 import java.util.*
 import kotlin.collections.ArrayList
 import java.text.SimpleDateFormat
@@ -111,6 +116,51 @@ class DialoguesActivity : BaseActivity() {
         for (d in dialogs) {
             ids.add(d.friendId)
         }
+
+        val pref = SharedPreferencesUtility(applicationContext)
+        val arr = pref.getListString("friends")
+        fun stringsToUsers(h : ArrayList<String>) : ArrayList<User> {
+            val u : ArrayList<User> = ArrayList<User>()
+            h.forEach {
+                val gson = Gson()
+                val user = gson.fromJson(it, User::class.java)
+                u.add(user)
+            }
+            return u
+        }
+        if (arr != null) {
+            val users = stringsToUsers(arr)
+            Log.i("dialogsAct", users.toString())
+            for (d in dialogs) {
+                for (usr in users) {
+                    if (usr.id == d.friendId) {
+                        d.nickname = usr.nickname
+                        d.avatar = usr.avatar
+                    }
+                }
+            }
+            Log.i("dialogsAct", dialogs.toString())
+            val clickCallback = {dialog: Dialog -> Unit
+                val b = Bundle()
+                b.putString("friend_id", dialog.friendId)
+                b.putString("nickname", dialog.nickname)
+                b.putString("avatar", dialog.avatar)
+                val navController = findNavController(R.id.nav_host_fragment)
+                navController.navigate(R.id.nav_dialog, b)
+            }
+            val onHoldCallback = {dialog: Dialog -> Unit
+//                        dialoguesButtonOnClick()
+            }
+            dialoguesList.adapter = DialoguesListAdapter(this, dialogs,  object : DialoguesListAdapter.Callback {
+                override fun onItemClicked(item: Dialog) {
+                    clickCallback(item)
+                }
+            }, onHoldCallback)
+            Log.i("friendsTest", "friends was took from SharedPreferences")
+        } else {
+            Log.i("friendsTest", "SharedPreferences is empty")
+        }
+
         val data = mapOf("ids" to ids)
         functions!!
             .getHttpsCallable("getUsers")
@@ -122,7 +172,7 @@ class DialoguesActivity : BaseActivity() {
                     val unfound = result["unfound"] as ArrayList<String>
                     Log.i("dialogsAct", users.toString())
                     Log.i("dialogsAct", unfound.toString())
-                    var usrs = hashMapToUser(users)
+                    val usrs = hashMapToUser(users)
                     for (d in dialogs) {
                         for (usr in usrs) {
                             if (usr.id == d.friendId) {

@@ -22,15 +22,20 @@ class SharedPreferencesUtility(appContext: Context?) {
      * @param key SharedPreferences key
      * @return ArrayList of String
      */
-    fun getListString(key: String): ArrayList<String> {
-        return ArrayList(
-            listOf(
-                *TextUtils.split(
-                    preferences.getString(key, ""),
-                    "‚‗‚"
+    fun getListString(key: String): ArrayList<String>? {
+        val value = preferences.getString(key, null)
+        if (value != null) {
+            return ArrayList(
+                listOf(
+                    *TextUtils.split(
+                        value,
+                        "‚‗‚"
+                    )
                 )
             )
-        )
+        } else {
+            return null
+        }
     }
 
     /**
