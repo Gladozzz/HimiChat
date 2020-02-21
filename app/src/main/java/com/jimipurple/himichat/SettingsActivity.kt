@@ -136,30 +136,31 @@ class SettingsActivity : BaseActivity() {
             var ref : StorageReference? = null
             val rawImage : RequestCreator?
             val setAvatar = {uri: Uri -> Unit
-                val dataForJson = mapOf("id" to mAuth!!.uid, "avatar" to uri.toString())
-                functions!!
-                    .getHttpsCallable("setAvatar")
-                        .call(dataForJson).addOnCompleteListener { task1 ->
-                            try {
-                                val i = Log.i(
-                                    "setAvatar",
-                                    "result " + task1.result?.data.toString()
-                                )
-                                val result = task1.result?.data as HashMap<String, Any>
-                                val added = try {
-                                    result["added"] as Boolean
-                                } catch (e: Exception) {
-                                    false
-                                }
-                                if (added) {
-                                    Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
-                                }
-                            } catch (e: Exception) {
-                                Log.i("setAvatar", "error " + e.message)
-                            }
-                    }
+//                val dataForJson = mapOf("id" to mAuth!!.uid, "avatar" to uri.toString())
+//                functions!!
+//                    .getHttpsCallable("setAvatar")
+//                        .call(dataForJson).addOnCompleteListener { task1 ->
+//                            try {
+//                                val i = Log.i(
+//                                    "setAvatar",
+//                                    "result " + task1.result?.data.toString()
+//                                )
+//                                val result = task1.result?.data as HashMap<String, Any>
+//                                val added = try {
+//                                    result["added"] as Boolean
+//                                } catch (e: Exception) {
+//                                    false
+//                                }
+//                                if (added) {
+//                                    Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+//                                } else {
+//                                    Toast.makeText(applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+//                                }
+//                            } catch (e: Exception) {
+//                                Log.i("setAvatar", "error " + e.message)
+//                            }
+//                    }
+                firestore!!.collection("users").document(mAuth!!.uid!!).update("avatar", uri.toString())
             }
             Picasso.get().load(File(picturePath.trim())).resize(500, 500).centerCrop().into(object : com.squareup.picasso.Target {
                 override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {

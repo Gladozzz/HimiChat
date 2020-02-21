@@ -9,6 +9,7 @@ import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.db.MessagesDBHelper
@@ -23,6 +24,7 @@ class MessagingService : FirebaseMessagingService() {
 
     private var mAuth: FirebaseAuth? = null
     private var functions: FirebaseFunctions? = null
+    private var firestore: FirebaseFirestore? = null
     private var CHANNEL_ID = "himichat_messages"
 
     val INTENT_FILTER = "INTENT_FILTER"
@@ -40,6 +42,7 @@ class MessagingService : FirebaseMessagingService() {
 
         mAuth = FirebaseAuth.getInstance()
         functions = FirebaseFunctions.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
         val db = MessagesDBHelper(applicationContext)
         // Check if message contains a data payload.
@@ -128,6 +131,7 @@ class MessagingService : FirebaseMessagingService() {
                     val kp = KeysDBHelper(applicationContext).getKeyPair(Base64.decode(receiver_public_key, Base64.DEFAULT))
                     if (kp != null) {
                         val data = mapOf("id" to sender_id)
+                        //TODO
                         functions!!
                             .getHttpsCallable("getUser")
                             .call(data).addOnCompleteListener { task ->
@@ -293,19 +297,20 @@ class MessagingService : FirebaseMessagingService() {
                 Thread.sleep(100)
                 uid = mAuth!!.uid
             }
-            val data = hashMapOf(
-                "userId" to uid,
-                "token" to token
-            )
-            var res = functions!!
-                .getHttpsCallable("setToken")
-                .call(data).addOnCompleteListener { task ->
-                    try {
-                        Log.i("setToken", "result " + task.result?.data.toString())
-                    } catch (e: Exception) {
-                        Log.i("setToken", "error " + e.message)
-                    }
-                }
+//            val data = hashMapOf(
+//                "userId" to uid,
+//                "token" to token
+//            )
+//            var res = functions!!
+//                .getHttpsCallable("setToken")
+//                .call(data).addOnCompleteListener { task ->
+//                    try {
+//                        Log.i("setToken", "result " + task.result?.data.toString())
+//                    } catch (e: Exception) {
+//                        Log.i("setToken", "error " + e.message)
+//                    }
+//                }
+            firestore!!.collection("users").document(mAuth!!.uid!!).update("token", token)
             return true
         } catch (e : Exception) {
             Log.i("msgService:tokenSend", "error " + e.toString())

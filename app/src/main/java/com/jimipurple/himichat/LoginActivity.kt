@@ -6,14 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.google.firebase.FirebaseApp
+import androidx.annotation.NonNull
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
@@ -64,45 +67,52 @@ class LoginActivity : BaseActivity() {
                         val rn = realNameEdit.text.toString()
                         val currentUID: String = mAuth!!.currentUser!!.uid
                         Log.i("auth:data", "current email: $currentUID, nickname: $nickname")
-                        val user = HashMap<String, Any>()
-                        user["id"] = currentUID
-                        user["nickname"] = nickname
-                        user["avatar"] = ""
-                        user["real_name"] = rn
-                        user["email"] = email
-                        user["public_key"] = email
-                        //firestore.collection("users").document(currentUID).set(user
-                        var res = functions!!
-                            .getHttpsCallable("setUser")
-                            .call(user).addOnCompleteListener { task ->
-                                try {
-                                    Log.i("setUser", "result " + task.result?.data.toString())
-                                } catch (e: Exception) {
-                                    Log.i("setUser", "error " + e.message)
-                                }
-                            }
-                        pushTokenToServer()
-                        var kp = keydb.getKeyPair(currentUID)
-                        if (kp == null) {
-                            generateKeys()
-                            kp = keydb.getKeyPair(currentUID)
-                        }
-                        pushKeysToServer(kp!!.publicKey)
-                        successful()
-//                        val userData = mapOf(
-//                            "id" to currentUID,
-//                            "nickname" to nickname,
-//                            "avatar" to "",
-//                            "real_name" to rn,
-//                            "email" to email
-//                        )
-//                        firestore.collection("users").document(mAuth!!.uid!!)
-//                            .set(userData, SetOptions.merge())
-//                            .addOnSuccessListener {
-//                                Log.i("LoginActivity", "user data successfully written")
-//                                successful()
+//                        val user = HashMap<String, Any>()
+//                        user["id"] = currentUID
+//                        user["nickname"] = nickname
+//                        user["avatar"] = ""
+//                        user["real_name"] = rn
+//                        user["email"] = email
+//                        user["public_key"] = email
+//                        //firestore.collection("users").document(currentUID).set(user
+//                        var res = functions!!
+//                            .getHttpsCallable("setUser")
+//                            .call(user).addOnCompleteListener { task ->
+//                                try {
+//                                    Log.i("setUser", "result " + task.result?.data.toString())
+//                                } catch (e: Exception) {
+//                                    Log.i("setUser", "error " + e.message)
+//                                }
 //                            }
-//                            .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
+//                        pushTokenToServer()
+//                        var kp = keydb.getKeyPair(currentUID)
+//                        if (kp == null) {
+//                            generateKeys()
+//                            kp = keydb.getKeyPair(currentUID)
+//                        }
+//                        pushKeysToServer(kp!!.publicKey)
+//                        successful()
+                        val userData = mapOf(
+                            "id" to currentUID,
+                            "nickname" to nickname,
+                            "avatar" to "",
+                            "real_name" to rn,
+                            "email" to email
+                        )
+                        firestore!!.collection("users").document(mAuth!!.uid!!)
+                            .set(userData, SetOptions.merge())
+                            .addOnSuccessListener {
+                                Log.i("LoginActivity", "user data successfully written")
+                                pushTokenToServer()
+                                var kp = keydb.getKeyPair(currentUID)
+                                if (kp == null) {
+                                    generateKeys()
+                                    kp = keydb.getKeyPair(currentUID)
+                                }
+                                pushKeysToServer(kp!!.publicKey)
+                                successful()
+                            }
+                            .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("auth:failure", "createUserWithEmail:failure", task.exception)
@@ -181,11 +191,21 @@ class LoginActivity : BaseActivity() {
 
     public override fun onStart() {
         super.onStart()
+
 //        startService(Intent(this, MessagingService::class.java))
         createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
         if (currentUser != null){
+            currentUser.getIdToken(true)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val idToken = task.result!!.token
+                        //TODO sign token with id
+                        // ...
+                    } else { // Handle error -> task.getException();
+                    }
+                }
             val currentUID = currentUser.uid
 
             //check keys
@@ -313,19 +333,20 @@ class LoginActivity : BaseActivity() {
                 Log.i("auth:start", newToken)
                 applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
                     .edit().putString("firebaseToken", newToken).apply()
-                val data = hashMapOf(
-                    "userId" to uid,
-                    "token" to newToken
-                )
-                var res = functions!!
-                    .getHttpsCallable("setToken")
-                    .call(data).addOnCompleteListener { task ->
-                        try {
-                            Log.i("setToken", "setToken result " + task.result?.data.toString())
-                        } catch (e: Exception) {
-                            Log.i("setToken", "setToken error " + e.message)
-                        }
-                    }
+//                val data = hashMapOf(
+//                    "userId" to uid,
+//                    "token" to newToken
+//                )
+//                var res = functions!!
+//                    .getHttpsCallable("setToken")
+//                    .call(data).addOnCompleteListener { task ->
+//                        try {
+//                            Log.i("setToken", "setToken result " + task.result?.data.toString())
+//                        } catch (e: Exception) {
+//                            Log.i("setToken", "setToken error " + e.message)
+//                        }
+//                    }
+                firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("token" to  newToken))
             }
     }
 }

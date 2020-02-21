@@ -122,37 +122,38 @@ class SettingsFragment : BaseFragment() {
             val rawImage : RequestCreator?
             val setAvatar = {uri: Uri -> Unit
                 val dataForJson = mapOf("id" to mAuth!!.uid, "avatar" to uri.toString())
-                functions!!
-                    .getHttpsCallable("setAvatar")
-                    .call(dataForJson).addOnCompleteListener { task1 ->
-                        try {
-                            val i = Log.i(
-                                "setAvatar",
-                                "result " + task1.result?.data.toString()
-                            )
-                            val result = task1.result?.data as HashMap<String, Any>
-                            val added = try {
-                                result["added"] as Boolean
-                            } catch (e: Exception) {
-                                false
-                            }
-                            if (added) {
-                                Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
-                                val f = fragmentAdapter!!.getCurrentFragment()!!
-                                if (f is ProfileSettingsFragment) {
-                                    f.updateAvatar()
-                                }
-                                val a = activity!!
-                                if (a is NavigationActivity) {
-                                    a.updateAvatar()
-                                }
-                            } else {
-                                Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (e: Exception) {
-                            Log.i("setAvatar", "error " + e.message)
-                        }
-                    }
+//                functions!!
+//                    .getHttpsCallable("setAvatar")
+//                    .call(dataForJson).addOnCompleteListener { task1 ->
+//                        try {
+//                            val i = Log.i(
+//                                "setAvatar",
+//                                "result " + task1.result?.data.toString()
+//                            )
+//                            val result = task1.result?.data as HashMap<String, Any>
+//                            val added = try {
+//                                result["added"] as Boolean
+//                            } catch (e: Exception) {
+//                                false
+//                            }
+//                            if (added) {
+//                                Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+//                                val f = fragmentAdapter!!.getCurrentFragment()!!
+//                                if (f is ProfileSettingsFragment) {
+//                                    f.updateAvatar()
+//                                }
+//                                val a = activity!!
+//                                if (a is NavigationActivity) {
+//                                    a.updateAvatar()
+//                                }
+//                            } else {
+//                                Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+//                            }
+//                        } catch (e: Exception) {
+//                            Log.i("setAvatar", "error " + e.message)
+//                        }
+//                    }
+                firestore!!.collection("users").document(mAuth!!.uid!!).update("avatar", uri.toString())
             }
             Glide.with(this)
                 .asBitmap()
