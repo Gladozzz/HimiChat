@@ -209,7 +209,7 @@ class LoginActivity : BaseActivity() {
             val currentUID = currentUser.uid
 
             //check keys
-            val keysDB = KeysDBHelper(applicationContext)
+//            val keysDB = KeysDBHelper(applicationContext)
             var kp = keydb.getKeyPair(currentUID)
             if (kp == null) {
                 generateKeys()

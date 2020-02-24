@@ -58,7 +58,6 @@ class DialogFragment : BaseFragment() {
         avatar = arguments!!["avatar"] as String
         nickname = arguments!!["nickname"] as String
 
-        activity!!.registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
         MessagingService.setCallbackOnMessageRecieved { activity!!.runOnUiThread { reloadMsgs() } }
         MessagingService.isDialog = true
         MessagingService.currentDialog = friend_id!!
@@ -103,11 +102,20 @@ class DialogFragment : BaseFragment() {
         return inflater.inflate(R.layout.fragment_dialog, container, false)
     }
 
+    override fun onStart() {
+        super.onStart()
+        activity!!.registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
-        activity!!.unregisterReceiver(FCMReceiver)
+        try {
+            activity!!.unregisterReceiver(FCMReceiver)
+        } catch (e: Exception) {
+            Log.e("DialogFragment", e.message)
+        }
     }
 
     fun reloadMsgs() {

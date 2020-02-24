@@ -50,8 +50,11 @@ class DialoguesFragment : BaseFragment() {
         val currentTime = Calendar.getInstance().time
 
         reloadMsgs()
+    }
 
-        activity!!.registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+    override fun onStart() {
+        super.onStart()
+        activity!!.registerReceiver(FCMReceiverDialogues, IntentFilter(MessagingService.INTENT_FILTER))
     }
 
     private fun reloadMsgs() {
@@ -182,10 +185,14 @@ class DialoguesFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        activity!!.unregisterReceiver(FCMReceiver)
+        try {
+            activity!!.unregisterReceiver(FCMReceiverDialogues)
+        } catch (e: Exception) {
+            Log.e("DialoguesFragment", e.message)
+        }
     }
 
-    val FCMReceiver = object : BroadcastReceiver() {
+    val FCMReceiverDialogues = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             reloadMsgs()
         }

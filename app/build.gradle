@@ -63,6 +63,9 @@ dependencies {
 
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
+    implementation('io.socket:socket.io-client:1.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
 //    implementation 'com.google.android.material:material:1.2.0-alpha04'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

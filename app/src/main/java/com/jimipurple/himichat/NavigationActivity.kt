@@ -61,6 +61,8 @@ class NavigationActivity : BaseActivity() {
 
         storage = FirebaseStorage.getInstance()
 
+        startService(Intent(this, SocketService::class.java))
+
 //        val data = mapOf("id" to mAuth!!.uid!!)
 //        functions!!
 //            .getHttpsCallable("getFriends")

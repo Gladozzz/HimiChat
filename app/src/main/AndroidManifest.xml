@@ -14,13 +14,18 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
+        <service
+                android:name=".SocketService"
+                android:exported="false"></service>
 
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+        <meta-data
+                android:name="com.google.android.gms.version"
+                android:value="@integer/google_play_services_version" />
 
         <activity
                 android:name=".NavigationActivity"
                 android:label="@string/title_activity_navigation"
-                android:theme="@style/AppTheme.NoActionBar"/>
+                android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".FriendRequestsActivity" />
         <activity android:name=".FindFriendActivity" />
         <activity android:name=".SettingsActivity" />
@@ -46,7 +51,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.google.firebase.components.ComponentDiscoveryService" >
+        <service android:name="com.google.firebase.components.ComponentDiscoveryService">
             <meta-data
                     android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
                     android:value="com.google.firebase.components.ComponentRegistrar" />
@@ -61,10 +66,10 @@
                     android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
                     android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar"/>
+                    android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
                     android:name="com.google.firebase.components:com.google.firebase.functions.FunctionsRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar"/>
+                    android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
                     android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
                     android:value="com.google.firebase.components.ComponentRegistrar" />
