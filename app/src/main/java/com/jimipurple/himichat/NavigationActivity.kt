@@ -29,6 +29,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.models.User
 import com.google.gson.Gson
+import com.jimipurple.himichat.utills.FirestoreRequest
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.LruCache as PicLruCache
 
@@ -225,6 +226,9 @@ class NavigationActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+
+//        FirestoreRequest(this).getUser(mAuth!!.uid!!)
+
         fun hashMapToUser(h : ArrayList<java.util.HashMap<String, Any>>) : ArrayList<User> {
             val u : ArrayList<User> = ArrayList<User>()
             h.forEach {

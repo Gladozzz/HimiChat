@@ -48,6 +48,8 @@ class DialoguesFragment : BaseFragment() {
         mAuth = FirebaseAuth.getInstance()
         id = mAuth!!.uid!!
         val currentTime = Calendar.getInstance().time
+        MessagingService.setCallbackOnMessageRecieved { activity!!.runOnUiThread { reloadMsgs() } }
+        SocketService.setCallbackOnMessageReceived { activity!!.runOnUiThread { reloadMsgs() } }
 
         reloadMsgs()
     }
@@ -120,6 +122,7 @@ class DialoguesFragment : BaseFragment() {
         for (d in dialogs) {
             ids.add(d.friendId)
         }
+
         val data = mapOf("ids" to ids)
         functions!!
             .getHttpsCallable("getUsers")
@@ -159,6 +162,62 @@ class DialoguesFragment : BaseFragment() {
                     }, onHoldCallback)
                 }
             }
+
+//        Log.i("FirestoreRequest", ids.toString())
+//        val users = ArrayList<User>()
+//        for (i in (ids.size-1) downTo 0) {
+//            firestore!!.collection("users").document(ids[i]).get().addOnCompleteListener{ doc ->
+//                if (doc.isSuccessful) {
+//                    val friendData = doc.result!!
+//                    var nickname = friendData.get("nickname") as String?
+//                    if (nickname == null) {
+//                        nickname = ""
+//                    }
+//                    var realname = friendData.get("real_name") as String?
+//                    if (realname == null) {
+//                        realname = ""
+//                    }
+//                    var avatar = friendData.get("avatar") as String?
+//                    if (avatar == null) {
+//                        avatar = ""
+//                    }
+//                    val user = User(ids[i], nickname, realname, avatar)
+//                    users.add(user)
+//                } else {
+//                    Log.e("FirestoreRequest", "Error getting documents.", doc.exception)
+//                }
+//                if (i == 0) {
+//                    if (users.isNotEmpty()) {
+//                        for (d in dialogs) {
+//                            for (usr in users) {
+//                                if (usr.id == d.friendId) {
+//                                    d.nickname = usr.nickname
+//                                    d.avatar = usr.avatar
+//                                }
+//                            }
+//                        }
+//                        val clickCallback = {dialog: Dialog -> Unit
+//                            val b = Bundle()
+//                            b.putString("friend_id", dialog.friendId)
+//                            b.putString("nickname", dialog.nickname)
+//                            b.putString("avatar", dialog.avatar)
+//                            val navController = findNavController()
+//                            navController.navigate(R.id.nav_dialog, b)
+//                        }
+//                        val onHoldCallback = {dialog: Dialog -> Unit
+//                            dialoguesButtonOnClick()
+//                        }
+//                        dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
+//                            override fun onItemClicked(item: Dialog) {
+//                                clickCallback(item)
+//                            }
+//                        }, onHoldCallback)
+//                    } else {
+//                        Log.e("FirestoreRequest", "No one of users were loaded.")
+//                    }
+//                }
+//            }
+//        }
 
         val c = Calendar.getInstance().time
         Log.i("dateTEST","Current time => $c")

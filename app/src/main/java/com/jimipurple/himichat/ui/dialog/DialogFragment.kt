@@ -59,6 +59,7 @@ class DialogFragment : BaseFragment() {
         nickname = arguments!!["nickname"] as String
 
         MessagingService.setCallbackOnMessageRecieved { activity!!.runOnUiThread { reloadMsgs() } }
+        SocketService.setCallbackOnMessageReceived { activity!!.runOnUiThread { reloadMsgs() } }
         MessagingService.isDialog = true
         MessagingService.currentDialog = friend_id!!
         val linearLayoutManager = LinearLayoutManager(c)
@@ -330,32 +331,40 @@ class DialogFragment : BaseFragment() {
             "receiverPublicKey" to Base64.encodeToString(receiverPublicKey, Base64.DEFAULT),
             "signature" to Base64.encodeToString(signature, Base64.DEFAULT)
         )
-        Log.i("sendEncryptedMessage", "data $data")
+
         messageInput.setText("")
-        functions!!
-            .getHttpsCallable("sendEncryptedMessage")
-            .call(data).addOnCompleteListener { task ->
-                Log.i("sendEncryptedMessage", "sendEncryptedMessage complete")
-                if (!task.isSuccessful) {
-                    Log.i("sendEncryptedMessage", "sendEncryptedMessage not success")
-                    val e = task.exception
-                    Log.i("sendEncryptedMessage", "error to send $e")
-                    if (e is FirebaseFunctionsException) {
-                        val code = e.code
-                        val details = e.details
-                        Log.i("sendEncryptedMessage", "error to send $details \n$code")
+
+        if (SocketService.isAuthorized()) {
+            SocketService.sendEncryptedMessage(c!!, receiverId, msg.deliveredId.toString(), text, keyPair, receiverPublicKey)
+        } else {
+            Log.i("sendEncryptedMessage", "data $data")
+            messageInput.setText("")
+            functions!!
+                .getHttpsCallable("sendEncryptedMessage")
+                .call(data).addOnCompleteListener { task ->
+                    Log.i("sendEncryptedMessage", "sendEncryptedMessage complete")
+                    if (!task.isSuccessful) {
+                        Log.i("sendEncryptedMessage", "sendEncryptedMessage not success")
+                        val e = task.exception
+                        Log.i("sendEncryptedMessage", "error to send $e")
+                        if (e is FirebaseFunctionsException) {
+                            val code = e.code
+                            val details = e.details
+                            Log.i("sendEncryptedMessage", "error to send $details \n$code")
+                        }
+                    } else {
+                        Log.i("sendEncryptedMessage", "sendEncryptedMessage success")
+                        try {
+                            Log.i("sendEncryptedMessage", "result " + task.result?.data.toString())
+                            data["text"]
+                        } catch (e: Exception) {
+                            Log.i("sendEncryptedMessage", "sendEncryptedMessage error " + e.message)
+                            Log.i("sendEncryptedMessage", "sendEncryptedMessage error " + e.message)
+                        }
+                        messageInput.setText("")
                     }
-                } else {
-                    Log.i("sendEncryptedMessage", "sendEncryptedMessage success")
-                    try {
-                        Log.i("sendEncryptedMessage", "result " + task.result?.data.toString())
-                        data["text"]
-                    } catch (e: Exception) {
-                        Log.i("sendEncryptedMessage", "sendEncryptedMessage error " + e.message)
-                    }
-                    messageInput.setText("")
                 }
-            }
+        }
     }
 
     private fun friendsButtonOnClick() {
