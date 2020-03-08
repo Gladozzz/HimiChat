@@ -225,6 +225,7 @@ class DialogFragment : BaseFragment() {
 //                }
             firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(activity!!, OnCompleteListener<DocumentSnapshot>() {
                 if (it.isSuccessful) {
+//                    db!!.pushMessage(msg)
                     val result = it.result?.get("public_key") as Blob?
                     val kp = KeysDBHelper(c!!).getKeyPair(mAuth!!.uid!!)
                     if (result != null && kp != null) {
@@ -258,6 +259,7 @@ class DialogFragment : BaseFragment() {
             "token" to c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
         )
 //        messageInput.setText("")
+        db!!.pushMessage(msg)
         Log.i("msgTest", c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
         functions!!
             .getHttpsCallable("sendMessage")
@@ -338,7 +340,6 @@ class DialogFragment : BaseFragment() {
             SocketService.sendEncryptedMessage(c!!, receiverId, msg.deliveredId.toString(), text, keyPair, receiverPublicKey)
         } else {
             Log.i("sendEncryptedMessage", "data $data")
-            messageInput.setText("")
             functions!!
                 .getHttpsCallable("sendEncryptedMessage")
                 .call(data).addOnCompleteListener { task ->
@@ -359,32 +360,15 @@ class DialogFragment : BaseFragment() {
                             data["text"]
                         } catch (e: Exception) {
                             Log.i("sendEncryptedMessage", "sendEncryptedMessage error " + e.message)
-                            Log.i("sendEncryptedMessage", "sendEncryptedMessage error " + e.message)
                         }
-                        messageInput.setText("")
                     }
                 }
         }
     }
 
-    private fun friendsButtonOnClick() {
-        val i = Intent(c, FriendsActivity::class.java)
-        startActivity(i)
-    }
-
-    private fun dialoguesButtonOnClick() {
-        val i = Intent(c, DialoguesActivity::class.java)
-        startActivity(i)
-    }
-
-    private fun settingsButtonOnClick() {
-        val i = Intent(c, SettingsActivity::class.java)
-        startActivity(i)
-    }
-
     val FCMReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-//            reloadMsgs()
+//            reloadMsgs()-
         }
     }
 }

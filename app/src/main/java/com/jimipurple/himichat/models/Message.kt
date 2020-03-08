@@ -1,14 +1,20 @@
 package com.jimipurple.himichat.models
 
+import android.util.Log
+import com.google.gson.*
+import java.lang.reflect.Type
 import java.security.PrivateKey
 import java.security.PublicKey
-import java.util.Date
+import java.util.*
+
 
 abstract class Message(mid: Int?, sId: String, rId: String, txt: String) {
     var id = mid
     var senderId = sId
     var receiverId = rId
     var text : String = txt
+
+
 
     override fun toString(): String {
         //return super.toString()
@@ -90,6 +96,95 @@ class UndeliveredMessage(sId: String, rId: String, txt: String, dId: Long) : Mes
     override fun toString(): String {
         //return super.toString()
         return "($receiverId, $text}"
+    }
+}
+
+class MessageInstanceCreator(m: Message) :
+    InstanceCreator<Message?> {
+    private val m: Message
+    override fun createInstance(type: Type?): Message {
+        // create new object with our additional property
+        when(m) {
+            is ReceivedMessage -> {
+                return m as ReceivedMessage
+            }
+            is SentMessage -> {
+                return m as SentMessage
+            }
+            is UndeliveredMessage -> {
+                return m as UndeliveredMessage
+            }
+        }
+        // return it to gson for further usage
+        return m
+    }
+
+    init {
+        this.m = m
+    }
+}
+
+class MessageAdapter : JsonSerializer<Message>,
+    JsonDeserializer<Message?> {
+    override fun serialize(
+        src: Message,
+        typeOfSrc: Type,
+        context: JsonSerializationContext
+    ): JsonElement {
+        Log.i("serTest", "serialize")
+        when(src) {
+            is ReceivedMessage -> {
+                val notAbstractSRC =  src as ReceivedMessage
+                val result = JsonObject()
+                result.add("type", JsonPrimitive(notAbstractSRC::class.java.name))
+                Log.i("serTest", "serialize ${result["type"]}")
+                result.add("properties", context.serialize(notAbstractSRC, notAbstractSRC::class.java))
+                return result
+            }
+            is SentMessage -> {
+                val notAbstractSRC =  src as SentMessage
+                val result = JsonObject()
+                result.add("type", JsonPrimitive(notAbstractSRC::class.java.name))
+                Log.i("serTest", "serialize ${result["type"]}")
+                result.add("properties", context.serialize(notAbstractSRC, notAbstractSRC::class.java))
+                return result
+            }
+            is UndeliveredMessage -> {
+                val notAbstractSRC =  src as UndeliveredMessage
+                val result = JsonObject()
+                result.add("type", JsonPrimitive(notAbstractSRC::class.java.name))
+                Log.i("serTest", "serialize ${result["type"]}")
+                result.add("properties", context.serialize(notAbstractSRC, notAbstractSRC::class.java))
+                return result
+            }
+        }
+        Log.i("serTest", "pizdec")
+        val result = JsonObject()
+        result.add("type", JsonPrimitive(src::class.java.name))
+        Log.i("serTest", "serialize ${result["type"]}")
+        result.add("properties", context.serialize(src, src::class.java))
+        return result
+    }
+
+    @Throws(JsonParseException::class)
+    override fun deserialize(
+        json: JsonElement,
+        typeOfT: Type?,
+        context: JsonDeserializationContext
+    ): Message {
+        Log.i("serTest", "typeOfT.toString()")
+        Log.i("serTest", typeOfT!!::class.java.name)
+        val jsonObject: JsonObject = json.asJsonObject
+        val type: String = jsonObject.get("type").asString
+        val element: JsonElement = jsonObject.get("properties")
+        return try {
+            context.deserialize(
+                element,
+                Class.forName(type)
+            )
+        } catch (cnfe: ClassNotFoundException) {
+            throw JsonParseException("Unknown element type: $type", cnfe)
+        }
     }
 }
 

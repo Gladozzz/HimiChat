@@ -11,14 +11,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.jimipurple.himichat.*
 import com.jimipurple.himichat.adapters.DialoguesListAdapter
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
+import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import kotlinx.android.synthetic.main.fragment_dialogues.*
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import java.text.SimpleDateFormat
 
 
 class DialoguesFragment : BaseFragment() {
@@ -54,114 +57,174 @@ class DialoguesFragment : BaseFragment() {
         reloadMsgs()
     }
 
+    private fun dialogsToStrings(h : ArrayList<Dialog>) : ArrayList<String> {
+        val s : ArrayList<String> = ArrayList<String>()
+        h.forEach {
+            val gson = Gson()
+            val gsonBuilder = GsonBuilder()
+            gsonBuilder.registerTypeAdapter(
+                Message::class.java,
+                MessageAdapter()
+            )
+            val customGson = gsonBuilder.create()
+            val json = customGson.toJson(it)
+            s.add(json)
+        }
+        return s
+    }
+
+    private fun stringsToDialogs(h : ArrayList<String>) : ArrayList<Dialog> {
+        val u : ArrayList<Dialog> = ArrayList<Dialog>()
+        h.forEach {
+            val gson = Gson()
+            val gsonBuilder = GsonBuilder()
+            gsonBuilder.registerTypeAdapter(
+                Message::class.java,
+                MessageAdapter()
+            )
+            val customGson = gsonBuilder.create()
+            val d = customGson.fromJson(it, Dialog::class.java)
+            u.add(d)
+        }
+        return u
+    }
+
     override fun onStart() {
         super.onStart()
         activity!!.registerReceiver(FCMReceiverDialogues, IntentFilter(MessagingService.INTENT_FILTER))
     }
 
     private fun reloadMsgs() {
-        val allMsgs = db!!.getMessages()
-        val msgs = allMsgs
-        val dialogs = ArrayList<Dialog>()
-        val undeliveredMsgs = db!!.getUndeliveredMessages()
-        Log.i("msgs", msgs.toString())
-        Log.i("unmsgs", undeliveredMsgs.toString())
+        if (dialoguesList != null) {
+            val pref = SharedPreferencesUtility(c!!.applicationContext)
+            val arr = pref.getListString("dialogs")
+            if (arr != null) {
+                val dialogs = stringsToDialogs(arr)
+                val clickCallback = {dialog: Dialog -> Unit
+                    val b = Bundle()
+                    b.putString("friend_id", dialog.friendId)
+                    b.putString("nickname", dialog.nickname)
+                    b.putString("avatar", dialog.avatar)
+                    val navController = findNavController()
+                    navController.navigate(R.id.nav_dialog, b)
+                }
+                val onHoldCallback = {dialog: Dialog -> Unit
+                    dialoguesButtonOnClick()
+                }
+                dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
+                    override fun onItemClicked(item: Dialog) {
+                        clickCallback(item)
+                    }
+                }, onHoldCallback)
+                Log.i("dialogsTest", "dialogs was took from SharedPreferences")
+            } else {
+                Log.i("dialogsTest", "SharedPreferences is empty")
+            }
 
-        if (msgs != null && msgs.isNotEmpty()) {
-            msgs.reverse()
-            for (msg in msgs) {
-                when (msg) {
-                    is UndeliveredMessage -> {
-                        var isExist = false
-                        for (d in dialogs) {
-                            if (d.friendId == msg.receiverId && id == msg.senderId) {
-                                isExist = true
-                                //break
+            val allMsgs = db!!.getMessages()
+            val msgs = allMsgs
+            val dialogs = ArrayList<Dialog>()
+            val undeliveredMsgs = db!!.getUndeliveredMessages()
+            Log.i("msgs", msgs.toString())
+            Log.i("unmsgs", undeliveredMsgs.toString())
+
+            if (msgs != null && msgs.isNotEmpty()) {
+                msgs.reverse()
+                for (msg in msgs) {
+                    when (msg) {
+                        is UndeliveredMessage -> {
+                            var isExist = false
+                            for (d in dialogs) {
+                                if (d.friendId == msg.receiverId && id == msg.senderId) {
+                                    isExist = true
+                                    //break
+                                }
+                            }
+                            if (!isExist) {
+                                dialogs.add(Dialog(msg.receiverId, msg, null, null))
                             }
                         }
-                        if (!isExist) {
-                            dialogs.add(Dialog(msg.receiverId, msg, null, null))
-                        }
-                    }
-                    is ReceivedMessage -> {
-                        var isExist = false
-                        for (d in dialogs) {
-                            if (d.friendId == msg.senderId && id == msg.receiverId) {
-                                isExist = true
+                        is ReceivedMessage -> {
+                            var isExist = false
+                            for (d in dialogs) {
+                                if (d.friendId == msg.senderId && id == msg.receiverId) {
+                                    isExist = true
+                                }
+                            }
+                            if (!isExist) {
+                                dialogs.add(Dialog(msg.senderId, msg, null, null))
                             }
                         }
-                        if (!isExist) {
-                            dialogs.add(Dialog(msg.senderId, msg, null, null))
-                        }
-                    }
-                    is SentMessage -> {
-                        var isExist = false
-                        for (d in dialogs) {
-                            if (d.friendId == msg.receiverId && id == msg.senderId) {
-                                isExist = true
+                        is SentMessage -> {
+                            var isExist = false
+                            for (d in dialogs) {
+                                if (d.friendId == msg.receiverId && id == msg.senderId) {
+                                    isExist = true
+                                }
                             }
-                        }
-                        if (!isExist) {
-                            dialogs.add(Dialog(msg.receiverId, msg, null, null))
+                            if (!isExist) {
+                                dialogs.add(Dialog(msg.receiverId, msg, null, null))
+                            }
                         }
                     }
                 }
             }
-        }
-        fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
-            val u : ArrayList<User> = ArrayList<User>()
-            h.forEach {
-                u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
+            fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
+                val u : ArrayList<User> = ArrayList<User>()
+                h.forEach {
+                    u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
+                }
+                Log.i("dialogsAct", h.toString())
+                Log.i("dialogsAct", u.toString())
+                return u
             }
-            Log.i("dialogsAct", h.toString())
-            Log.i("dialogsAct", u.toString())
-            return u
-        }
-        Log.i("dialogsAct", dialogs.toString())
-        val ids = ArrayList<String>()
-        for (d in dialogs) {
-            ids.add(d.friendId)
-        }
+            Log.i("dialogsAct", dialogs.toString())
+            val ids = ArrayList<String>()
+            for (d in dialogs) {
+                ids.add(d.friendId)
+            }
 
-        val data = mapOf("ids" to ids)
-        functions!!
-            .getHttpsCallable("getUsers")
-            .call(data).continueWith { task ->
-                val result = task.result?.data as HashMap<String, Any>
-                Log.i("dialogsAct", result.toString())
-                if (result["found"] == true) {
-                    val users = result["users"] as ArrayList<HashMap<String, Any>>
-                    val unfound = result["unfound"] as ArrayList<String>
-                    Log.i("dialogsAct", users.toString())
-                    Log.i("dialogsAct", unfound.toString())
-                    var usrs = hashMapToUser(users)
-                    for (d in dialogs) {
-                        for (usr in usrs) {
-                            if (usr.id == d.friendId) {
-                                d.nickname = usr.nickname
-                                d.avatar = usr.avatar
+            val data = mapOf("ids" to ids)
+            functions!!
+                .getHttpsCallable("getUsers")
+                .call(data).continueWith { task ->
+                    val result = task.result?.data as HashMap<String, Any>
+                    Log.i("dialogsAct", result.toString())
+                    if (result["found"] == true) {
+                        val users = result["users"] as ArrayList<HashMap<String, Any>>
+                        val unfound = result["unfound"] as ArrayList<String>
+                        Log.i("dialogsAct", users.toString())
+                        Log.i("dialogsAct", unfound.toString())
+                        var usrs = hashMapToUser(users)
+                        for (d in dialogs) {
+                            for (usr in usrs) {
+                                if (usr.id == d.friendId) {
+                                    d.nickname = usr.nickname
+                                    d.avatar = usr.avatar
+                                }
                             }
                         }
-                    }
-                    Log.i("dialogsAct", dialogs.toString())
-                    val clickCallback = {dialog: Dialog -> Unit
-                        val b = Bundle()
-                        b.putString("friend_id", dialog.friendId)
-                        b.putString("nickname", dialog.nickname)
-                        b.putString("avatar", dialog.avatar)
-                        val navController = findNavController()
-                        navController.navigate(R.id.nav_dialog, b)
-                    }
-                    val onHoldCallback = {dialog: Dialog -> Unit
-                        dialoguesButtonOnClick()
-                    }
-                    dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
-                        override fun onItemClicked(item: Dialog) {
-                            clickCallback(item)
+                        Log.i("dialogsAct", dialogs.toString())
+                        val strings = dialogsToStrings(dialogs)
+                        pref.putListString("dialogs", strings)
+                        val clickCallback = {dialog: Dialog -> Unit
+                            val b = Bundle()
+                            b.putString("friend_id", dialog.friendId)
+                            b.putString("nickname", dialog.nickname)
+                            b.putString("avatar", dialog.avatar)
+                            val navController = findNavController()
+                            navController.navigate(R.id.nav_dialog, b)
                         }
-                    }, onHoldCallback)
+                        val onHoldCallback = {dialog: Dialog -> Unit
+                            dialoguesButtonOnClick()
+                        }
+                        dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
+                            override fun onItemClicked(item: Dialog) {
+                                clickCallback(item)
+                            }
+                        }, onHoldCallback)
+                    }
                 }
-            }
 
 //        Log.i("FirestoreRequest", ids.toString())
 //        val users = ArrayList<User>()
@@ -219,12 +282,13 @@ class DialoguesFragment : BaseFragment() {
 //            }
 //        }
 
-        val c = Calendar.getInstance().time
-        Log.i("dateTEST","Current time => $c")
+            val c = Calendar.getInstance().time
+            Log.i("dateTEST","Current time => $c")
 
-        val df = SimpleDateFormat("dd-MMM-yyyy")
-        val formattedDate = df.format(c)
-        Log.i("dateTEST","Current time => $formattedDate")
+            val df = SimpleDateFormat("dd-MMM-yyyy")
+            val formattedDate = df.format(c)
+            Log.i("dateTEST","Current time => $formattedDate")
+        }
     }
 
     private fun friendsButtonOnClick() {
