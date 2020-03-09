@@ -4,10 +4,12 @@ import android.app.IntentService
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jimipurple.himichat.db.KeysDBHelper
@@ -155,13 +157,16 @@ class SocketService : IntentService("SocketService") {
                             Log.i("SocketService", "notifed")
                             //Picasso.get().load(avatar).get()
                             // Create an explicit intent for an Activity in your app
-                            val new_intent = Intent(this, DialogActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            }
-                            new_intent.putExtra("friend_id", sender_id)
-                            new_intent.putExtra("nickname", nickname)
-                            new_intent.putExtra("avatar", avatar)
-                            val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+                            val b = Bundle()
+                            b.putString("friend_id", sender_id)
+                            b.putString("nickname", nickname)
+                            b.putString("avatar", avatar)
+                            val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                                .setComponentName(NavigationActivity::class.java)
+                                .setGraph(R.navigation.mobile_navigation)
+                                .setDestination(R.id.nav_dialog)
+                                .setArguments(b)
+                                .createPendingIntent()
 
                             val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                                 .setSmallIcon(R.drawable.send_message)

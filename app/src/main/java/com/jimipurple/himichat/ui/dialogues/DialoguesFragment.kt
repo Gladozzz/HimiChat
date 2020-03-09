@@ -60,7 +60,6 @@ class DialoguesFragment : BaseFragment() {
     private fun dialogsToStrings(h : ArrayList<Dialog>) : ArrayList<String> {
         val s : ArrayList<String> = ArrayList<String>()
         h.forEach {
-            val gson = Gson()
             val gsonBuilder = GsonBuilder()
             gsonBuilder.registerTypeAdapter(
                 Message::class.java,
@@ -76,7 +75,6 @@ class DialoguesFragment : BaseFragment() {
     private fun stringsToDialogs(h : ArrayList<String>) : ArrayList<Dialog> {
         val u : ArrayList<Dialog> = ArrayList<Dialog>()
         h.forEach {
-            val gson = Gson()
             val gsonBuilder = GsonBuilder()
             gsonBuilder.registerTypeAdapter(
                 Message::class.java,
@@ -109,7 +107,9 @@ class DialoguesFragment : BaseFragment() {
                     navController.navigate(R.id.nav_dialog, b)
                 }
                 val onHoldCallback = {dialog: Dialog -> Unit
-                    dialoguesButtonOnClick()
+//                    dialoguesButtonOnClick()
+                    val navController = findNavController()
+                    navController.navigate(R.id.nav_dialogues)
                 }
                 dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
                     override fun onItemClicked(item: Dialog) {
@@ -216,7 +216,9 @@ class DialoguesFragment : BaseFragment() {
                             navController.navigate(R.id.nav_dialog, b)
                         }
                         val onHoldCallback = {dialog: Dialog -> Unit
-                            dialoguesButtonOnClick()
+//                            dialoguesButtonOnClick()
+                            val navController = findNavController()
+                            navController.navigate(R.id.nav_dialogues)
                         }
                         dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
                             override fun onItemClicked(item: Dialog) {
@@ -289,21 +291,6 @@ class DialoguesFragment : BaseFragment() {
             val formattedDate = df.format(c)
             Log.i("dateTEST","Current time => $formattedDate")
         }
-    }
-
-    private fun friendsButtonOnClick() {
-        val i = Intent(c, FriendsActivity::class.java)
-        startActivity(i)
-    }
-
-    private fun dialoguesButtonOnClick() {
-        val i = Intent(c, DialoguesActivity::class.java)
-        startActivity(i)
-    }
-
-    private fun settingsButtonOnClick() {
-        val i = Intent(c, SettingsActivity::class.java)
-        startActivity(i)
     }
 
     override fun onDestroy() {

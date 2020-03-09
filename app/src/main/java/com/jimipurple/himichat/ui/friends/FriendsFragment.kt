@@ -78,17 +78,26 @@ class FriendsFragment : BaseFragment() {
     private fun updateFriends() {
         val data = mapOf("id" to mAuth!!.uid!!)
         val profile = {u: User -> Unit
-//            val data1 = mapOf("inviterId" to mAuth!!.uid, "id" to u.id)
-//            functions!!
-//                .getHttpsCallable("getUser")
-//                .call(data1).continueWith { task ->
-//                    val result = task.result?.data as HashMap<String, Any>
-//                    if (result["found"] == true) {
-//                        Toast.makeText(c, "${u.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
-//                    } else {
-//                        Toast.makeText(c, "${u.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
-//                    }
-//                }
+            firestore!!.collection("users").document(u.id).get().addOnCompleteListener{
+                if (it.isSuccessful) {
+                    val userData = it.result!!
+                    var nickname1 = userData.get("nickname") as String?
+                    if (nickname1 == null) {
+                        nickname1 = ""
+                    }
+                    var realname1 = userData.get("real_name") as String?
+                    if (realname1 == null) {
+                        realname1 = ""
+                    }
+                    var avatar1 = userData.get("avatar") as String?
+                    if (avatar1 == null) {
+                        avatar1 = ""
+                    }
+                    val user = User(u.id, nickname1, realname1, avatar1)
+                } else {
+                    Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                }
+            }
         }
         val sendMsg = {u: User -> Unit
             val b = Bundle()
@@ -103,11 +112,7 @@ class FriendsFragment : BaseFragment() {
         val arr = pref.getListString("friends")
         if (arr != null) {
             val users = stringsToUsers(arr)
-            val adapter = FriendsListAdapter(c!!.applicationContext, users, object : FriendsListAdapter.Callback {
-                override fun onItemClicked(item: User) {
-                    profile(item)
-                }
-            }, sendMsg)
+            val adapter = FriendsListAdapter(c!!.applicationContext, users, profile, sendMsg)
             FriendsList.adapter = adapter
             FriendsList.layoutManager = LinearLayoutManager(c!!)
             Log.i("friendsTest", "friends was took from SharedPreferences")
@@ -176,11 +181,7 @@ class FriendsFragment : BaseFragment() {
                             }
                             if (i == 0) {
                                 if (friends.isNotEmpty()) {
-                                    val adapter = FriendsListAdapter(c!!, friends, object : FriendsListAdapter.Callback {
-                                        override fun onItemClicked(item: User) {
-                                            profile(item)
-                                        }
-                                    }, sendMsg)
+                                    val adapter = FriendsListAdapter(c!!, friends, profile, sendMsg)
                                     FriendsList.adapter = adapter
                                     //friendRequests.layoutManager = LinearLayoutManager(this)
                                 } else {

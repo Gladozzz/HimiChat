@@ -5,9 +5,13 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.content.Intent
+import android.os.Bundle
 import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
@@ -93,14 +97,16 @@ class MessagingService : FirebaseMessagingService() {
                                     Log.i("msgServiceTread", "notifed")
                                     //Picasso.get().load(avatar).get()
                                     // Create an explicit intent for an Activity in your app
-                                    val intent = Intent(this, DialogActivity::class.java).apply {
-                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    }
-                                    intent.putExtra("friend_id", sender_id)
-                                    intent.putExtra("nickname", nickname)
-                                    intent.putExtra("avatar", avatar)
-                                    val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-
+                                    val b = Bundle()
+                                    b.putString("friend_id", sender_id)
+                                    b.putString("nickname", nickname)
+                                    b.putString("avatar", avatar)
+                                    val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                                        .setComponentName(NavigationActivity::class.java)
+                                        .setGraph(R.navigation.mobile_navigation)
+                                        .setDestination(R.id.nav_dialog)
+                                        .setArguments(b)
+                                        .createPendingIntent()
                                     val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                                         .setSmallIcon(R.drawable.send_message)
                                         .setContentTitle(nickname)
@@ -174,13 +180,16 @@ class MessagingService : FirebaseMessagingService() {
                                     Log.i("msgServiceTread", "notifed")
                                     //Picasso.get().load(avatar).get()
                                     // Create an explicit intent for an Activity in your app
-                                    val intent = Intent(this, DialogActivity::class.java).apply {
-                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    }
-                                    intent.putExtra("friend_id", sender_id)
-                                    intent.putExtra("nickname", nickname)
-                                    intent.putExtra("avatar", avatar)
-                                    val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+                                    val b = Bundle()
+                                    b.putString("friend_id", sender_id)
+                                    b.putString("nickname", nickname)
+                                    b.putString("avatar", avatar)
+                                    val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                                        .setComponentName(NavigationActivity::class.java)
+                                        .setGraph(R.navigation.mobile_navigation)
+                                        .setDestination(R.id.nav_dialog)
+                                        .setArguments(b)
+                                        .createPendingIntent()
 
                                     val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                                         .setSmallIcon(R.drawable.send_message)

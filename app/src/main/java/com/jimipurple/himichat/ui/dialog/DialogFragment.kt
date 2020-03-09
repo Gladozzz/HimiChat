@@ -75,7 +75,9 @@ class DialogFragment : BaseFragment() {
             } else {
                 Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        avatarDialogView.setImageBitmap(bitmap)
+                        if (avatarDialogView != null) {
+                            avatarDialogView.setImageBitmap(bitmap)
+                        }
                         LruCache(c!!).set(avatar!!, bitmap!!)
                     }
 

@@ -11,18 +11,18 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentSnapshot
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.*
 import com.squareup.picasso.LruCache
 
 
-class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val clickCallback: Callback, val sendMessageButtonOnClick: (u: User)-> Unit) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
+class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val profile: (User) -> Task<DocumentSnapshot>, val dialog: (u: User)-> Unit) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendHolder {
         Log.i("FriendListAdapter", "items $items")
@@ -84,10 +84,11 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val c
             }
 
             itemView.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
+                if (adapterPosition != RecyclerView.NO_POSITION) dialog(item)
             }
 
-            sendMessageButton.setOnClickListener {sendMessageButtonOnClick(item)}
+            sendMessageButton.setOnClickListener {dialog(item)}
+            avatar.setOnClickListener { dialog(item)}
         }
     }
 
