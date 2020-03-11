@@ -7,6 +7,7 @@
     <string name="privacy">Privacy</string>
     <string name="design">Design</string>
     <string name="something">Something goes wrong</string>
+    <string name="enter_msg">Enter message</string>
 
     <string name="label_email">Email:</string>
     <string name="label_password">Password:</string>
