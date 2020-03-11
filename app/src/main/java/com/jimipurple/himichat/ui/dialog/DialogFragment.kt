@@ -94,7 +94,7 @@ class DialogFragment : BaseFragment() {
 
         reloadMsgs()
 
-        sendMessageButton.setOnClickListener { onSendBtnClick() }
+        dialogMessageInput.button!!.setOnClickListener { onSendBtnClick() }
     }
 
     override fun onCreateView(
@@ -176,7 +176,7 @@ class DialogFragment : BaseFragment() {
     }
 
     private fun onSendBtnClick(){
-        val text = messageInput.text.toString()
+        val text = dialogMessageInput.inputEditText!!.text.toString()
         if (text != "") {
             val receiverId = friend_id
             val senderId = mAuth!!.uid!!
@@ -280,7 +280,7 @@ class DialogFragment : BaseFragment() {
                     } catch (e: Exception) {
                         Log.i("dialogMessage", "sendMessage error " + e.message)
                     }
-                    messageInput.setText("")
+                    dialogMessageInput.inputEditText!!.setText("")
                 }
             }
 
@@ -336,7 +336,7 @@ class DialogFragment : BaseFragment() {
             "signature" to Base64.encodeToString(signature, Base64.DEFAULT)
         )
 
-        messageInput.setText("")
+        dialogMessageInput.inputEditText!!.setText("")
 
         if (SocketService.isAuthorized()) {
             SocketService.sendEncryptedMessage(c!!, receiverId, msg.deliveredId.toString(), text, keyPair, receiverPublicKey)
