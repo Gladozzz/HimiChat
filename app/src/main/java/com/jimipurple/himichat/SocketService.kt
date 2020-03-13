@@ -172,7 +172,7 @@ class SocketService : IntentService("SocketService") {
                                 .setSmallIcon(R.drawable.send_message)
                                 .setContentTitle(nickname)
                                 .setContentText(text)
-                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
                                 // Set the intent that will fire when the user taps the notification
                                 .setContentIntent(pendingIntent)
                                 .setAutoCancel(true)

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#703D99</color>
-    <color name="colorCloudSent">#3D0A66</color>
-    <color name="colorCloudReceived">#5C1E99</color>
-    <color name="colorPrimaryDark">#1F0A33</color>
-    <color name="colorAccent">#B188CC</color>
+    <color name="colorPrimary">#43305E</color>
+    <color name="colorCloudSent">#006A84</color>
+    <color name="colorCloudReceived">#11345C</color>
+    <color name="colorPrimaryDark">#1A1A22</color>
+    <color name="colorAccent">#95E5F0</color>
+    <color name="colorAccentDark">#114471</color>
 
     <color name="white">#ffffff</color>
     <color name="white60">#a0ffffff</color>

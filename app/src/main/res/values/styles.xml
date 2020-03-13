@@ -8,6 +8,24 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+<!--    <style name="AppTheme1" parent="Theme.AppCompat.NoActionBar">-->
+<!--        <color name="colorPrimary1">#43305E</color>-->
+<!--        <color name="colorCloudSent1">#006A84</color>-->
+<!--        <color name="colorCloudReceived1">#11345C</color>-->
+<!--        <color name="colorPrimaryDark1">#1A1A22</color>-->
+<!--        <color name="colorAccent1">#95E5F0</color>-->
+<!--        <color name="colorAccentDark1">#114471</color>-->
+<!--    </style>-->
+
+<!--    <style name="AppTheme2" parent="Theme.AppCompat.NoActionBar">-->
+<!--        <color name="colorPrimary2">#CAEBF8</color>-->
+<!--        <color name="colorCloudSent2">#006A84</color>-->
+<!--        <color name="colorCloudReceived2">#11345C</color>-->
+<!--        <color name="colorPrimaryDark2">#1A1A22</color>-->
+<!--        <color name="colorAccent2">#8F85BF</color>-->
+<!--        <color name="colorAccentDark2">#8659A5</color>-->
+<!--    </style>-->
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
