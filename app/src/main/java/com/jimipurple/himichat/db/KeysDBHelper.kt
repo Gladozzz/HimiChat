@@ -123,6 +123,7 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
             return kp
         }
         cursor.close()
+        db.close()
         return null
     }
 
@@ -165,6 +166,7 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
             return kp
         }
         cursor.close()
+        db.close()
         return null
     }
 
@@ -214,6 +216,7 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
             return s
         }
         cursor.close()
+        db.close()
         return null
     }
 

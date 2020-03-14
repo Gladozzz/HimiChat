@@ -1,16 +1,11 @@
 package com.jimipurple.himichat.utills
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
 import java.io.ByteArrayOutputStream
 import android.graphics.Bitmap.CompressFormat
-import android.net.Uri
-import com.jimipurple.himichat.db.BitmapsDBHelper
-import java.lang.Exception
-import kotlin.concurrent.thread
 
 
 fun getStringFromBitmap(bitmap : Bitmap) : String {

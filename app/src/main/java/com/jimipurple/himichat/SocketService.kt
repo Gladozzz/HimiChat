@@ -87,14 +87,16 @@ class SocketService : IntentService("SocketService") {
                     }
                 }
         }
-        socket.on("offline") { args ->
-            val data = args[0] as String
-            Log.i("SocketService", data)
-            var online = SharedPreferencesUtility(applicationContext).getListString("online")
+        socket.on("disconnect") { args ->
+//            val data = args[0] as String
+//            Log.i("SocketService", data)
+            val online = SharedPreferencesUtility(applicationContext).getListString("online")
             if (online != null) {
-                online.remove(data)
-                SharedPreferencesUtility(applicationContext).putListString("online", online)
+//                online.remove(data)
+                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().remove("online").apply()
+//                SharedPreferencesUtility(applicationContext).putListString("online", online)
             }
+            authorized = false
         }
         socket.on("receiving_encrypted_message") { args ->
             Log.i("SocketService", "receiving_encrypted_message " + args[0])
@@ -151,7 +153,7 @@ class SocketService : IntentService("SocketService") {
 //                        }
                         socket.emit("confirm_delivery", sender_id, delivery_id)
                         if (MessagingService.isDialog) {
-//                            MessagingService.callbackOnMessageReceived()
+//                            callbackOnMessageReceived()
                         }
                         if (!MessagingService.isDialog || MessagingService.isDialog && MessagingService.currentDialog != sender_id) {
                             Log.i("SocketService", "notifed")
@@ -197,17 +199,15 @@ class SocketService : IntentService("SocketService") {
             val unmsgs = db.getUndeliveredMessages()
             var unmsg : UndeliveredMessage? = null
             val dId = args[1] as String
-            if (unmsgs != null) {
-                for (i in unmsgs) {
-                    if (i.deliveredId == dId.toLong()) {
-                        unmsg = i
-                    }
+            unmsgs?.forEach { i ->
+                if (i.deliveredId == dId.toLong()) {
+                    unmsg = i
                 }
             }
             Log.i("SocketService", "delivered_id $dId")
             Log.i("SocketService", unmsg.toString())
             if (unmsg != null) {
-                val msg = SentMessage(null, mAuth!!.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
+                val msg = SentMessage(null, mAuth!!.uid!!, unmsg!!.receiverId, unmsg!!.text, Date().time, null, null)
                 db.deleteUndeliveredMessage(dId.toString())
                 db.pushMessage(msg)
                 Log.i("SocketService", msg.toString())

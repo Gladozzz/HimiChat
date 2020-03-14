@@ -90,7 +90,7 @@ internal class MessageInputStyle private constructor(
     var delayTypingStatus = 0
         private set
 
-    fun getSelector(
+    private fun getSelector(
         @ColorInt normalColor: Int, @ColorInt pressedColor: Int,
         @ColorInt disabledColor: Int, @DrawableRes shape: Int
     ): Drawable {
