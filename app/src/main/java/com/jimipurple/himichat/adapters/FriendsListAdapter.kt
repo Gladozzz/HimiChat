@@ -88,7 +88,7 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val p
             }
 
             sendMessageButton.setOnClickListener {dialog(item)}
-            avatar.setOnClickListener { dialog(item)}
+            avatar.setOnClickListener { profile(item)}
         }
     }
 
