@@ -14,7 +14,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
 import com.bumptech.glide.Glide
@@ -24,7 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.jimipurple.himichat.*
-import com.jimipurple.himichat.adapters.SettingsPageAdapter
+import com.jimipurple.himichat.ui.adapters.SettingsPageAdapter
 import com.squareup.picasso.RequestCreator
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.fragment_settings.viewpager_main

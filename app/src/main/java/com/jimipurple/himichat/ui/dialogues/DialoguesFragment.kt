@@ -11,10 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.jimipurple.himichat.*
-import com.jimipurple.himichat.adapters.DialoguesListAdapter
+import com.jimipurple.himichat.ui.adapters.DialoguesListAdapter
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
 import com.jimipurple.himichat.utills.SharedPreferencesUtility

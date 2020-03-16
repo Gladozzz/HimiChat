@@ -19,7 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.DocumentSnapshot
-import com.jimipurple.himichat.adapters.MessageListAdapter
+import com.jimipurple.himichat.ui.adapters.MessageListAdapter
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.*
 import com.squareup.picasso.LruCache

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.jimipurple.himichat.BaseFragment
 import com.jimipurple.himichat.R
-import com.jimipurple.himichat.adapters.FriendsListAdapter
+import com.jimipurple.himichat.ui.adapters.FriendsListAdapter
 import com.jimipurple.himichat.models.User
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import kotlinx.android.synthetic.main.fragment_friends.*
@@ -94,6 +94,10 @@ class FriendsFragment : BaseFragment() {
                         avatar1 = ""
                     }
                     val user = User(u.id, nickname1, realname1, avatar1)
+                    val b = Bundle()
+                    b.putString("friend_id", u.id)
+                    val navController = findNavController()
+                    navController.navigate(R.id.nav_profile, b)
                 } else {
                     Log.i("FirestoreRequest", "Error getting documents.", it.exception)
                 }

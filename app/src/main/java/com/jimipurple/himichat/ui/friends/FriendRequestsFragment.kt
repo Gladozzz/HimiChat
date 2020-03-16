@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.jimipurple.himichat.*
-import com.jimipurple.himichat.adapters.FriendRequestsListAdapter
+import com.jimipurple.himichat.ui.adapters.FriendRequestsListAdapter
 import com.jimipurple.himichat.models.FriendRequest
 import kotlinx.android.synthetic.main.fragment_friend_requests.*
 

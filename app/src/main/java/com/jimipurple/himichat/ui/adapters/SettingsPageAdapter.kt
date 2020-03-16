@@ -1,4 +1,4 @@
-package com.jimipurple.himichat.adapters
+package com.jimipurple.himichat.ui.adapters
 
 import android.content.Context
 import android.view.ViewGroup

@@ -1,4 +1,4 @@
-package com.jimipurple.himichat.adapters
+package com.jimipurple.himichat.ui.adapters
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.Dialog
 import com.jimipurple.himichat.models.User

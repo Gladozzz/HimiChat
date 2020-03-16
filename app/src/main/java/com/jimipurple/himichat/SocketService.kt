@@ -325,7 +325,9 @@ class SocketService : IntentService("SocketService") {
             SocketService.callbackOnMessageReceived = {callback()}
         }
 
-        private var socket: Socket = IO.socket("http://192.168.1.171:3000")
+        private var socket: Socket = IO.socket("http://208.73.200.206:3000")
+//        private var socket: Socket = IO.socket("http://192.168.1.171:3000")
+//        private var socket: Socket = IO.socket("http://84.22.142.69:3000")
 
         fun sendEncryptedMessage(context: Context, receiverId: String, deliveredId: String, text: String, keyPair: CurveKeyPair, receiverPublicKey: ByteArray) {
             Log.i("sendEncryptedMessage", "keyPair ${keyPair.privateKey.toString(Charsets.UTF_8)} \n${keyPair.privateKey.toString(Charsets.UTF_8)} \nreceiverPublicKey ${receiverPublicKey.toString(Charsets.ISO_8859_1)}")
