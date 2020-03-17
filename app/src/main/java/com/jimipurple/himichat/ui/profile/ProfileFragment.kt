@@ -8,6 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.jimipurple.himichat.BaseFragment
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.User
@@ -41,6 +44,26 @@ class ProfileFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         friend_id = arguments!!["friend_id"] as String
+        profileSendMessageButton.setOnClickListener {
+            val b = Bundle()
+            b.putString("friend_id", friend_id)
+            b.putString("nickname", nickname)
+            b.putString("avatar", avatar)
+            val navController = findNavController()
+            navController.navigate(R.id.nav_dialog, b)
+        }
+        profileRemoveFriendButton.setOnClickListener {
+//            val data = mapOf("ids" to ids)
+//            functions!!
+//                .getHttpsCallable("getUsers")
+//                .call(data).continueWith { task ->
+//                    val result = task.result?.data as HashMap<String, Any>
+//                    Log.i("dialogsAct", result.toString())
+//                    if (result["found"] == true) {
+//
+//                    }
+//                }
+        }
         firestore!!.collection("users").document(friend_id!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
@@ -58,20 +81,30 @@ class ProfileFragment : BaseFragment() {
                 }
                 val user = User(friend_id!!, nickname!!, realname!!, avatar!!)
 
-                Picasso.get().load(avatar).into(object : com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        if (profileAvatarView != null) {
-                            profileAvatarView.setImageBitmap(bitmap)
+                Glide.with(this)
+                    .asBitmap()
+                    .load(avatar)
+                    .into(object : CustomTarget<Bitmap>(){
+                        override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
+                            if (profileAvatarView != null) {
+                                profileAvatarView.setImageBitmap(bitmap)
+                            }
+                            LruCache(c!!).set(avatar!!, bitmap)
+                            Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
                         }
-                        LruCache(c!!).set(avatar!!, bitmap!!)
-                    }
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                            // this is called when imageView is cleared on lifecycle call or for
+                            // some other reason.
+                            // if you are referencing the bitmap somewhere else too other than this imageView
+                            // clear it here as you can no longer have the bitmap
+//                                    avatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
+                        }
 
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("Profile", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
-                    }
-                })
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            super.onLoadFailed(errorDrawable)
+                            Log.e("Profile", "Загрузка изображения не удалась $avatar")
+                        }
+                    })
                 nicknameEdit.setText(nickname)
                 realnameEdit.setText(realname)
             } else {

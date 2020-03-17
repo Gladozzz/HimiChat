@@ -22,6 +22,7 @@ import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.MessagesDBHelper
+import com.jimipurple.himichat.models.User
 import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.regex.Pattern
@@ -40,6 +41,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
     private var functions = FirebaseFunctions.getInstance()
     private var nickname: String? = null
     private var realname: String? = null
+    private var avatar: String? = null
     private val ARG_PAGE = "ARG_PAGE"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,52 +65,100 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
         return inflater.inflate(R.layout.profile_settings_fragment, container, false)
     }
     fun updateAvatar() {
-        val data = mapOf("id" to mAuth!!.uid!!)
-        functions
-            .getHttpsCallable("getUser")
-            .call(data).continueWith { task ->
-                val result = task.result?.data as HashMap<String, Any>
-                Log.i("settings", result.toString())
-                nicknameEdit.setText(result["nickname"] as String)
-                realnameEdit.setText(result["realname"] as String)
-                nickname = result["nickname"] as String
-                realname = result["realname"] as String
+//        val data = mapOf("id" to mAuth!!.uid!!)
+//        functions
+//            .getHttpsCallable("getUser")
+//            .call(data).continueWith { task ->
+//                val result = task.result?.data as HashMap<String, Any>
+//                Log.i("settings", result.toString())
+//                nicknameEdit.setText(result["nickname"] as String)
+//                realnameEdit.setText(result["realname"] as String)
+//                nickname = result["nickname"] as String
+//                realname = result["realname"] as String
+//                renameNicknameButton.setOnClickListener { loadUserData() }
+//                renameRealnameButton.setOnClickListener { loadUserData() }
+//                logoutButton.setOnClickListener { logoutCallback() }
+//                val url = Uri.parse(result["avatar"] as String)
+//                if (url != null) {
+//                    val bitmap = LruCache(context!!)[result["avatar"] as String]
+//                    if (bitmap != null) {
+//                        avatarView.setImageBitmap(bitmap)
+//                    } else {
+//                        Glide.with(this)
+//                            .asBitmap()
+//                            .load(url)
+//                            .into(object : CustomTarget<Bitmap>(){
+//                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+//                                    avatarView.setImageBitmap(resource)
+//                                    LruCache(context!!).set(url.toString(), resource)
+//                                    Log.i("Profile", "bitmap from $url is loaded and set to imageView")
+//                                }
+//                                override fun onLoadCleared(placeholder: Drawable?) {
+//                                    // this is called when imageView is cleared on lifecycle call or for
+//                                    // some other reason.
+//                                    // if you are referencing the bitmap somewhere else too other than this imageView
+//                                    // clear it here as you can no longer have the bitmap
+////                                    avatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
+//                                }
+//
+//                                override fun onLoadFailed(errorDrawable: Drawable?) {
+//                                    super.onLoadFailed(errorDrawable)
+//                                    Log.e("Profile", "Загрузка изображения не удалась $url")
+//                                }
+//                            })
+//                    }
+//                } else {
+//                    Log.i("Profile", "avatar wasn't received")
+//                }
+//            }
+        firestore.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+            if (it.isSuccessful) {
+                val userData = it.result!!
+                nickname = userData.get("nickname") as String?
+                if (nickname == null) {
+                    nickname = ""
+                }
+                realname = userData.get("real_name") as String?
+                if (realname == null) {
+                    realname = ""
+                }
+                avatar = userData.get("avatar") as String?
+                if (avatar == null) {
+                    avatar = ""
+                }
+                val user = User(mAuth!!.uid!!, nickname!!, realname!!, avatar!!)
+
+                Glide.with(this)
+                    .asBitmap()
+                    .load(avatar)
+                    .into(object : CustomTarget<Bitmap>(){
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            avatarView.setImageBitmap(resource)
+                            LruCache(context!!).set(avatar!!, resource)
+                            Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
+                        }
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                            // this is called when imageView is cleared on lifecycle call or for
+                            // some other reason.
+                            // if you are referencing the bitmap somewhere else too other than this imageView
+                            // clear it here as you can no longer have the bitmap
+//                                    avatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
+                        }
+
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            super.onLoadFailed(errorDrawable)
+                            Log.e("Profile", "Загрузка изображения не удалась $avatar")
+                        }
+                    })
+                nicknameEdit.setText(nickname)
+                realnameEdit.setText(realname)
                 renameNicknameButton.setOnClickListener { loadUserData() }
                 renameRealnameButton.setOnClickListener { loadUserData() }
                 logoutButton.setOnClickListener { logoutCallback() }
-                val url = Uri.parse(result["avatar"] as String)
-                if (url != null) {
-                    val bitmap = LruCache(context!!)[result["avatar"] as String]
-                    if (bitmap != null) {
-                        avatarView.setImageBitmap(bitmap)
-                    } else {
-                        Glide.with(this)
-                            .asBitmap()
-                            .load(url)
-                            .into(object : CustomTarget<Bitmap>(){
-                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                    avatarView.setImageBitmap(resource)
-                                    LruCache(context!!).set(url.toString(), resource)
-                                    Log.i("Profile", "bitmap from $url is loaded and set to imageView")
-                                }
-                                override fun onLoadCleared(placeholder: Drawable?) {
-                                    // this is called when imageView is cleared on lifecycle call or for
-                                    // some other reason.
-                                    // if you are referencing the bitmap somewhere else too other than this imageView
-                                    // clear it here as you can no longer have the bitmap
-//                                    avatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
-                                }
-
-                                override fun onLoadFailed(errorDrawable: Drawable?) {
-                                    super.onLoadFailed(errorDrawable)
-                                    Log.e("Profile", "Загрузка изображения не удалась $url")
-                                }
-                            })
-                    }
-                } else {
-                    Log.i("Profile", "avatar wasn't received")
-                }
+            } else {
+                Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
+        }
     }
 
 //    fun newInstance(page: Int): ProfileSettingsFragment {
