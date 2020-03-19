@@ -167,65 +167,66 @@ class DialoguesFragment : BaseFragment() {
                         }
                     }
                 }
-            }
-            fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
-                val u : ArrayList<User> = ArrayList<User>()
-                h.forEach {
-                    u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
+                emptyDialoguesListLabel.visibility = View.GONE
+                dialoguesList.visibility = View.VISIBLE
+                fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
+                    val u : ArrayList<User> = ArrayList<User>()
+                    h.forEach {
+                        u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
+                    }
+                    Log.i("dialogsAct", h.toString())
+                    Log.i("dialogsAct", u.toString())
+                    return u
                 }
-                Log.i("dialogsAct", h.toString())
-                Log.i("dialogsAct", u.toString())
-                return u
-            }
-            Log.i("dialogsAct", dialogs.toString())
-            val ids = ArrayList<String>()
-            for (d in dialogs) {
-                ids.add(d.friendId)
-            }
+                Log.i("dialogsAct", dialogs.toString())
+                val ids = ArrayList<String>()
+                for (d in dialogs) {
+                    ids.add(d.friendId)
+                }
 
-            val data = mapOf("ids" to ids)
-            functions!!
-                .getHttpsCallable("getUsers")
-                .call(data).continueWith { task ->
-                    val result = task.result?.data as HashMap<String, Any>
-                    Log.i("dialogsAct", result.toString())
-                    if (result["found"] == true) {
-                        val users = result["users"] as ArrayList<HashMap<String, Any>>
-                        val unfound = result["unfound"] as ArrayList<String>
-                        Log.i("dialogsAct", users.toString())
-                        Log.i("dialogsAct", unfound.toString())
-                        var usrs = hashMapToUser(users)
-                        for (d in dialogs) {
-                            for (usr in usrs) {
-                                if (usr.id == d.friendId) {
-                                    d.nickname = usr.nickname
-                                    d.avatar = usr.avatar
+                val data = mapOf("ids" to ids)
+                functions!!
+                    .getHttpsCallable("getUsers")
+                    .call(data).continueWith { task ->
+                        val result = task.result?.data as HashMap<String, Any>
+                        Log.i("dialogsAct", result.toString())
+                        if (result["found"] == true) {
+                            val users = result["users"] as ArrayList<HashMap<String, Any>>
+                            val unfound = result["unfound"] as ArrayList<String>
+                            Log.i("dialogsAct", users.toString())
+                            Log.i("dialogsAct", unfound.toString())
+                            var usrs = hashMapToUser(users)
+                            for (d in dialogs) {
+                                for (usr in usrs) {
+                                    if (usr.id == d.friendId) {
+                                        d.nickname = usr.nickname
+                                        d.avatar = usr.avatar
+                                    }
                                 }
                             }
-                        }
-                        Log.i("dialogsAct", dialogs.toString())
-                        val strings = dialogsToStrings(dialogs)
-                        pref.putListString("dialogs", strings)
-                        val clickCallback = {dialog: Dialog -> Unit
-                            val b = Bundle()
-                            b.putString("friend_id", dialog.friendId)
-                            b.putString("nickname", dialog.nickname)
-                            b.putString("avatar", dialog.avatar)
-                            val navController = findNavController()
-                            navController.navigate(R.id.nav_dialog, b)
-                        }
-                        val onHoldCallback = {dialog: Dialog -> Unit
-//                            dialoguesButtonOnClick()
-                            val navController = findNavController()
-                            navController.navigate(R.id.nav_dialogues)
-                        }
-                        dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
-                            override fun onItemClicked(item: Dialog) {
-                                clickCallback(item)
+                            Log.i("dialogsAct", dialogs.toString())
+                            val strings = dialogsToStrings(dialogs)
+                            pref.putListString("dialogs", strings)
+                            val clickCallback = {dialog: Dialog -> Unit
+                                val b = Bundle()
+                                b.putString("friend_id", dialog.friendId)
+                                b.putString("nickname", dialog.nickname)
+                                b.putString("avatar", dialog.avatar)
+                                val navController = findNavController()
+                                navController.navigate(R.id.nav_dialog, b)
                             }
-                        }, onHoldCallback)
+                            val onHoldCallback = {dialog: Dialog -> Unit
+//                            dialoguesButtonOnClick()
+                                val navController = findNavController()
+                                navController.navigate(R.id.nav_dialogues)
+                            }
+                            dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
+                                override fun onItemClicked(item: Dialog) {
+                                    clickCallback(item)
+                                }
+                            }, onHoldCallback)
+                        }
                     }
-                }
 
 //        Log.i("FirestoreRequest", ids.toString())
 //        val users = ArrayList<User>()
@@ -282,6 +283,10 @@ class DialoguesFragment : BaseFragment() {
 //                }
 //            }
 //        }
+            } else {
+                emptyDialoguesListLabel.visibility = View.VISIBLE
+                dialoguesList.visibility = View.GONE
+            }
 
             val c = Calendar.getInstance().time
             Log.i("dateTEST","Current time => $c")

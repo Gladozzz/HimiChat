@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import com.jimipurple.himichat.*
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
@@ -91,6 +92,12 @@ class FindFriendFragment : BaseFragment() {
                                                     Picasso.get().load(avatar).into(object : com.squareup.picasso.Target {
                                                         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                                                             avatarView.setImageBitmap(bitmap)
+                                                            avatarView.setOnClickListener {
+                                                                val b = Bundle()
+                                                                b.putString("profile_id", id)
+                                                                val navController = findNavController()
+                                                                navController.navigate(R.id.nav_profile, b)
+                                                            }
                                                         }
 
                                                         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}

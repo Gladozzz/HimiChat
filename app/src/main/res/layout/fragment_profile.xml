@@ -25,14 +25,24 @@
             android:orientation="horizontal"
             android:weightSum="100">
 
+        <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:text="@string/label_nickname" />
+
         <EditText
                 android:id="@+id/nicknameEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="90"
-                android:inputType="textPersonName"
-                android:text="Nickname" />
+                android:editable="false"
+                android:inputType="none"
+                android:text="Nickname"
+                android:textIsSelectable="true" />
 
     </LinearLayout>
 
@@ -44,15 +54,25 @@
             android:orientation="horizontal"
             android:weightSum="100">
 
+        <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:text="@string/label_real_name" />
+
         <EditText
                 android:id="@+id/realnameEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="90"
+                android:editable="false"
                 android:gravity="fill_horizontal"
-                android:inputType="textPersonName"
-                android:text="Realname" />
+                android:inputType="none"
+                android:text="Realname"
+                android:textIsSelectable="true" />
 
     </LinearLayout>
 
@@ -64,6 +84,18 @@
             android:orientation="horizontal"
             android:weightSum="100">
 
+
+        <Button
+                android:id="@+id/profileEditButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="4"
+                android:background="@color/colorPrimary"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/button_edit_profile"
+                android:visibility="gone" />
 
         <Button
                 android:id="@+id/profileRemoveFriendButton"

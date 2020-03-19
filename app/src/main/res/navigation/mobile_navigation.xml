@@ -39,7 +39,7 @@
             tools:layout="@layout/fragment_profile">
 
         <argument
-                android:name="friend_id"
+                android:name="profile_id"
                 app:argType="string"/>
     </fragment>
 

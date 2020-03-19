@@ -15,6 +15,10 @@
     <string name="label_nickname">Nickname:</string>
     <string name="label_real_name">Real name:</string>
     <string name="label_rename">Rename field:</string>
+    <string name="label_empty_request_list">No requests</string>
+    <string name="label_empty_friends_list">No friends</string>
+    <string name="label_empty_users_list">No users for your request</string>
+    <string name="label_empty_dialogues_list">No dialogues yet</string>
 
     <string name="button_sign_out">sign out</string>
     <string name="button_delete_all_messages">delete all messages</string>
@@ -31,6 +35,7 @@
     <string name="button_load_avatar">Load avatar</string>
     <string name="button_send_message">Send message</string>
     <string name="button_remove_friend">Remove friend</string>
+    <string name="button_edit_profile">Edit profile</string>
     <string name="loadRenameButton">Rename</string>
 
     <string name="context_menu_item_remove">Remove</string>

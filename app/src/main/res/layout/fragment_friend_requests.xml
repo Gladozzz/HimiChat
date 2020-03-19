@@ -5,7 +5,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".FriendRequestsActivity" android:background="@color/colorPrimaryDark">
+        tools:context=".FriendRequestsFragment"
+        android:background="@color/colorPrimaryDark">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendRequests"
@@ -23,6 +24,22 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.363"
             tools:listitem="@layout/received_requests_list" />
+
+    <TextView
+            android:id="@+id/emptyRequestsListMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:paddingStart="10dp"
+            android:text="@string/label_empty_request_list"
+            android:textSize="20sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <Button
             android:id="@+id/reсeivedButton"

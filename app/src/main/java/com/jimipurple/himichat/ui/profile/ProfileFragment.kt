@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_profile.*
 class ProfileFragment : BaseFragment() {
 
     val REQUEST_CODE_DIALOG_ACTIVITY = 1
-    var friend_id : String? = null
+    var profile_id : String? = null
     private var nickname: String? = null
     private var realname: String? = null
     private var avatar: String? = null
@@ -43,10 +43,15 @@ class ProfileFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        friend_id = arguments!!["friend_id"] as String
+        profile_id = arguments!!["profile_id"] as String
+        if (profile_id == mAuth!!.uid!!) {
+            setOwnProfileMode()
+        } else {
+            setAnotherProfileMode()
+        }
         profileSendMessageButton.setOnClickListener {
             val b = Bundle()
-            b.putString("friend_id", friend_id)
+            b.putString("friend_id", profile_id)
             b.putString("nickname", nickname)
             b.putString("avatar", avatar)
             val navController = findNavController()
@@ -64,7 +69,7 @@ class ProfileFragment : BaseFragment() {
 //                    }
 //                }
         }
-        firestore!!.collection("users").document(friend_id!!).get().addOnCompleteListener{
+        firestore!!.collection("users").document(profile_id!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
                 nickname = userData.get("nickname") as String?
@@ -79,7 +84,7 @@ class ProfileFragment : BaseFragment() {
                 if (avatar == null) {
                     avatar = ""
                 }
-                val user = User(friend_id!!, nickname!!, realname!!, avatar!!)
+                val user = User(profile_id!!, nickname!!, realname!!, avatar!!)
 
                 Glide.with(this)
                     .asBitmap()
@@ -111,5 +116,19 @@ class ProfileFragment : BaseFragment() {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
         }
+    }
+
+    private fun setOwnProfileMode() {
+        profileRemoveFriendButton.visibility = View.GONE
+        profileSendMessageButton.visibility = View.GONE
+
+        profileEditButton.visibility = View.VISIBLE
+    }
+
+    private fun setAnotherProfileMode() {
+        profileSendMessageButton.visibility = View.VISIBLE
+        profileRemoveFriendButton.visibility = View.VISIBLE
+
+        profileEditButton.visibility = View.GONE
     }
 }

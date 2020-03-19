@@ -95,7 +95,7 @@ class FriendsFragment : BaseFragment() {
                     }
                     val user = User(u.id, nickname1, realname1, avatar1)
                     val b = Bundle()
-                    b.putString("friend_id", u.id)
+                    b.putString("profile_id", u.id)
                     val navController = findNavController()
                     navController.navigate(R.id.nav_profile, b)
                 } else {

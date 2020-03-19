@@ -123,36 +123,41 @@ class FriendRequestsFragment : BaseFragment() {
                 if (result["found"] == true) {
                     if (result["invited_by"] is ArrayList<*>) {
                         val received = result["invited_by"] as ArrayList<*>
-                        //TODO 1123123
                         Log.i("received_inv", "received $received")
-                        val data1 = mapOf("ids" to received)
-                        functions!!
-                            .getHttpsCallable("getUsers")
-                            .call(data1).continueWith { task ->
-                                val result1 = task.result?.data as HashMap<String, Any>
-                                Log.i("received_inv", "result1 $result1")
-                                if (result1["found"] == true) {
-                                    val users = result1["users"] as ArrayList<HashMap<String, Any>>
-                                    val unfound = result1["unfound"] as ArrayList<String>
-                                    Log.i("received_inv", "users $users")
-                                    Log.i("received_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
-                                        override fun onItemClicked(item: FriendRequest) {
-                                            profile(item)
-                                        }
-                                    }, cancel,  block, accept)
-                                    friendRequests.adapter = adapter
-                                    //friendRequests.layoutManager = LinearLayoutManager(this)
+                        if (received.isEmpty()) {
+                            emptyRequestsListMessage.visibility = View.VISIBLE
+                            friendRequests.visibility = View.GONE
+                        } else {
+                            emptyRequestsListMessage.visibility = View.GONE
+                            friendRequests.visibility = View.VISIBLE
+                            val data1 = mapOf("ids" to received)
+                            functions!!
+                                .getHttpsCallable("getUsers")
+                                .call(data1).continueWith { task ->
+                                    val result1 = task.result?.data as HashMap<String, Any>
+                                    Log.i("received_inv", "result1 $result1")
+                                    if (result1["found"] == true) {
+                                        val users = result1["users"] as ArrayList<HashMap<String, Any>>
+                                        val unfound = result1["unfound"] as ArrayList<String>
+                                        Log.i("received_inv", "users $users")
+                                        Log.i("received_inv", "unfound $unfound")
+                                        val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+                                            override fun onItemClicked(item: FriendRequest) {
+                                                profile(item)
+                                            }
+                                        }, cancel,  block, accept)
+                                        friendRequests.adapter = adapter
+                                        //friendRequests.layoutManager = LinearLayoutManager(this)
+                                    }
                                 }
-                            }
+                        }
                     } else if (result["invited_by"] is String) {
                         val received = result["invited_by"] as String
-                        //TODO 1123123
                         Log.i("received_inv", "users $received")
                         val data1 = mapOf("id" to received)
                         functions!!
                             .getHttpsCallable("getUser")
-                            .call(data).continueWith { task ->
+                            .call(data1).continueWith { task ->
                                 val result1 = task.result?.data as HashMap<String, Any>
                                 if (result1["found"] == true) {
                                     val users = result1["users"] as ArrayList<HashMap<String, Any>>
@@ -191,36 +196,41 @@ class FriendRequestsFragment : BaseFragment() {
                 if (result["found"] == true) {
                     if (result["invites"] is ArrayList<*>) {
                         val sent = result["invites"] as ArrayList<*>
-                        //TODO 1123123
                         Log.i("sent_inv", "received $sent")
-                        val data1 = mapOf("ids" to sent)
-                        functions!!
-                            .getHttpsCallable("getUsers")
-                            .call(data1).continueWith { task ->
-                                val result1 = task.result?.data as HashMap<String, Any>
-                                Log.i("sent_inv", "result1 $result1")
-                                if (result1["found"] == true) {
-                                    val users = result1["users"] as ArrayList<HashMap<String, Any>>
-                                    val unfound = result1["unfound"] as ArrayList<String>
-                                    Log.i("sent_inv", "users $users")
-                                    Log.i("sent_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
-                                        override fun onItemClicked(item: FriendRequest) {
-                                            profile(item)
-                                        }
-                                    }, cancel,  block, accept)
-                                    friendRequests.adapter = adapter
-                                    //friendRequests.layoutManager = LinearLayoutManager(this)
+                        if (sent.isEmpty()) {
+                            emptyRequestsListMessage.visibility = View.VISIBLE
+                            friendRequests.visibility = View.GONE
+                        } else {
+                            emptyRequestsListMessage.visibility = View.GONE
+                            friendRequests.visibility = View.VISIBLE
+                            val data1 = mapOf("ids" to sent)
+                            functions!!
+                                .getHttpsCallable("getUsers")
+                                .call(data1).continueWith { task ->
+                                    val result1 = task.result?.data as HashMap<String, Any>
+                                    Log.i("sent_inv", "result1 $result1")
+                                    if (result1["found"] == true) {
+                                        val users = result1["users"] as ArrayList<HashMap<String, Any>>
+                                        val unfound = result1["unfound"] as ArrayList<String>
+                                        Log.i("sent_inv", "users $users")
+                                        Log.i("sent_inv", "unfound $unfound")
+                                        val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+                                            override fun onItemClicked(item: FriendRequest) {
+                                                profile(item)
+                                            }
+                                        }, cancel,  block, accept)
+                                        friendRequests.adapter = adapter
+                                        //friendRequests.layoutManager = LinearLayoutManager(this)
+                                    }
                                 }
-                            }
+                        }
                     } else if (result["invites"] is String) {
                         val sent = result["invites"] as String
-                        //TODO 1123123
                         Log.i("sent_inv", "users $sent")
                         val data1 = mapOf("id" to sent)
                         functions!!
                             .getHttpsCallable("getUser")
-                            .call(data).continueWith { task ->
+                            .call(data1).continueWith { task ->
                                 val result1 = task.result?.data as HashMap<String, Any>
                                 if (result1["found"] == true) {
                                     val users = result1["users"] as ArrayList<HashMap<String, Any>>
