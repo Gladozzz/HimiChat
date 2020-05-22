@@ -13,10 +13,12 @@
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:usesCleartextTraffic="true">
         <service
                 android:name=".SocketService"
-                android:exported="false"></service>
+                android:exported="false"
+                android:enabled="true"/>
 
         <meta-data
                 android:name="com.google.android.gms.version"
@@ -26,9 +28,6 @@
                 android:name=".NavigationActivity"
                 android:label="@string/title_activity_navigation"
                 android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".FriendRequestsActivity" />
-        <activity android:name=".FindFriendActivity" />
-        <activity android:name=".SettingsActivity" />
 
         <service
                 android:name=".MessagingService"
@@ -39,10 +38,6 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-
-        <activity android:name=".DialogActivity" />
-        <activity android:name=".FriendsActivity" />
-        <activity android:name=".DialoguesActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

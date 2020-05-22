@@ -1,7 +1,6 @@
 package com.jimipurple.himichat
 
 import android.app.IntentService
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -23,24 +22,11 @@ import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import io.socket.client.IO
 import io.socket.client.Socket
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-// TODO: Rename actions, choose action names that describe tasks that this
-// IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-private const val ACTION_FOO = "com.jimipurple.himichat.action.FOO"
-private const val ACTION_BAZ = "com.jimipurple.himichat.action.BAZ"
+//private const val serverURL = "http://192.168.1.171:3000/"
+private const val serverURL = "http://www.himichat.space:3000/"
 
-// TODO: Rename parameters
-private const val EXTRA_PARAM1 = "com.jimipurple.himichat.extra.PARAM1"
-private const val EXTRA_PARAM2 = "com.jimipurple.himichat.extra.PARAM2"
-
-/**
- * An [IntentService] subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
 class SocketService : IntentService("SocketService") {
 
     private var mAuth: FirebaseAuth? = null
@@ -50,11 +36,24 @@ class SocketService : IntentService("SocketService") {
 
     override fun onStartCommand(intent: Intent?, start_flags: Int, startId: Int): Int {
         mAuth = FirebaseAuth.getInstance()
-        socket.connect()
-
         random = Random()
 
+        try {
+//            socket = IO.socket(serverURL)
+            socket.connect()
+            onAllEvents()
+            Log.i("SocketServiceTEST", "SocketService START " + socket.connected())
+        } catch (e: Exception) {
+            Log.e("SocketService", "Error $e")
+        }
+        socket.connected()
+        return super.onStartCommand(intent, start_flags, startId)
+    }
 
+    private fun onAllEvents() {
+        socket.on(Socket.EVENT_CONNECT) {
+            Log.i("SocketService", "Socket Connected!")
+        }
         socket.on("auth_response") { args ->
             val data = args[0] as String
             for (el in args) {
@@ -171,7 +170,7 @@ class SocketService : IntentService("SocketService") {
                                 .createPendingIntent()
 
                             val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                .setSmallIcon(R.drawable.send_message)
+                                .setSmallIcon(R.drawable.ic_msg_24dp)
                                 .setContentTitle(nickname)
                                 .setContentText(text)
                                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -249,85 +248,35 @@ class SocketService : IntentService("SocketService") {
 //                }
 //            }
 
-        socket.connected()
-        return super.onStartCommand(intent, start_flags, startId)
+
+//        socket.on(Socket.EVENT_CONNECT_ERROR) {
+//            Log.i("SocketService", "Socket error")
+//        }
     }
 
     override fun onHandleIntent(intent: Intent?) {
-        when (intent?.action) {
-            ACTION_FOO -> {
-                val param1 = intent.getStringExtra(EXTRA_PARAM1)
-                val param2 = intent.getStringExtra(EXTRA_PARAM2)
-                handleActionFoo(param1, param2)
-            }
-            ACTION_BAZ -> {
-                val param1 = intent.getStringExtra(EXTRA_PARAM1)
-                val param2 = intent.getStringExtra(EXTRA_PARAM2)
-                handleActionBaz(param1, param2)
-            }
-        }
-    }
-
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private fun handleActionFoo(param1: String, param2: String) {
-        TODO("Handle action Foo")
-    }
-
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private fun handleActionBaz(param1: String, param2: String) {
-        TODO("Handle action Baz")
+//        when (intent?.action) {
+//            ACTION_FOO -> {
+//                val param1 = intent.getStringExtra(EXTRA_PARAM1)
+//                val param2 = intent.getStringExtra(EXTRA_PARAM2)
+//                handleActionFoo(param1, param2)
+//            }
+//            ACTION_BAZ -> {
+//                val param1 = intent.getStringExtra(EXTRA_PARAM1)
+//                val param2 = intent.getStringExtra(EXTRA_PARAM2)
+//                handleActionBaz(param1, param2)
+//            }
+//        }
     }
 
     companion object {
-        /**
-         * Starts this service to perform action Foo with the given parameters. If
-         * the service is already performing a task this action will be queued.
-         *
-         * @see IntentService
-         */
-        // TODO: Customize helper method
-        @JvmStatic
-        fun startActionFoo(context: Context, param1: String, param2: String) {
-            val intent = Intent(context, SocketService::class.java).apply {
-                action = ACTION_FOO
-                putExtra(EXTRA_PARAM1, param1)
-                putExtra(EXTRA_PARAM2, param2)
-            }
-            context.startService(intent)
-        }
-
-        /**
-         * Starts this service to perform action Baz with the given parameters. If
-         * the service is already performing a task this action will be queued.
-         *
-         * @see IntentService
-         */
-        // TODO: Customize helper method
-        @JvmStatic
-        fun startActionBaz(context: Context, param1: String, param2: String) {
-            val intent = Intent(context, SocketService::class.java).apply {
-                action = ACTION_BAZ
-                putExtra(EXTRA_PARAM1, param1)
-                putExtra(EXTRA_PARAM2, param2)
-            }
-            context.startService(intent)
-        }
-
         private var callbackOnMessageReceived = {}
+        private var socket: Socket = IO.socket(serverURL)
 
         fun setCallbackOnMessageReceived(callback: () -> Unit) {
             SocketService.callbackOnMessageReceived = {callback()}
         }
 
-        private var socket: Socket = IO.socket("http://208.73.200.206:3000")
-//        private var socket: Socket = IO.socket("http://192.168.1.171:3000")
-//        private var socket: Socket = IO.socket("http://84.22.142.69:3000")
 
         fun sendEncryptedMessage(context: Context, receiverId: String, deliveredId: String, text: String, keyPair: CurveKeyPair, receiverPublicKey: ByteArray) {
             Log.i("sendEncryptedMessage", "keyPair ${keyPair.privateKey.toString(Charsets.UTF_8)} \n${keyPair.privateKey.toString(Charsets.UTF_8)} \nreceiverPublicKey ${receiverPublicKey.toString(Charsets.ISO_8859_1)}")
@@ -343,7 +292,7 @@ class SocketService : IntentService("SocketService") {
             val senderPublicKey = Base64.encodeToString(keyPair.publicKey, Base64.DEFAULT)
             val receiverPublicKey1 = Base64.encodeToString(receiverPublicKey, Base64.DEFAULT)
             val signature1 = Base64.encodeToString(signature, Base64.DEFAULT)
-            socket.emit("sending_encrypted_message", receiverId1, encryptedText1, deliveredId, senderPublicKey, receiverPublicKey1, signature1)
+            this.socket.emit("sending_encrypted_message", receiverId1, encryptedText1, deliveredId, senderPublicKey, receiverPublicKey1, signature1)
         }
 
         private var authorized = false

@@ -62,7 +62,7 @@
                     android:id="@+id/acceptButton"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:background="@color/colorPrimary"
+                    android:background="@color/colorPrimaryDark"
                     android:padding="0dp"
                     android:scaleType="centerInside"
                     app:srcCompat="@drawable/ic_accept" />
@@ -71,7 +71,7 @@
                     android:id="@+id/blockButton"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:background="@color/colorPrimary"
+                    android:background="@color/colorPrimaryDark"
                     android:padding="0dp"
                     android:scaleType="centerInside"
                     app:srcCompat="@drawable/ic_block" />

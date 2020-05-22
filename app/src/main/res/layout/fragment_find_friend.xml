@@ -10,7 +10,7 @@
         android:paddingTop="20dp"
         android:paddingEnd="20dp"
         android:paddingRight="20dp"
-        tools:context=".FindFriendActivity">
+        tools:context=".ui.friends.FindFriendFragment">
 
     <EditText
             android:id="@+id/nicknameEdit"

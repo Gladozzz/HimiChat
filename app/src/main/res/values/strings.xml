@@ -4,6 +4,8 @@
     <string name="loading">Loading…</string>>
     <string name="find">Find</string>>
     <string name="profile">Profile</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
     <string name="privacy">Privacy</string>
     <string name="design">Design</string>
     <string name="something">Something goes wrong</string>

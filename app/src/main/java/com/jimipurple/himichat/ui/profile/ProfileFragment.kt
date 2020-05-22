@@ -43,7 +43,7 @@ class ProfileFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        profile_id = arguments!!["profile_id"] as String
+        profile_id = requireArguments()["profile_id"] as String
         if (profile_id == mAuth!!.uid!!) {
             setOwnProfileMode()
         } else {

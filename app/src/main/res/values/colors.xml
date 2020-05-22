@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#43305E</color>
-    <color name="colorCloudSent">#006A84</color>
-    <color name="colorCloudReceived">#11345C</color>
+    <color name="colorCloudSent">#3C3C4C</color>
+    <color name="colorCloudReceived">#2F2F3C</color>
     <color name="colorPrimaryDark">#1A1A22</color>
     <color name="colorAccent">#95E5F0</color>
     <color name="colorAccentDark">#114471</color>

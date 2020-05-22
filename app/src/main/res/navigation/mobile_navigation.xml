@@ -24,12 +24,12 @@
             <argument
                     android:name="friend_id"
                     app:argType="string"/>
-        <argument
-                android:name="nickname"
-                app:argType="string"/>
-        <argument
-                android:name="avatar"
-                app:argType="string"/>
+            <argument
+                    android:name="nickname"
+                    app:argType="string"/>
+            <argument
+                    android:name="avatar"
+                    app:argType="string"/>
     </fragment>
 
     <fragment

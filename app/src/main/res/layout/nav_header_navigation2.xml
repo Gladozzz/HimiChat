@@ -2,10 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/nav_header_height"
+        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:gravity="bottom"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
@@ -20,18 +19,28 @@
             android:paddingTop="@dimen/nav_header_vertical_spacing"
             app:srcCompat="@drawable/defaultavatar" />
 
-    <TextView
-            android:id="@+id/navHeaderNicknameView"
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:text="@string/label_nickname"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:orientation="vertical">
 
-    <TextView
-            android:id="@+id/navHeaderRealnameView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_real_name" />
+        <TextView
+                android:id="@+id/navHeaderNicknameView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingTop="10dp"
+                android:text="@string/label_nickname"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        <TextView
+                android:id="@+id/navHeaderRealnameView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="@string/label_real_name" />
+
+    </LinearLayout>
 
 </LinearLayout>

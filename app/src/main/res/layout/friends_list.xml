@@ -49,16 +49,5 @@
                     android:textSize="16sp" />
         </LinearLayout>
 
-        <ImageButton
-                android:id="@+id/sendMessageButton"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="25dp"
-                android:layout_weight="1"
-                android:background="@color/colorPrimary"
-                android:padding="10dp"
-                android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_friends_list_send" />
     </LinearLayout>
 </LinearLayout>

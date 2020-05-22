@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -14,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -30,6 +32,7 @@ import com.jimipurple.himichat.*
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.CurveKeyPair
 import com.jimipurple.himichat.encryption.Encryption
+import kotlinx.android.synthetic.main.app_bar_navigation.*
 
 //passion is a key bro (⌐■_■)
 class DialogFragment : BaseFragment() {
@@ -54,37 +57,45 @@ class DialogFragment : BaseFragment() {
         mAuth = FirebaseAuth.getInstance()
         id = mAuth!!.uid!!
         db = MessagesDBHelper(c!!)
-        friend_id = arguments!!["friend_id"] as String
-        avatar = arguments!!["avatar"] as String
-        nickname = arguments!!["nickname"] as String
+        friend_id = requireArguments()["friend_id"] as String
+        avatar = requireArguments()["avatar"] as String
+        nickname = requireArguments()["nickname"] as String
 
-        MessagingService.setCallbackOnMessageRecieved { activity!!.runOnUiThread { reloadMsgs() } }
-        SocketService.setCallbackOnMessageReceived { activity!!.runOnUiThread { reloadMsgs() } }
+        val app = c!!.applicationContext as MyApp
+        val ac = app.currentActivity!! as AppCompatActivity
+        val bar = ac.supportActionBar!!
+
+        bar.title = nickname
+        bar.setSubtitle(R.string.offline)
+
+        MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
+        SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
         MessagingService.isDialog = true
         MessagingService.currentDialog = friend_id!!
         val linearLayoutManager = LinearLayoutManager(c)
         linearLayoutManager.stackFromEnd = true
         messageList.layoutManager = linearLayoutManager
 
-        nicknameDialogView.text = nickname
+        //nicknameDialogView.text = nickname
         val url = Uri.parse(avatar)
         if (url != null) {
             val bitmap = LruCache(c!!)[avatar!!]
             if (bitmap != null) {
-                avatarDialogView.setImageBitmap(bitmap)
+                //avatarDialogView.setImageBitmap(bitmap)
+                toolbar.setLogo(BitmapDrawable(bitmap))
             } else {
                 Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        if (avatarDialogView != null) {
-                            avatarDialogView.setImageBitmap(bitmap)
-                        }
+//                        if (avatarDialogView != null) {
+//                            avatarDialogView.setImageBitmap(bitmap)
+//                        }
                         LruCache(c!!).set(avatar!!, bitmap!!)
                     }
 
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("Profile", "Загрузка изображения не удалась " + avatarDialogView + "\n" + e?.message)
+                        Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
                     }
                 })
             }
@@ -107,7 +118,7 @@ class DialogFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()
-        activity!!.registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+        requireActivity().registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
     }
 
     override fun onDestroy() {
@@ -115,7 +126,7 @@ class DialogFragment : BaseFragment() {
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
         try {
-            activity!!.unregisterReceiver(FCMReceiver)
+            requireActivity().unregisterReceiver(FCMReceiver)
         } catch (e: Exception) {
             Log.e("DialogFragment", e.message)
         }
@@ -225,7 +236,7 @@ class DialogFragment : BaseFragment() {
 //                        }
 //                    }
 //                }
-            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(activity!!, OnCompleteListener<DocumentSnapshot>() {
+            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(requireActivity(), OnCompleteListener<DocumentSnapshot>() {
                 if (it.isSuccessful) {
 //                    db!!.pushMessage(msg)
                     val result = it.result?.get("public_key") as Blob?

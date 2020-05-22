@@ -162,6 +162,8 @@ class FriendsFragment : BaseFragment() {
                 val friendsIDs = userData.get("friends") as? ArrayList<String>?
                 val friends = ArrayList<User>()
                 if (friendsIDs != null) {
+                    emptyFriendsListMessage.visibility = View.GONE
+                    FriendsList.visibility = View.VISIBLE
                     for (i in (friendsIDs.size-1)..0) {
                         firestore!!.collection("users").document(friendsIDs[i]).get().addOnCompleteListener{ doc ->
                             if (doc.isSuccessful) {
@@ -209,6 +211,8 @@ class FriendsFragment : BaseFragment() {
 //                    }
                 } else {
                     Log.e("FirestoreRequest", "There is no friends!")
+                    emptyFriendsListMessage.visibility = View.VISIBLE
+                    FriendsList.visibility = View.GONE
                 }
             } else {
                 Log.e("FirestoreRequest", "Error getting documents.", it.exception)

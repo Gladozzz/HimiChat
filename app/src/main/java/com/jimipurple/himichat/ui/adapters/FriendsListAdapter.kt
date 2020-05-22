@@ -43,7 +43,6 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val p
         private val name = itemView.findViewById(R.id.name) as TextView
         private val realName = itemView.findViewById(R.id.realName) as TextView
         private val avatar = itemView.findViewById(R.id.avatarFriend) as ImageView
-        private val sendMessageButton = itemView.findViewById(R.id.sendMessageButton) as ImageButton
 
         fun bind(item: User) {
             name.text = item.nickname
@@ -87,7 +86,6 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val p
                 if (adapterPosition != RecyclerView.NO_POSITION) dialog(item)
             }
 
-            sendMessageButton.setOnClickListener {dialog(item)}
             avatar.setOnClickListener { profile(item)}
         }
     }
