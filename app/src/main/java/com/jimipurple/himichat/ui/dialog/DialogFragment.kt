@@ -127,9 +127,10 @@ class DialogFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        bar!!.title = null
-//        bar!!.subtitle = null
-//        bar!!.setLogo(null)
+        tbar!!.title = null
+        tbar!!.subtitle = null
+        tbar!!.setLogo(null)
+        tbar!!.setTitle(R.string.menu_dialogues)
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
         try {

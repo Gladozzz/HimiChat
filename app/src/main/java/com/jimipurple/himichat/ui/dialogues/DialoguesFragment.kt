@@ -95,14 +95,13 @@ class DialoguesFragment : BaseFragment() {
     override fun onStart() {
         super.onStart()
         requireActivity().registerReceiver(FCMReceiverDialogues, IntentFilter(MessagingService.INTENT_FILTER))
-        bar!!.setTitle(R.string.menu_dialogues)
-        bar = ac!!.supportActionBar!!
-        bar!!.setTitle(R.string.menu_dialogues)
+//        bar = ac!!.supportActionBar!!
+        tbar!!.setTitle(R.string.menu_dialogues)
     }
 
     override fun onResume() {
         super.onResume()
-        bar!!.setTitle(R.string.menu_dialogues)
+        tbar!!.setTitle(R.string.menu_dialogues)
     }
 
     private fun reloadMsgs() {
