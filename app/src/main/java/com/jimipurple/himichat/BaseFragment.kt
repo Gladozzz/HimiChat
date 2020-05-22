@@ -6,7 +6,9 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.google.android.gms.common.util.VisibleForTesting
 import com.google.firebase.FirebaseApp
@@ -24,8 +26,16 @@ open class BaseFragment : Fragment() {
     protected var firestore: FirebaseFirestore? = null
     protected var firebaseToken: String  = ""
     protected var functions: FirebaseFunctions? = null
+    protected var app: MyApp? = null
+    protected var ac: AppCompatActivity? = null
+    protected var bar: ActionBar? = null
+    var tbar: Toolbar? = null
 
 //    protected var mMyApp: MyApp? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onStart() {
         super.onStart()
@@ -35,12 +45,13 @@ open class BaseFragment : Fragment() {
 //        functions = FirebaseFunctions.getInstance()
 //        firebaseToken = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")!!
 
-//        mMyApp = this.c as MyApp
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         c = context
+        app = this.c!!.applicationContext as MyApp
+        tbar = app!!.tbar
         FirebaseApp.initializeApp(c!!)
         mAuth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()

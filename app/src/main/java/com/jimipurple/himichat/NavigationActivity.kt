@@ -57,10 +57,12 @@ class NavigationActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
         setSupportActionBar(toolbar)
 
         storage = FirebaseStorage.getInstance()
+        mMyApp!!.currentActivity = this
+        mMyApp!!.tbar = toolbar
 
         startService(Intent(this, SocketService::class.java))
 

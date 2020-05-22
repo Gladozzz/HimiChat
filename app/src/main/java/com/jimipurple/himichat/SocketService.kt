@@ -271,10 +271,15 @@ class SocketService : IntentService("SocketService") {
 
     companion object {
         private var callbackOnMessageReceived = {}
+        private var callbackOnOnlineListChanged = {}
         private var socket: Socket = IO.socket(serverURL)
 
         fun setCallbackOnMessageReceived(callback: () -> Unit) {
             SocketService.callbackOnMessageReceived = {callback()}
+        }
+
+        fun setCallbackOnOnlineListChanged(callback: () -> Unit) {
+            SocketService.callbackOnOnlineListChanged = {callback()}
         }
 
 

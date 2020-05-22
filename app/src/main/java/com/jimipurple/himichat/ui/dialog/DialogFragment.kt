@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -61,12 +62,12 @@ class DialogFragment : BaseFragment() {
         avatar = requireArguments()["avatar"] as String
         nickname = requireArguments()["nickname"] as String
 
-        val app = c!!.applicationContext as MyApp
-        val ac = app.currentActivity!! as AppCompatActivity
-        val bar = ac.supportActionBar!!
+        app = c!!.applicationContext as MyApp
+        tbar!!.title = nickname
+        tbar!!.setSubtitle(R.string.offline)
+//        ac = app!!.currentActivity!! as AppCompatActivity
+//        bar = ac!!.supportActionBar!!
 
-        bar.title = nickname
-        bar.setSubtitle(R.string.offline)
 
         MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
         SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
@@ -82,7 +83,7 @@ class DialogFragment : BaseFragment() {
             val bitmap = LruCache(c!!)[avatar!!]
             if (bitmap != null) {
                 //avatarDialogView.setImageBitmap(bitmap)
-                toolbar.setLogo(BitmapDrawable(bitmap))
+                tbar!!.setLogo(BitmapDrawable(bitmap))
             } else {
                 Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
@@ -90,6 +91,7 @@ class DialogFragment : BaseFragment() {
 //                            avatarDialogView.setImageBitmap(bitmap)
 //                        }
                         LruCache(c!!).set(avatar!!, bitmap!!)
+                        tbar!!.setLogo(BitmapDrawable(bitmap))
                     }
 
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
@@ -119,10 +121,15 @@ class DialogFragment : BaseFragment() {
     override fun onStart() {
         super.onStart()
         requireActivity().registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+//        bar!!.title = nickname
+//        bar!!.setSubtitle(R.string.offline)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+//        bar!!.title = null
+//        bar!!.subtitle = null
+//        bar!!.setLogo(null)
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
         try {

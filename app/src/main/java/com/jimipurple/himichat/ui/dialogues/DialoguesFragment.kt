@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.GsonBuilder
@@ -49,9 +50,14 @@ class DialoguesFragment : BaseFragment() {
         db = MessagesDBHelper(c!!)
         mAuth = FirebaseAuth.getInstance()
         id = mAuth!!.uid!!
+        app = c!!.applicationContext as MyApp
+//        ac = app!!.currentActivity!! as AppCompatActivity
+        ac = app!!.currentActivity!! as AppCompatActivity
+        bar = ac!!.supportActionBar!!
+
         val currentTime = Calendar.getInstance().time
-        MessagingService.setCallbackOnMessageRecieved { activity!!.runOnUiThread { reloadMsgs() } }
-        SocketService.setCallbackOnMessageReceived { activity!!.runOnUiThread { reloadMsgs() } }
+        MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
+        SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
 
         reloadMsgs()
     }
@@ -88,7 +94,15 @@ class DialoguesFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()
-        activity!!.registerReceiver(FCMReceiverDialogues, IntentFilter(MessagingService.INTENT_FILTER))
+        requireActivity().registerReceiver(FCMReceiverDialogues, IntentFilter(MessagingService.INTENT_FILTER))
+        bar!!.setTitle(R.string.menu_dialogues)
+        bar = ac!!.supportActionBar!!
+        bar!!.setTitle(R.string.menu_dialogues)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        bar!!.setTitle(R.string.menu_dialogues)
     }
 
     private fun reloadMsgs() {
@@ -300,7 +314,7 @@ class DialoguesFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         try {
-            activity!!.unregisterReceiver(FCMReceiverDialogues)
+            requireActivity().unregisterReceiver(FCMReceiverDialogues)
         } catch (e: Exception) {
             Log.e("DialoguesFragment", e.message)
         }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +35,7 @@ open class BaseActivity : AppCompatActivity() {
         firebaseToken = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")!!
 
         mMyApp = this.applicationContext as MyApp
+        mMyApp!!.currentActivity = this
     }
 
     @VisibleForTesting
@@ -43,6 +45,11 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        mMyApp!!.currentActivity = this
+    }
+
+    override fun onStart() {
+        super.onStart()
         mMyApp!!.currentActivity = this
     }
 
