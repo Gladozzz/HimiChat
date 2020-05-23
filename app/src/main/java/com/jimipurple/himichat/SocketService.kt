@@ -21,7 +21,9 @@ import com.jimipurple.himichat.models.UndeliveredMessage
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import io.socket.client.IO
 import io.socket.client.Socket
+import kotlinx.coroutines.Job
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 //private const val serverURL = "http://192.168.1.171:3000/"
@@ -53,6 +55,11 @@ class SocketService : IntentService("SocketService") {
     private fun onAllEvents() {
         socket.on(Socket.EVENT_CONNECT) {
             Log.i("SocketService", "Socket Connected!")
+            try {
+                onlineChecking.start()
+            } catch (e: Exception) {
+                Log.i("SocketServiceOnline", " " + e.message)
+            }
         }
         socket.on("auth_response") { args ->
             val data = args[0] as String
@@ -97,6 +104,16 @@ class SocketService : IntentService("SocketService") {
             }
             authorized = false
         }
+//        socket.on("online_list") { args ->
+//            val data = args[0] as String
+//            Log.i("SocketService", "online_list $data")
+//            val online = SharedPreferencesUtility(applicationContext).getListString("online")
+//            if (online != null) {
+////                online.remove(data)
+//                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().remove("online").apply()
+////                SharedPreferencesUtility(applicationContext).putListString("online", online)
+//            }
+//        }
         socket.on("receiving_encrypted_message") { args ->
             Log.i("SocketService", "receiving_encrypted_message " + args[0])
             val db = MessagesDBHelper(applicationContext)
@@ -215,23 +232,6 @@ class SocketService : IntentService("SocketService") {
                 Log.i("SocketService", "undelivered message wasn't found")
             }
         }
-//        socket.on("online") { args ->
-//            Log.i("SocketService", "online $args")
-//            val data = ArrayList<String>()
-//            for (id in args) {
-//                data.add(id as String)
-//            }
-//            var online = SharedPreferencesUtility(applicationContext).getListString("online")
-//            if (online != null) {
-//                online.add(data)
-//            } else {
-//                online = ArrayList<String>()
-//                online.add(data)
-//            }
-//            SharedPreferencesUtility(applicationContext).putListString("online", online)
-//        }
-
-
 //        val uid = mAuth!!.uid
 //        mAuth!!.currentUser!!.getIdToken(true)
 //            .addOnCompleteListener { task ->
@@ -272,7 +272,26 @@ class SocketService : IntentService("SocketService") {
     companion object {
         private var callbackOnMessageReceived = {}
         private var callbackOnOnlineListChanged = {}
-        private var socket: Socket = IO.socket(serverURL)
+        var socket: Socket = IO.socket(serverURL)
+        private var authorized = false
+        var usersToCheck = ArrayList<String>()
+        var isCheckOnline = true
+        var onlineChecking = Thread(Runnable {
+            while (true) {
+                if (isCheckOnline) {
+                    Log.i("SocketServiceOnline", usersToCheck.toString())
+                    socket.emit("online_check", usersToCheck.joinToString(separator = ":"))
+                }
+                Thread.sleep(5000)
+            }
+        })
+
+        fun getOnlineList(usersToCheckOnes: MutableCollection<String>) {
+            if (usersToCheckOnes.isNotEmpty()) {
+                val stringList = usersToCheckOnes.joinToString(separator = ":")
+                socket.emit("online_check", stringList)
+            }
+        }
 
         fun setCallbackOnMessageReceived(callback: () -> Unit) {
             SocketService.callbackOnMessageReceived = {callback()}
@@ -281,7 +300,6 @@ class SocketService : IntentService("SocketService") {
         fun setCallbackOnOnlineListChanged(callback: () -> Unit) {
             SocketService.callbackOnOnlineListChanged = {callback()}
         }
-
 
         fun sendEncryptedMessage(context: Context, receiverId: String, deliveredId: String, text: String, keyPair: CurveKeyPair, receiverPublicKey: ByteArray) {
             Log.i("sendEncryptedMessage", "keyPair ${keyPair.privateKey.toString(Charsets.UTF_8)} \n${keyPair.privateKey.toString(Charsets.UTF_8)} \nreceiverPublicKey ${receiverPublicKey.toString(Charsets.ISO_8859_1)}")
@@ -299,8 +317,6 @@ class SocketService : IntentService("SocketService") {
             val signature1 = Base64.encodeToString(signature, Base64.DEFAULT)
             this.socket.emit("sending_encrypted_message", receiverId1, encryptedText1, deliveredId, senderPublicKey, receiverPublicKey1, signature1)
         }
-
-        private var authorized = false
 
         fun isAuthorized(): Boolean {
             if (socket.connected() && authorized) {

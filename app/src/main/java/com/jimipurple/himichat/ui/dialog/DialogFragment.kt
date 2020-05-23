@@ -9,31 +9,33 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.DocumentSnapshot
-import com.jimipurple.himichat.ui.adapters.MessageListAdapter
-import com.jimipurple.himichat.db.MessagesDBHelper
-import com.jimipurple.himichat.models.*
-import com.squareup.picasso.LruCache
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.fragment_dialog.*
 import com.google.firebase.functions.FirebaseFunctionsException
 import com.jimipurple.himichat.*
 import com.jimipurple.himichat.db.KeysDBHelper
+import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.encryption.CurveKeyPair
 import com.jimipurple.himichat.encryption.Encryption
-import kotlinx.android.synthetic.main.app_bar_navigation.*
+import com.jimipurple.himichat.models.Message
+import com.jimipurple.himichat.models.ReceivedMessage
+import com.jimipurple.himichat.models.SentMessage
+import com.jimipurple.himichat.models.UndeliveredMessage
+import com.jimipurple.himichat.ui.adapters.MessageListAdapter
+import com.squareup.picasso.LruCache
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.design_settings_fragment.*
+import kotlinx.android.synthetic.main.fragment_dialog.*
 
 //passion is a key bro (⌐■_■)
 class DialogFragment : BaseFragment() {
@@ -68,11 +70,35 @@ class DialogFragment : BaseFragment() {
 //        ac = app!!.currentActivity!! as AppCompatActivity
 //        bar = ac!!.supportActionBar!!
 
-
         MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
         SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
+        SocketService.usersToCheck = arrayListOf(friend_id!!)
         MessagingService.isDialog = true
         MessagingService.currentDialog = friend_id!!
+        val socket = SocketService.socket
+        socket.on("online_list") { args ->
+            val online = args[0] as String
+            Log.i("SocketServiceOnline", "online_list $online")
+            if (online != "") {
+                c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("online", online).apply()
+                var userOnline = false
+                online.split(":").forEach {
+                    if (it == friend_id) {
+                        userOnline = true
+                    }
+                }
+                val handler = Handler(c!!.mainLooper)
+                handler.post(Runnable {
+                    if (userOnline) {
+//                        tbar!!.setSubtitle(R.string.online)
+                        setOnline()
+                    } else {
+//                        tbar!!.setSubtitle(R.string.offline)
+                        setOffline()
+                    }
+                })
+            }
+        }
         val linearLayoutManager = LinearLayoutManager(c)
         linearLayoutManager.stackFromEnd = true
         messageList.layoutManager = linearLayoutManager
@@ -385,6 +411,14 @@ class DialogFragment : BaseFragment() {
                     }
                 }
         }
+    }
+
+    private fun setOffline() {
+        tbar!!.setSubtitle(R.string.offline)
+    }
+
+    private fun setOnline() {
+        tbar!!.setSubtitle(R.string.online)
     }
 
     val FCMReceiver = object : BroadcastReceiver() {
