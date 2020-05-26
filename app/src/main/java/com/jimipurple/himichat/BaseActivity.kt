@@ -3,6 +3,10 @@ package com.jimipurple.himichat
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,6 +17,8 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import com.squareup.picasso.LruCache
+import com.squareup.picasso.Picasso
 
 
 @SuppressLint("Registered")
@@ -54,12 +60,12 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        clearReferences()
+//        clearReferences()
         super.onPause()
     }
 
     override fun onDestroy() {
-        clearReferences()
+//        clearReferences()
         super.onDestroy()
     }
 

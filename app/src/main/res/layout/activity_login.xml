@@ -6,181 +6,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".LoginActivity" android:background="@color/colorPrimaryDark">
-    <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:ems="10"
-            android:id="@+id/emailEdit"
-            app:layout_constraintStart_toEndOf="@+id/emailLabel" android:layout_marginStart="8dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp" android:layout_marginTop="70dp"
-            app:layout_constraintTop_toTopOf="parent"/>
-    <TextView
-            android:text="@string/label_email"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:id="@+id/emailLabel"
-            app:layout_constraintTop_toTopOf="@+id/emailEdit" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp" android:background="#00FFFCFC"/>
-    <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:id="@+id/passwordEdit" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/emailEdit" app:layout_constraintStart_toEndOf="@+id/passwordLabel"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="16dp" app:layout_constraintEnd_toEndOf="parent"/>
-    <TextView
-            android:text="@string/label_password"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:id="@+id/passwordLabel" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp" app:layout_constraintTop_toBottomOf="@+id/emailEdit"/>
 
-    <Button
-            android:id="@+id/signInButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="142dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/button_sign_in"
+    <include
+            android:id="@+id/loginLayout"
+            layout="@layout/login_mode_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-            android:id="@+id/registerModeButton"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="70dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/button_register_mode"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-            android:id="@+id/passwordRepeatLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/label_password_repeat"
-            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordEdit" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-            android:id="@+id/passwordRepeatEdit"
+    <include
+            android:id="@+id/registerLayout"
+            layout="@layout/register_mode_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:ems="10"
-            android:inputType="textPassword"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/passwordRepeatLabel"
-            app:layout_constraintTop_toBottomOf="@+id/passwordEdit" />
-
-    <Button
-            android:id="@+id/registerButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="142dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/button_register"
+            android:layout_height="0dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-            android:id="@+id/loginModeButton"
-            android:layout_width="140dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="70dp"
-            android:background="@color/colorPrimary"
-            android:text="@string/button_login_mode"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-            android:id="@+id/nicknameLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/label_nickname"
-            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordRepeatEdit" />
-
-    <EditText
-            android:id="@+id/nicknameEdit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@+id/nicknameInfoButton"
-            app:layout_constraintStart_toEndOf="@+id/nicknameLabel"
-            app:layout_constraintTop_toBottomOf="@+id/passwordRepeatEdit" />
-
-    <ImageButton
-            android:id="@+id/nicknameInfoButton"
-            android:layout_width="45dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/colorPrimary"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordRepeatEdit"
-            app:srcCompat="@android:drawable/ic_menu_info_details" />
-
-    <TextView
-            android:id="@+id/realNameLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/label_real_name"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nicknameLabel" />
-
-    <EditText
-            android:id="@+id/realNameEdit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/realNameLabel"
-            app:layout_constraintTop_toBottomOf="@+id/nicknameEdit" />
+            app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

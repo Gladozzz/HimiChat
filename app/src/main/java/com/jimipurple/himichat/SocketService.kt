@@ -27,7 +27,10 @@ import kotlin.collections.ArrayList
 
 
 //private const val serverURL = "http://192.168.1.171:3000/"
-private const val serverURL = "http://www.himichat.space:3000/"
+//private const val serverURL = "http://www.himichat.space:3000/"
+//private const val serverURL = "https://www.himichat.space:443/"
+//private const val serverURL = "https://82.146.60.200:443/"
+private const val serverURL = "http://82.146.60.200:80/"
 
 class SocketService : IntentService("SocketService") {
 

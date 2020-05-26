@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
 import com.bumptech.glide.Glide
@@ -54,14 +55,14 @@ class SettingsFragment : BaseFragment() {
 
         val data = mapOf("id" to mAuth!!.uid!!)
 
-        val logout = {
+        app!!.logoutCallback = {
             logoutButtonOnClick()
         }
-        val loadAvatar = {
+        app!!.loadAvatarCallback = {
             loadAvatarButtonOnClick()
         }
 
-        fragmentAdapter = SettingsPageAdapter(this.childFragmentManager, c!!.applicationContext, logout, loadAvatar)
+        fragmentAdapter = SettingsPageAdapter(this.childFragmentManager, c!!.applicationContext)
         viewpager_main.adapter = fragmentAdapter
         SettingsTabs.setupWithViewPager(viewpager_main)
     }
@@ -74,7 +75,7 @@ class SettingsFragment : BaseFragment() {
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(i)
         } catch (e: Exception) {
-            Log.i("logout:fail", e.message)
+            Log.e("logout:fail", e.message)
         } finally {
             Runtime.getRuntime().exit(0)
         }
@@ -92,7 +93,7 @@ class SettingsFragment : BaseFragment() {
 
     private fun checkPermission(): Boolean {
         return if (ActivityCompat.checkSelfPermission(c!!, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(activity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
+            requestPermissions(app!!.currentActivity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
             false
         } else {
             Log.e("settingsFragment", "PERMISSION GRANTED")
@@ -104,6 +105,7 @@ class SettingsFragment : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && null != data) {
+            Toast.makeText(c!!, R.string.toast_load_avatar_warning, Toast.LENGTH_LONG).show()
             val selectedImage = data.data
             val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
 
@@ -169,6 +171,7 @@ class SettingsFragment : BaseFragment() {
                                         .addOnSuccessListener {
                                             ref!!.downloadUrl.addOnSuccessListener { uri ->
                                                 Log.i("avatar_load", "onSuccess: uri= $uri")
+                                                Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
                                                 setAvatar(uri)
                                             }
                                         }
@@ -182,6 +185,7 @@ class SettingsFragment : BaseFragment() {
                                         .addOnSuccessListener {
                                             ref!!.downloadUrl.addOnSuccessListener { uri ->
                                                 Log.i("avatar_load", "onSuccess: uri= $uri")
+                                                Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
                                                 setAvatar(uri)
                                             }
                                         }
@@ -195,6 +199,7 @@ class SettingsFragment : BaseFragment() {
                                         .addOnSuccessListener {
                                             ref!!.downloadUrl.addOnSuccessListener { uri ->
                                                 Log.i("avatar_load", "onSuccess: uri= $uri")
+                                                Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
                                                 setAvatar(uri)
                                             }
                                         }
@@ -212,6 +217,7 @@ class SettingsFragment : BaseFragment() {
                     override fun onLoadFailed(errorDrawable: Drawable?) {
                         super.onLoadFailed(errorDrawable)
                         Log.e("avatar_load", "Загрузка изображения не удалась $picturePath")
+                        Toast.makeText(requireContext(), R.string.toast_load_avatar_error, Toast.LENGTH_LONG).show()
                     }
                 })
         }

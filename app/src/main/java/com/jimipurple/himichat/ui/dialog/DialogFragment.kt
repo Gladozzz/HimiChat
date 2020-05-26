@@ -54,15 +54,15 @@ class DialogFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        c.setContentView(R.layout.fragment_dialog)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mAuth = FirebaseAuth.getInstance()
         id = mAuth!!.uid!!
         db = MessagesDBHelper(c!!)
         friend_id = requireArguments()["friend_id"] as String
         avatar = requireArguments()["avatar"] as String
         nickname = requireArguments()["nickname"] as String
+
+        title = nickname
+        subtitle = resources.getString(R.string.offline)
 
         app = c!!.applicationContext as MyApp
         tbar!!.title = nickname
@@ -99,40 +99,13 @@ class DialogFragment : BaseFragment() {
                 })
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val linearLayoutManager = LinearLayoutManager(c)
         linearLayoutManager.stackFromEnd = true
         messageList.layoutManager = linearLayoutManager
-
-        //nicknameDialogView.text = nickname
-        val url = Uri.parse(avatar)
-        if (url != null) {
-            val bitmap = LruCache(c!!)[avatar!!]
-            if (bitmap != null) {
-                //avatarDialogView.setImageBitmap(bitmap)
-                tbar!!.setLogo(BitmapDrawable(bitmap))
-            } else {
-                Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-//                        if (avatarDialogView != null) {
-//                            avatarDialogView.setImageBitmap(bitmap)
-//                        }
-                        LruCache(c!!).set(avatar!!, bitmap!!)
-                        tbar!!.setLogo(BitmapDrawable(bitmap))
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
-                    }
-                })
-            }
-        } else {
-            Log.i("Profile", "avatar wasn't received")
-        }
-
         reloadMsgs()
-
         dialogMessageInput.button!!.setOnClickListener { onSendBtnClick() }
     }
 
@@ -153,10 +126,12 @@ class DialogFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        tbar!!.title = null
-        tbar!!.subtitle = null
-        tbar!!.setLogo(null)
-        tbar!!.setTitle(R.string.menu_dialogues)
+////        tbar!!.title = null
+//        tbar!!.subtitle = null
+////        tbar!!.setLogo(null)
+////        tbar!!.setTitle(R.string.menu_dialogues)
+////        val act = app!!.currentActivity!!
+//        app!!.setToolbar(null, null)
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
         try {
@@ -328,39 +303,6 @@ class DialogFragment : BaseFragment() {
                     dialogMessageInput.inputEditText!!.setText("")
                 }
             }
-
-//                val data1 = hashMapOf(
-//                    "id" to id
-//                )
-//                functions
-//                    .getHttpsCallable("getToken")
-//                    .call(data1).addOnCompleteListener { task ->
-//                        if (!task.isSuccessful) {
-//                            val e = task.exception
-//                            if (e is FirebaseFunctionsException) {
-//                                val code = e.code
-//                                val details = e.details
-//                                Log.i("dialogMessage", "error to send $details \n$code")
-//                            }
-//                        } else {
-//                            try {
-//                                Log.i("dialogMessage", "result " + task.result?.data.toString())
-//                                val dat = task.result?.data as HashMap<String, Any>
-//                                val receiverToken = dat["token"]
-//                                //data["token"] = receiverToken
-//                                val fm = FirebaseMessaging.getInstance()
-//                                fm.send(RemoteMessage.Builder("${receiverToken}@fcm.googleapis.com")
-//                                    .setData(data)
-//                                    .setMessageId(data["deliveredId"]!!)
-//                                    //.setMessageType("data")
-//                                    .build())
-//
-//                                Log.i("dialogMessage", "data $data")
-//                            } catch (e: Exception) {
-//                                Log.i("dialogMessage", "getToken error " + e.message)
-//                            }
-//                        }
-//                    }
     }
 
     private fun sendEncryptedMessage(receiverId: String, senderId: String, text: String, msg: UndeliveredMessage, keyPair: CurveKeyPair, receiverPublicKey: ByteArray) {
@@ -413,12 +355,26 @@ class DialogFragment : BaseFragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        tbar!!.subtitle = null
+        app!!.setToolbar(null, null)
+    }
+
     private fun setOffline() {
-        tbar!!.setSubtitle(R.string.offline)
+//        val act = requireActivity()
+//        val t = act.actionBar
+        val act = app!!.currentActivity!!
+        val t = act.supportActionBar!!
+        t!!.setSubtitle(R.string.offline)
     }
 
     private fun setOnline() {
-        tbar!!.setSubtitle(R.string.online)
+//        val act = requireActivity()
+//        val t = act.actionBar
+        val act = app!!.currentActivity!!
+        val t = act.supportActionBar!!
+        t!!.setSubtitle(R.string.online)
     }
 
     val FCMReceiver = object : BroadcastReceiver() {

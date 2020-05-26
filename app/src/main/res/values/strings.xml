@@ -11,6 +11,8 @@
     <string name="something">Something goes wrong</string>
     <string name="enter_msg">Enter message</string>
 
+    <string name="web_client_id" translatable="false">195021957274-o2hlc401ln8feoplko4ql11gfc677q0o.apps.googleusercontent.com</string>
+
     <string name="label_email">Email:</string>
     <string name="label_password">Password:</string>
     <string name="label_password_repeat">Repeat password:</string>
@@ -63,6 +65,7 @@
     <string name="toast_cancel_invite_error">error to cancel friend request</string>
     <string name="toast_load_avatar_complete">avatar was loaded</string>
     <string name="toast_load_avatar_error">error to load avatar</string>
+    <string name="toast_load_avatar_warning">loading avatar can take some time</string>
     <string name="toast_future_feature">Future feature</string>
 
     <string name="channel_name">HimiChat messages</string>

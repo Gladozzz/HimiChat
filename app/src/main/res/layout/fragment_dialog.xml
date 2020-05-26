@@ -6,7 +6,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"
-        tools:context=".ui.dialog.DialogFragment">
+        android:theme="@style/AppTheme"
+        tools:context=".NavigationActivity"
+        android:screenOrientation="portrait">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messageList"

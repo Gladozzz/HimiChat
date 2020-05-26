@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+    <ImageView
+            android:id="@+id/avatarView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            app:srcCompat="@drawable/defaultavatar" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="100">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="100">
+
+            <EditText
+                    android:id="@+id/realnameEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="90"
+                    android:gravity="start"
+                    android:inputType="textPersonName"
+                    android:text="Realname" />
+
+            <Button
+                    android:id="@+id/renameRealnameButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="10"
+                    android:background="@color/colorPrimary"
+                    android:ems="5"
+                    android:saveEnabled="false"
+                    android:text="@string/loadRenameButton" />
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="fill_vertical"
+                android:gravity="fill_horizontal|center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="100">
+
+            <EditText
+                    android:id="@+id/nicknameEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="90"
+                    android:inputType="textPersonName"
+                    android:text="Nickname" />
+
+            <Button
+                    android:id="@+id/renameNicknameButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="10"
+                    android:background="@color/colorPrimary"
+                    android:text="@string/loadRenameButton" />
+
+        </LinearLayout>
+
+        <Button
+                android:id="@+id/logoutButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorPrimary"
+                android:text="@string/button_logout" />
+
+        <Button
+                android:id="@+id/deleteAllMessagesButton"
+                android:layout_width="200dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorPrimary"
+                android:text="@string/button_delete_all_messages" />
+    </LinearLayout>
+
+</LinearLayout>

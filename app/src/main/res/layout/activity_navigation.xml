@@ -22,9 +22,9 @@
             android:fitsSystemWindows="true"
             android:isScrollContainer="false"
             app:headerLayout="@layout/nav_header_navigation2"
-            app:itemIconTint="@color/colorAccent"
+            app:itemIconTint="@color/white_five"
             app:itemTextAppearance="@style/TextAppearance.AppCompat.Large"
-            app:itemTextColor="@color/colorAccent"
+            app:itemTextColor="@color/white_five"
             app:menu="@menu/activity_navigation_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

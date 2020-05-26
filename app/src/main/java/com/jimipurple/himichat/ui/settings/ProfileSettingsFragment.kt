@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -20,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
+import com.jimipurple.himichat.BaseFragment
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.models.User
@@ -28,17 +30,13 @@ import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.regex.Pattern
 
 
-class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCallback: () -> Unit) : Fragment() {
+class ProfileSettingsFragment : BaseFragment() {
 
     private val RESULT_LOAD_IMAGE = 1
     private val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2
     private val GET_FROM_GALLERY = 3
 
-    private var mAuth: FirebaseAuth? = null
-    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var storage: FirebaseStorage = FirebaseStorage.getInstance()
-    private var firebaseToken: String  = ""
-    private var functions = FirebaseFunctions.getInstance()
     private var nickname: String? = null
     private var realname: String? = null
     private var avatar: String? = null
@@ -51,7 +49,8 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
-        loadAvatarButton.setOnClickListener { loadAvatarCallback() }
+//        loadAvatarButton.setOnClickListener { loadAvatarCallback() }
+        avatarView.setOnClickListener { app!!.loadAvatarCallback() }
         deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
 
         updateAvatar()
@@ -111,7 +110,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
 //                    Log.i("Profile", "avatar wasn't received")
 //                }
 //            }
-        firestore.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
                 nickname = userData.get("nickname") as String?
@@ -154,7 +153,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
                 realnameEdit.setText(realname)
                 renameNicknameButton.setOnClickListener { loadUserData() }
                 renameRealnameButton.setOnClickListener { loadUserData() }
-                logoutButton.setOnClickListener { logoutCallback() }
+                logoutButton.setOnClickListener { app!!.logoutCallback() }
             } else {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
@@ -170,7 +169,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
 //    }
 
     fun deleteAllMessages() {
-        MessagesDBHelper(context!!).deleteAllMessages()
+        MessagesDBHelper(c!!).deleteAllMessages()
     }
 
     fun isNicknameValid(nickname: String): Boolean {
@@ -185,7 +184,7 @@ class ProfileSettingsFragment(val logoutCallback: () -> Unit, val loadAvatarCall
             nickname = nicknameEdit.text.toString()
             realname = realnameEdit.text.toString()
             val data = mapOf("id" to mAuth!!.uid!!, "nickname" to nickname, "realname" to realname)
-            functions
+            functions!!
                 .getHttpsCallable("getUser")
                 .call(data).continueWith { task ->
                     //

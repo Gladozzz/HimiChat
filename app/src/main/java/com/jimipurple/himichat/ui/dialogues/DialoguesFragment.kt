@@ -5,11 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.GsonBuilder
@@ -44,6 +46,14 @@ class DialoguesFragment : BaseFragment() {
         return inflater.inflate(R.layout.fragment_dialogues, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        tbar!!.title = resources.getString(R.string.menu_dialogues)
+        tbar!!.subtitle = null
+        tbar!!.logo = null
+        app!!.setToolbar(resources.getString(R.string.menu_dialogues), null)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 //        setContentView(R.layout.fragment_dialogues)
@@ -54,6 +64,12 @@ class DialoguesFragment : BaseFragment() {
 //        ac = app!!.currentActivity!! as AppCompatActivity
         ac = app!!.currentActivity!! as AppCompatActivity
         bar = ac!!.supportActionBar!!
+        if (savedInstanceState != null) {
+            val title = savedInstanceState.getString("title")
+            val subtitle = savedInstanceState.getString("subtitle")
+            tbar!!.title = title
+            tbar!!.subtitle = subtitle
+        }
 
         val currentTime = Calendar.getInstance().time
         MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
@@ -96,12 +112,12 @@ class DialoguesFragment : BaseFragment() {
         super.onStart()
         requireActivity().registerReceiver(FCMReceiverDialogues, IntentFilter(MessagingService.INTENT_FILTER))
 //        bar = ac!!.supportActionBar!!
-        tbar!!.setTitle(R.string.menu_dialogues)
+//        tbar!!.setTitle(R.string.menu_dialogues)
     }
 
     override fun onResume() {
         super.onResume()
-        tbar!!.setTitle(R.string.menu_dialogues)
+//        tbar!!.setTitle(R.string.menu_dialogues)
     }
 
     private fun reloadMsgs() {
@@ -318,6 +334,13 @@ class DialoguesFragment : BaseFragment() {
             Log.e("DialoguesFragment", e.message)
         }
     }
+
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//        outState.putString("title", tbar!!.title.toString())
+//        outState.putString("subtitle", tbar!!.subtitle.toString())
+////        outState.putSerializable("logo", bar!!.logo)
+//    }
 
     val FCMReceiverDialogues = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {

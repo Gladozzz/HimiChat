@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 //import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.ActionBar
@@ -30,11 +31,26 @@ open class BaseFragment : Fragment() {
     protected var ac: AppCompatActivity? = null
     protected var bar: ActionBar? = null
     var tbar: Toolbar? = null
+    var title: CharSequence? = null
+    var subtitle: CharSequence? = null
 
 //    protected var mMyApp: MyApp? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        app = this.c!!.applicationContext as MyApp
+        tbar = app!!.tbar
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+//        if (savedInstanceState != null) {
+//            val title = savedInstanceState.getCharSequence("title")
+//            val subtitle = savedInstanceState.getCharSequence("subtitle")
+//            tbar!!.title = title
+//            tbar!!.subtitle = subtitle
+//            Log.i("savedTitle", "title $title subtitle $subtitle")
+//        }
     }
 
     override fun onStart() {
@@ -99,6 +115,16 @@ open class BaseFragment : Fragment() {
     fun hideKeyboard(view: View) {
         val imm = c!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+//        outState.putCharSequence("title", tbar!!.title)
+//        outState.putCharSequence("subtitle", tbar!!.subtitle)
+//        val title = tbar!!.title
+//        val subtitle = tbar!!.subtitle
+//        Log.i("savedTitle", "title $title subtitle $subtitle")
+//        outState.putSerializable("logo", toolbar!!.logo)
     }
 
 //    public override fun onStop() {

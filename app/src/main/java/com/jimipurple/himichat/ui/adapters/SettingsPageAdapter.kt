@@ -11,7 +11,7 @@ import com.jimipurple.himichat.ui.settings.ProfileSettingsFragment
 import com.jimipurple.himichat.R
 
 
-class SettingsPageAdapter(fm: FragmentManager, context: Context, private val logoutCallback: () -> Unit, private val loadAvatarCallback: () -> Unit) : FragmentPagerAdapter(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class SettingsPageAdapter(fm: FragmentManager, context: Context) : FragmentPagerAdapter(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
     private var cont: Context = context
     private var mCurrentFragment: Fragment? = null
 //    private val logout = logoutCallback
@@ -33,10 +33,7 @@ class SettingsPageAdapter(fm: FragmentManager, context: Context, private val log
     override fun getItem(position: Int): Fragment {
         return when (position) {
             0 -> {
-                ProfileSettingsFragment(
-                    logoutCallback,
-                    loadAvatarCallback
-                )
+                ProfileSettingsFragment()
             }
             1 -> {
                 PrivacySettingsFragment()

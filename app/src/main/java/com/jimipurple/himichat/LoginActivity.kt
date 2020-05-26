@@ -9,11 +9,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.NonNull
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GetTokenResult
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -22,7 +24,13 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.Encryption
+import com.jimipurple.himichat.models.User
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.login_mode_layout.*
+import kotlinx.android.synthetic.main.login_mode_layout.emailEdit
+import kotlinx.android.synthetic.main.login_mode_layout.passwordEdit
+import kotlinx.android.synthetic.main.register_mode_layout.*
+import kotlinx.android.synthetic.main.register_mode_layout.nicknameEdit
 import java.util.regex.Pattern
 
 
@@ -32,8 +40,15 @@ class LoginActivity : BaseActivity() {
 //    private var firestore: FirebaseFirestore? = null
 //    private var firebaseToken: String  = ""
 //    private var functions: FirebaseFunctions? = null
+    private var RC_SIGN_IN = 0
     private var CHANNEL_ID = "himichat_messages"
     private var keydb = KeysDBHelper(this)
+    private var googleSignInClient: GoogleSignInClient? = null
+
+    var profile_id : String? = null
+    private var nickname: String? = null
+    private var realname: String? = null
+    private var avatar: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +64,7 @@ class LoginActivity : BaseActivity() {
         loginModeButton.setOnClickListener { setLoginMode() }
         registerButton.setOnClickListener { registerButtonOnClick() }
         signInButton.setOnClickListener { signInButtonOnClick() }
+        signWithGoogleButton.setOnClickListener { signWithGoogleButtonOnClick() }
     }
 
     private fun registerButtonOnClick() {
@@ -172,6 +188,16 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    private fun signWithGoogleButtonOnClick() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        val signInIntent = googleSignInClient!!.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
     private fun createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -228,36 +254,16 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun setRegisterMode() {
-        signInButton.visibility = View.GONE
-        registerModeButton.visibility = View.GONE
-
-        registerButton.visibility = View.VISIBLE
-        loginModeButton.visibility = View.VISIBLE
-        passwordRepeatEdit.visibility = View.VISIBLE
-        passwordRepeatLabel.visibility = View.VISIBLE
-        nicknameEdit.visibility = View.VISIBLE
-        nicknameLabel.visibility = View.VISIBLE
-        nicknameInfoButton.visibility = View.VISIBLE
-        realNameEdit.visibility = View.VISIBLE
-        realNameLabel.visibility = View.VISIBLE
+        loginLayout.visibility = View.GONE
+        registerLayout.visibility = View.VISIBLE
 
         passwordRepeatEdit.text.clear()
         nicknameEdit.text.clear()
     }
 
     private fun setLoginMode() {
-        signInButton.visibility = View.VISIBLE
-        registerModeButton.visibility = View.VISIBLE
-
-        registerButton.visibility = View.GONE
-        loginModeButton.visibility = View.GONE
-        passwordRepeatEdit.visibility = View.GONE
-        passwordRepeatLabel.visibility = View.GONE
-        nicknameEdit.visibility = View.GONE
-        nicknameLabel.visibility = View.GONE
-        nicknameInfoButton.visibility = View.GONE
-        realNameEdit.visibility = View.GONE
-        realNameLabel.visibility = View.GONE
+        loginLayout.visibility = View.VISIBLE
+        registerLayout.visibility = View.GONE
 
         passwordRepeatEdit.text.clear()
         nicknameEdit.text.clear()
@@ -348,5 +354,72 @@ class LoginActivity : BaseActivity() {
 //                    }
                 firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("token" to  newToken))
             }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String, account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        mAuth!!.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d("googleAuth", "signInWithCredential:success")
+                    val user = mAuth!!.currentUser
+                    val currentUID = user!!.uid
+                    pushTokenToServer()
+                    var kp = keydb.getKeyPair(currentUID)
+                    if (kp == null) {
+                        generateKeys()
+                        Log.i("auth:signIn", "New key's generated")
+                        kp = keydb.getKeyPair(currentUID)
+                    }
+                    pushKeysToServer(kp!!.publicKey)
+
+                    profile_id = mAuth!!.uid
+                    firestore!!.collection("users").document(profile_id!!).get().addOnCompleteListener{
+                        if (it.isSuccessful) {
+                            val userData = it.result!!
+                            nickname = userData.get("nickname") as String?
+                            if (nickname == null) {
+                                nickname = account.givenName
+                                firestore!!.collection("users").document(profile_id!!).update("nickname", nickname)
+                            }
+                            realname = userData.get("real_name") as String?
+                            if (realname == null) {
+                                realname = account.displayName
+                                firestore!!.collection("users").document(profile_id!!).update("real_name", realname)
+                            }
+                            avatar = userData.get("avatar") as String?
+                            if (avatar == null) {
+                                avatar = account.photoUrl!!.path
+                                firestore!!.collection("users").document(profile_id!!).update("avatar", avatar)
+                            }
+                            val user = User(profile_id!!, nickname!!, realname!!, avatar!!)
+                        } else {
+                            Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                        }
+                    }
+                    successful()
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w("googleAuth", "signInWithCredential:failure", task.exception)
+//                    Snackbar.make(view, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, R.string.toast_auth_error, Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                Log.d("googleAuth", "firebaseAuthWithGoogle:" + account.id)
+                firebaseAuthWithGoogle(account.idToken!!, account)
+            } catch (e: ApiException) {
+                Log.w("googleAuth", "Google sign in failed", e)
+            }
+        }
     }
 }

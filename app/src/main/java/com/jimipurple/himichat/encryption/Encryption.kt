@@ -1,8 +1,10 @@
 package com.jimipurple.himichat.encryption
 
+import android.net.Uri
 import android.util.Log
 import org.whispersystems.curve25519.Curve25519
 import org.whispersystems.curve25519.Curve25519KeyPair
+import java.io.File
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -27,6 +29,22 @@ object Encryption {
     fun verifySignature(message: ByteArray, publicKey: ByteArray, signature: ByteArray): Boolean {
         val cipher = Curve25519.getInstance(Curve25519.BEST)
         return cipher.verifySignature(publicKey, message, signature)
+    }
+
+    @Throws(Exception::class)
+    fun encryptFile(raw: ByteArray, path: Uri): ByteArray {
+        val file = File(path.path)
+        val clear: ByteArray = file.readBytes()
+        //val clear = Base64.decode(text, Base64.DEFAULT);
+        val skeySpec = SecretKeySpec(raw, "AES")
+        val cipher: Cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val iv = "SECUREVECTOR".toByteArray(Charsets.UTF_8)
+        //SecureRandom().nextBytes(iv)
+        //val spec = GCMParameterSpec(128, iv)
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec, IvParameterSpec(iv))
+        Log.i("generateKeysIV", String(cipher.iv, Charsets.UTF_8))
+        //cipher.iv
+        return cipher.doFinal(clear)
     }
 
     @Throws(Exception::class)

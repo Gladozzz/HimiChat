@@ -4,9 +4,11 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Log
 import androidx.navigation.findNavController
@@ -18,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
+import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
@@ -29,8 +32,10 @@ import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.models.User
 import com.google.gson.Gson
+import com.jimipurple.himichat.ui.dialog.DialogFragment
 import com.jimipurple.himichat.utills.FirestoreRequest
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
+import com.squareup.picasso.Picasso
 import com.squareup.picasso.LruCache as PicLruCache
 
 class NavigationActivity : BaseActivity() {
@@ -56,13 +61,12 @@ class NavigationActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_navigation)
         val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
         setSupportActionBar(toolbar)
 
         storage = FirebaseStorage.getInstance()
-        mMyApp!!.currentActivity = this
-        mMyApp!!.tbar = toolbar
 
         startService(Intent(this, SocketService::class.java))
 
@@ -109,6 +113,80 @@ class NavigationActivity : BaseActivity() {
         navView.setupWithNavController(navController)
         navView.getHeaderView(0)
         updateAvatar()
+
+        val bar = supportActionBar
+        if (savedInstanceState != null) {
+            val title = savedInstanceState.getCharSequence("title")
+            val subtitle = savedInstanceState.getCharSequence("subtitle")
+            Log.i("savedTitle", "onCreate title $title")
+            bar!!.title = title
+            bar.subtitle = subtitle
+        }
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            when(destination.id) {
+                R.id.nav_dialogues -> {
+                    bar!!.setTitle(R.string.menu_dialogues)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_dialog -> {
+                    val title = arguments!!["nickname"] as String
+                    val avatar = arguments["avatar"] as String
+                    bar!!.title = title
+                    bar.subtitle = resources.getString(R.string.offline)
+                    val url = Uri.parse(avatar)
+                    if (url != null) {
+                        val bitmap = com.squareup.picasso.LruCache(applicationContext)[avatar]
+                        if (bitmap != null) {
+                            bar.setLogo(BitmapDrawable(bitmap))
+                        } else {
+                            Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+                                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                    com.squareup.picasso.LruCache(applicationContext!!).set(avatar, bitmap!!)
+                                    bar.setLogo(BitmapDrawable(bitmap))
+                                }
+
+                                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                                    Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                                }
+                            })
+                        }
+                    } else {
+                        Log.i("Profile", "avatar wasn't received")
+                    }
+                }
+                R.id.nav_find_friend -> {
+                    bar!!.setTitle(R.string.menu_find_friend)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_friend_requests -> {
+                    bar!!.setTitle(R.string.menu_find_friend)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_profile -> {
+                    bar!!.setTitle(R.string.menu_profile)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_friends -> {
+                    bar!!.setTitle(R.string.menu_friends)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_settings -> {
+                    bar!!.setTitle(R.string.menu_settings)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+            }
+        }
+        mMyApp!!.currentActivity = this
+        mMyApp!!.tbar = toolbar
+        mMyApp!!.bar = bar
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -229,8 +307,6 @@ class NavigationActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
 
-//        FirestoreRequest(this).getUser(mAuth!!.uid!!)
-
         fun hashMapToUser(h : ArrayList<java.util.HashMap<String, Any>>) : ArrayList<User> {
             val u : ArrayList<User> = ArrayList<User>()
             h.forEach {
@@ -275,6 +351,15 @@ class NavigationActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        val bar = supportActionBar!!
+        Log.i("savedTitle", "osis savedTitle " + bar.title + " savedSubtitle " + bar.subtitle)
+        outState!!.putCharSequence("title", bar.title)
+        outState!!.putCharSequence("subtitle", bar.subtitle)
+//        outState?.putSerializable("logo", toolbar!!.logo)
     }
 
     override fun onRequestPermissionsResult(
