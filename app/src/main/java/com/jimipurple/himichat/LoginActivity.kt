@@ -28,7 +28,7 @@ import com.jimipurple.himichat.models.User
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.login_mode_layout.*
 import kotlinx.android.synthetic.main.login_mode_layout.emailEdit
-import kotlinx.android.synthetic.main.login_mode_layout.passwordEdit
+import kotlinx.android.synthetic.main.login_mode_layout.passwordSignEdit
 import kotlinx.android.synthetic.main.register_mode_layout.*
 import kotlinx.android.synthetic.main.register_mode_layout.nicknameEdit
 import java.util.regex.Pattern
@@ -68,9 +68,9 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun registerButtonOnClick() {
-        if (isEmailValid(emailEdit.text.toString()) && isNicknameValid(nicknameEdit.text.toString()) && passwordEdit.text.toString() == passwordRepeatEdit.text.toString() && passwordEdit.text.isNotEmpty()) {
-            val email = emailEdit.text.toString()
-            val password = passwordEdit.text.toString()
+        if (isEmailValid(emailRegisterEdit.text.toString()) && isNicknameValid(nicknameEdit.text.toString()) && passwordRegisterEdit.text.toString() == passwordRepeatEdit.text.toString() && passwordRegisterEdit.text.isNotEmpty()) {
+            val email = emailRegisterEdit.text.toString()
+            val password = passwordRegisterEdit.text.toString()
             mAuth!!.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -143,13 +143,15 @@ class LoginActivity : BaseActivity() {
 
                     // ...
                 }
+        } else {
+            Log.i("register:failure", "wrong data email ${emailRegisterEdit.text.toString()}")
         }
     }
 
     private fun signInButtonOnClick() {
-        if (isEmailValid(emailEdit.text.toString()) && passwordEdit.text.isNotEmpty()) {
+        if (isEmailValid(emailEdit.text.toString()) && passwordSignEdit.text.isNotEmpty()) {
             val email = emailEdit.text.toString()
-            val password = passwordEdit.text.toString()
+            val password = passwordSignEdit.text.toString()
             mAuth!!.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -186,16 +188,6 @@ class LoginActivity : BaseActivity() {
                     }
                 }
         }
-    }
-
-    private fun signWithGoogleButtonOnClick() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.web_client_id))
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-        val signInIntent = googleSignInClient!!.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
     private fun createNotificationChannel() {
@@ -356,6 +348,16 @@ class LoginActivity : BaseActivity() {
             }
     }
 
+    private fun signWithGoogleButtonOnClick() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        val signInIntent = googleSignInClient!!.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
     private fun firebaseAuthWithGoogle(idToken: String, account: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         mAuth!!.signInWithCredential(credential)
@@ -365,39 +367,56 @@ class LoginActivity : BaseActivity() {
                     Log.d("googleAuth", "signInWithCredential:success")
                     val user = mAuth!!.currentUser
                     val currentUID = user!!.uid
-                    pushTokenToServer()
-                    var kp = keydb.getKeyPair(currentUID)
-                    if (kp == null) {
-                        generateKeys()
-                        Log.i("auth:signIn", "New key's generated")
-                        kp = keydb.getKeyPair(currentUID)
-                    }
-                    pushKeysToServer(kp!!.publicKey)
-
                     profile_id = mAuth!!.uid
-                    firestore!!.collection("users").document(profile_id!!).get().addOnCompleteListener{
-                        if (it.isSuccessful) {
-                            val userData = it.result!!
-                            nickname = userData.get("nickname") as String?
-                            if (nickname == null) {
-                                nickname = account.givenName
-                                firestore!!.collection("users").document(profile_id!!).update("nickname", nickname)
+
+                    val docRef = firestore!!.collection("users").document("SF")
+                    firestore!!.collection("users").document(profile_id!!).get()
+                        .addOnSuccessListener { document ->
+                            if (document != null) {
+                                val userData = document
+                                nickname = userData.get("nickname") as String?
+                                realname = userData.get("real_name") as String?
+                                avatar = userData.get("avatar") as String?
+                                if (nickname == null) {
+                                    nickname = account.givenName
+                                    firestore!!.collection("users").document(profile_id!!).update("nickname", nickname)
+                                }
+                                if (realname == null) {
+                                    realname = account.displayName
+                                    firestore!!.collection("users").document(profile_id!!).update("real_name", realname)
+                                }
+                                if (avatar == null) {
+                                    avatar = account.photoUrl!!.path
+                                    firestore!!.collection("users").document(profile_id!!).update("avatar", avatar)
+                                }
+                                val user = User(profile_id!!, nickname!!, realname!!, avatar!!)
+                            } else {
+                                val userData = mapOf(
+                                    "id" to currentUID,
+                                    "nickname" to account.givenName,
+                                    "avatar" to account.photoUrl!!.path,
+                                    "real_name" to account.displayName,
+                                    "email" to account.email
+                                )
+                                firestore!!.collection("users").document(mAuth!!.uid!!)
+                                    .set(userData, SetOptions.merge())
+                                    .addOnSuccessListener {
+                                        Log.i("LoginActivity", "user data successfully written")
+                                        pushTokenToServer()
+                                        var kp = keydb.getKeyPair(currentUID)
+                                        if (kp == null) {
+                                            generateKeys()
+                                            kp = keydb.getKeyPair(currentUID)
+                                        }
+                                        pushKeysToServer(kp!!.publicKey)
+                                        successful()
+                                    }
+                                    .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
                             }
-                            realname = userData.get("real_name") as String?
-                            if (realname == null) {
-                                realname = account.displayName
-                                firestore!!.collection("users").document(profile_id!!).update("real_name", realname)
-                            }
-                            avatar = userData.get("avatar") as String?
-                            if (avatar == null) {
-                                avatar = account.photoUrl!!.path
-                                firestore!!.collection("users").document(profile_id!!).update("avatar", avatar)
-                            }
-                            val user = User(profile_id!!, nickname!!, realname!!, avatar!!)
-                        } else {
-                            Log.i("FirestoreRequest", "Error getting documents.", it.exception)
                         }
-                    }
+                        .addOnFailureListener { exception ->
+                            Log.d("FirestoreRequest", "get failed with ", exception)
+                        }
                     successful()
                 } else {
                     // If sign in fails, display a message to the user.
