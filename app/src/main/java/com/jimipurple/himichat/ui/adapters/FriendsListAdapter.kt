@@ -64,11 +64,7 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val p
                                     LruCache(context.applicationContext).set(url.toString(), resource)
                                 }
                                 override fun onLoadCleared(placeholder: Drawable?) {
-                                    // this is called when imageView is cleared on lifecycle call or for
-                                    // some other reason.
-                                    // if you are referencing the bitmap somewhere else too other than this imageView
-                                    // clear it here as you can no longer have the bitmap
-//                                    avatar.setImageBitmap(ResourcesCompat.getDrawable(context.resources, R.drawable.defaultavatar, null)!!.toBitmap())
+                                    //
                                 }
 
                                 override fun onLoadFailed(errorDrawable: Drawable?) {

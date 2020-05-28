@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -17,6 +18,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.Blob
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.functions.FirebaseFunctions
@@ -27,10 +29,7 @@ import com.jimipurple.himichat.encryption.Encryption
 import com.jimipurple.himichat.models.User
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.login_mode_layout.*
-import kotlinx.android.synthetic.main.login_mode_layout.emailEdit
-import kotlinx.android.synthetic.main.login_mode_layout.passwordSignEdit
 import kotlinx.android.synthetic.main.register_mode_layout.*
-import kotlinx.android.synthetic.main.register_mode_layout.nicknameEdit
 import java.util.regex.Pattern
 
 
@@ -371,56 +370,92 @@ class LoginActivity : BaseActivity() {
 
                     val docRef = firestore!!.collection("users").document("SF")
                     firestore!!.collection("users").document(profile_id!!).get()
-                        .addOnSuccessListener { document ->
-                            if (document != null) {
-                                val userData = document
-                                nickname = userData.get("nickname") as String?
-                                realname = userData.get("real_name") as String?
-                                avatar = userData.get("avatar") as String?
-                                if (nickname == null) {
-                                    nickname = account.givenName
-                                    firestore!!.collection("users").document(profile_id!!).update("nickname", nickname)
-                                }
-                                if (realname == null) {
-                                    realname = account.displayName
-                                    firestore!!.collection("users").document(profile_id!!).update("real_name", realname)
-                                }
-                                if (avatar == null) {
-                                    avatar = account.photoUrl!!.path
-                                    firestore!!.collection("users").document(profile_id!!).update("avatar", avatar)
-                                }
-                                val user = User(profile_id!!, nickname!!, realname!!, avatar!!)
-                            } else {
-                                val userData = mapOf(
-                                    "id" to currentUID,
-                                    "nickname" to account.givenName,
-                                    "avatar" to account.photoUrl!!.path,
-                                    "real_name" to account.displayName,
-                                    "email" to account.email
-                                )
-                                firestore!!.collection("users").document(mAuth!!.uid!!)
-                                    .set(userData, SetOptions.merge())
-                                    .addOnSuccessListener {
-                                        Log.i("LoginActivity", "user data successfully written")
-                                        pushTokenToServer()
-                                        var kp = keydb.getKeyPair(currentUID)
-                                        if (kp == null) {
-                                            generateKeys()
-                                            kp = keydb.getKeyPair(currentUID)
-                                        }
-                                        pushKeysToServer(kp!!.publicKey)
-                                        successful()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val document: DocumentSnapshot? = task.result
+                                if (document != null) {
+                                    if (document.exists()) {
+                                        Log.d("googleAuth", "Document exists!")
+                                        val userData = document
+//                                        nickname = userData.get("nickname") as String?
+//                                        realname = userData.get("real_name") as String?
+//                                        avatar = userData.get("avatar") as String?
+//                                        if (nickname == null) {
+//                                            nickname = account.givenName
+//                                            firestore!!.collection("users").document(profile_id!!).update("nickname", nickname)
+//                                        }
+//                                        if (realname == null) {
+//                                            realname = account.displayName
+//                                            firestore!!.collection("users").document(profile_id!!).update("real_name", realname)
+//                                        }
+//                                        if (avatar == null) {
+//                                            avatar = account.photoUrl!!.path
+//                                            firestore!!.collection("users").document(profile_id!!).update("avatar", avatar)
+//                                        }
+//                                        val user = User(profile_id!!, nickname!!, realname!!, avatar!!)
+                                    } else {
+                                        Log.d("googleAuth:create", "Document does not exist!")
+                                        val userData = mapOf(
+                                            "id" to currentUID,
+                                            "nickname" to account.email!!.substringBefore("@"),
+                                            "avatar" to account.photoUrl!!.toString().replace("s96-c", "s192-c", true),
+                                            "real_name" to account.displayName,
+                                            "email" to account.email
+                                        )
+                                        firestore!!.collection("users").document(mAuth!!.uid!!)
+                                            .set(userData, SetOptions.merge())
+                                            .addOnSuccessListener {
+                                                Log.i("googleAuth:create", "user data successfully written")
+                                                pushTokenToServer()
+                                                var kp = keydb.getKeyPair(currentUID)
+                                                if (kp == null) {
+                                                    generateKeys()
+                                                    kp = keydb.getKeyPair(currentUID)
+                                                }
+                                                pushKeysToServer(kp!!.publicKey)
+                                                successful()
+                                            }
+                                            .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
                                     }
-                                    .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
+                                } else {
+                                    Log.d("googleAuth:create", "Document does not exist!")
+                                    val userData = mapOf(
+                                        "id" to currentUID,
+                                        "nickname" to account.email!!.substringBefore("@"),
+                                        "avatar" to account.photoUrl!!.toString().replace("s96-c", "s192-c", true),
+                                        "real_name" to account.displayName,
+                                        "email" to account.email
+                                    )
+                                    firestore!!.collection("users").document(mAuth!!.uid!!)
+                                        .set(userData, SetOptions.merge())
+                                        .addOnSuccessListener {
+                                            Log.i("googleAuth:create", "user data successfully written")
+                                            pushTokenToServer()
+                                            var kp = keydb.getKeyPair(currentUID)
+                                            if (kp == null) {
+                                                generateKeys()
+                                                kp = keydb.getKeyPair(currentUID)
+                                            }
+                                            pushKeysToServer(kp!!.publicKey)
+                                            successful()
+                                        }
+                                        .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
+                                }
+                            } else {
+                                Log.d(
+                                    "googleAuth",
+                                    "Failed with: ",
+                                    task.exception
+                                )
                             }
                         }
                         .addOnFailureListener { exception ->
-                            Log.d("FirestoreRequest", "get failed with ", exception)
+                            Log.d("googleAuth:create", "get failed with ", exception)
                         }
                     successful()
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w("googleAuth", "signInWithCredential:failure", task.exception)
+                    Log.w("googleAuth:create", "signInWithCredential:failure", task.exception)
 //                    Snackbar.make(view, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
                     Toast.makeText(applicationContext, R.string.toast_auth_error, Toast.LENGTH_LONG).show()
                 }
