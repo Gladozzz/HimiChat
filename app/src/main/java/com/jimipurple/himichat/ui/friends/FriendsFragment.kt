@@ -164,7 +164,7 @@ class FriendsFragment : BaseFragment() {
                 if (friendsIDs != null) {
                     emptyFriendsListMessage.visibility = View.GONE
                     FriendsList.visibility = View.VISIBLE
-                    for (i in (friendsIDs.size-1)..0) {
+                    for (i in 0 until friendsIDs.size) {
                         firestore!!.collection("users").document(friendsIDs[i]).get().addOnCompleteListener{ doc ->
                             if (doc.isSuccessful) {
                                 val friendData = doc.result!!
@@ -185,11 +185,12 @@ class FriendsFragment : BaseFragment() {
                             } else {
                                 Log.e("FirestoreRequest", "Error getting documents.", doc.exception)
                             }
-                            if (i == 0) {
+                            if (i == friendsIDs.size -1) {
                                 if (friends.isNotEmpty()) {
                                     val adapter = FriendsListAdapter(c!!, friends, profile, sendMsg)
                                     FriendsList.adapter = adapter
                                     //friendRequests.layoutManager = LinearLayoutManager(this)
+                                    Log.e("FirestoreRequest", "friends loaded.")
                                 } else {
                                     Log.e("FirestoreRequest", "No one of friends were loaded.")
                                 }
@@ -198,17 +199,6 @@ class FriendsFragment : BaseFragment() {
                             }
                         }
                     }
-//                    if (friends.isNotEmpty()) {
-//                        val adapter = FriendsListAdapter(c!!, friends, object : FriendsListAdapter.Callback {
-//                            override fun onItemClicked(item: User) {
-//                                profile(item)
-//                            }
-//                        }, sendMsg)
-//                        FriendsList.adapter = adapter
-//                        //friendRequests.layoutManager = LinearLayoutManager(this)
-//                    } else {
-//                        Log.e("FirestoreRequest", "No one of friends were loaded.")
-//                    }
                 } else {
                     Log.e("FirestoreRequest", "There is no friends!")
                     emptyFriendsListMessage.visibility = View.VISIBLE
@@ -218,93 +208,7 @@ class FriendsFragment : BaseFragment() {
                 Log.e("FirestoreRequest", "Error getting documents.", it.exception)
             }
         }
-//        val docRef = firestore.collection("users").document(mAuth!!.uid!!)
-//        docRef.get()
-//            .addOnSuccessListener { document ->
-//                if (document != null) {
-//                    Log.i("FriendsActivity", "DocumentSnapshot data: ${document.data}")
-//                    document["friends"]
-//                } else {
-//                    Log.i("FriendsActivity", "No such document")
-//                }
-//            }
-//            .addOnFailureListener { exception ->
-//                Log.i("FriendsActivity", "get failed with ", exception)
-//            }
     }
-
-//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-//        super.onViewStateRestored(savedInstanceState)
-//
-//        val data = mapOf("id" to mAuth!!.uid!!)
-//        val profile = {u: User -> Unit
-////            val data1 = mapOf("inviterId" to mAuth!!.uid, "id" to u.id)
-////            functions!!
-////                .getHttpsCallable("getUser")
-////                .call(data1).continueWith { task ->
-////                    val result = task.result?.data as HashMap<String, Any>
-////                    if (result["found"] == true) {
-////                        Toast.makeText(c, "${u.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
-////                    } else {
-////                        Toast.makeText(c, "${u.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
-////                    }
-////                }
-//        }
-//        val sendMsg = {u: User -> Unit
-//            val b = Bundle()
-//            b.putString("friend_id", u.id)
-//            b.putString("nickname", u.nickname)
-//            b.putString("avatar", u.avatar)
-//            val navController = findNavController()
-//            navController.navigate(R.id.nav_dialog, b)
-//        }
-//
-//        val arr = LruCache<String, Any>(cacheSize).get("friends") as ArrayList<User>?
-//        if (arr != null) {
-//            val adapter = FriendsListAdapter(c!!.applicationContext, arr, object : FriendsListAdapter.Callback {
-//                override fun onItemClicked(item: User) {
-//                    profile(item)
-//                }
-//            }, sendMsg)
-//            FriendsList.adapter = adapter
-//            FriendsList.layoutManager = LinearLayoutManager(c!!)
-//            Log.i("friendsTest", "friends was took from LruCache")
-//        } else {
-//            Log.i("friendsTest", "LruCache is empty")
-//        }
-//
-//        functions!!
-//            .getHttpsCallable("getFriends")
-//            .call(data).continueWith { task ->
-//                val result = task.result?.data as HashMap<String, Any>
-//                if (result["found"] as Boolean) {
-//                    val friends = result["friends"] as ArrayList<String>
-//                    val data1 = mapOf("ids" to friends)
-//                    functions!!
-//                        .getHttpsCallable("getUsers")
-//                        .call(data1).continueWith { task ->
-//                            val result1 = task.result?.data as HashMap<String, Any>
-//                            Log.i("received_inv", "result1 $result1")
-//                            if (result1["found"] == true) {
-//                                val users = result1["users"] as ArrayList<HashMap<String, Any>>
-//                                val unfound = result1["unfound"] as ArrayList<String>
-//                                Log.i("FriendList", "users $users")
-//                                Log.i("FriendList", "unfound $unfound")
-//                                val arr1 = hashMapToUser(users)
-//                                LruCache<String, ArrayList<User>>(cacheSize).put("friends", arr1)
-//                                val adapter = FriendsListAdapter(c!!.applicationContext, arr1, object : FriendsListAdapter.Callback {
-//                                    override fun onItemClicked(item: User) {
-//                                        profile(item)
-//                                    }
-//                                }, sendMsg)
-//                                FriendsList.adapter = adapter
-//                                FriendsList.layoutManager = LinearLayoutManager(c!!)
-//                                Log.i("friendsTest", "friends was took from server")
-//                            }
-//                        }
-//                }
-//            }
-//    }
 
     private fun findFriendButtonOnClick() {
         val navController = findNavController()

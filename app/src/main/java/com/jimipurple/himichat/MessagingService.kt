@@ -5,13 +5,19 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
@@ -21,6 +27,9 @@ import com.jimipurple.himichat.encryption.Encryption
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
+import com.jimipurple.himichat.models.User
+import com.squareup.picasso.LruCache
+import kotlinx.android.synthetic.main.fragment_profile.*
 import java.util.*
 
 
@@ -30,6 +39,7 @@ class MessagingService : FirebaseMessagingService() {
     private var functions: FirebaseFunctions? = null
     private var firestore: FirebaseFirestore? = null
     private var CHANNEL_ID = "himichat_messages"
+    private var CHANNEL_ID_INVITES = "himichat_invites"
 
     val INTENT_FILTER = "INTENT_FILTER"
     var random: Random? = null
@@ -53,10 +63,49 @@ class MessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty()) {
             Log.i("msgService", "Message data payload: " + remoteMessage.data)
 
-            //TODO Сделать обработку сообщений
-
             if (/* Check if data needs to be processed by long running job */ true) {
                 // For long-running tasks (10 seconds or more) use Firebase Job Dispastcher.
+                if (remoteMessage.data["type"] == "invite"){
+                    val sender_id = remoteMessage.data["sender_id"]!!.toString()
+
+                    firestore!!.collection("users").document(sender_id).get().addOnCompleteListener{
+                        if (it.isSuccessful) {
+                            val userData = it.result!!
+                            val nickname = userData["nickname"]!! as String
+                            val avatar = userData["avatar"]!! as String
+                            val b = Bundle()
+                            b.putString("friend_id", sender_id)
+                            b.putString("nickname", nickname)
+                            b.putString("avatar", avatar)
+                            val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                                .setComponentName(NavigationActivity::class.java)
+                                .setGraph(R.navigation.mobile_navigation)
+                                .setDestination(R.id.nav_friend_requests)
+                                .setArguments(b)
+                                .createPendingIntent()
+                            val text = resources.getString(R.string.notification_invite_desc) + " " + nickname
+                            val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID_INVITES)
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
+                                .setContentTitle(resources.getText(R.string.notification_invite))
+                                .setContentText(text)
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                // Set the intent that will fire when the user taps the notification
+                                .setContentIntent(pendingIntent)
+                                .setAutoCancel(true)
+                            //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                            with(NotificationManagerCompat.from(applicationContext)) {
+                                // notificationId is a unique int for each notification that you must define
+                                val m = random!!.nextInt(9999 - 1000) + 1000
+                                notify(m, builder.build())
+                            }
+                        } else {
+                            Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                        }
+                    }
+                }
                 if (remoteMessage.data["type"] == "message"){
                     val text = remoteMessage.data["text"]!!.toString()
                     //val avatar = remoteMessage.data["avatar"]!!.toString()
@@ -108,7 +157,10 @@ class MessagingService : FirebaseMessagingService() {
                                         .setArguments(b)
                                         .createPendingIntent()
                                     val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                        .setSmallIcon(R.drawable.send_message)
+                                        .setSmallIcon(R.mipmap.ic_launcher)
+                                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                        .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
                                         .setContentTitle(nickname)
                                         .setContentText(text)
                                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -192,7 +244,8 @@ class MessagingService : FirebaseMessagingService() {
                                         .createPendingIntent()
 
                                     val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                        .setSmallIcon(R.drawable.send_message)
+                                        .setSmallIcon(R.mipmap.ic_launcher)
+                                        .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
                                         .setContentTitle(nickname)
                                         .setContentText(text)
                                         .setPriority(NotificationCompat.PRIORITY_HIGH)

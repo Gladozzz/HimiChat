@@ -17,6 +17,7 @@
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
     <color name="gray">#333333</color>
+    <color name="red">#FF0000</color>
     <color name="dark_gray">#282a2b</color>
     <color name="dark_grey_two">#191a1b</color>
     <color name="warm_grey">#7f7f7f</color>

@@ -78,7 +78,7 @@ class DialogFragment : BaseFragment() {
         val socket = SocketService.socket
         socket.on("online_list") { args ->
             val online = args[0] as String
-            Log.i("SocketServiceOnline", "online_list $online")
+//            Log.i("SocketServiceOnline", "online_list $online")
             if (online != "") {
                 c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("online", online).apply()
                 var userOnline = false
@@ -132,8 +132,11 @@ class DialogFragment : BaseFragment() {
 ////        tbar!!.setTitle(R.string.menu_dialogues)
 ////        val act = app!!.currentActivity!!
 //        app!!.setToolbar(null, null)
+        val socket = SocketService.socket
+        socket.off("online_list")
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
+        SocketService.setCallbackOnMessageReceived {  }
         try {
             requireActivity().unregisterReceiver(FCMReceiver)
         } catch (e: Exception) {

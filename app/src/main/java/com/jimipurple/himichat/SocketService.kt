@@ -8,6 +8,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavDeepLinkBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -42,11 +43,11 @@ class SocketService : IntentService("SocketService") {
     override fun onStartCommand(intent: Intent?, start_flags: Int, startId: Int): Int {
         mAuth = FirebaseAuth.getInstance()
         random = Random()
-
+        socket.close()
         try {
 //            socket = IO.socket(serverURL)
-            socket.connect()
             onAllEvents()
+            socket.connect()
             Log.i("SocketServiceTEST", "SocketService START " + socket.connected())
         } catch (e: Exception) {
             Log.e("SocketService", "Error $e")
@@ -190,10 +191,12 @@ class SocketService : IntentService("SocketService") {
                                 .createPendingIntent()
 
                             val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                .setSmallIcon(R.drawable.ic_msg_24dp)
                                 .setContentTitle(nickname)
                                 .setContentText(text)
-                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setSmallIcon(R.mipmap.ic_launcher_round)
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher_round).toBitmap())
                                 // Set the intent that will fire when the user taps the notification
                                 .setContentIntent(pendingIntent)
                                 .setAutoCancel(true)
@@ -235,26 +238,11 @@ class SocketService : IntentService("SocketService") {
                 Log.i("SocketService", "undelivered message wasn't found")
             }
         }
-//        val uid = mAuth!!.uid
-//        mAuth!!.currentUser!!.getIdToken(true)
-//            .addOnCompleteListener { task ->
-//                if (task.isSuccessful) {
-//                    val idToken = task.result!!.token
-//                    //TODO sign token with id
-////                    val raw = uid!!.toByteArray(Charsets.UTF_8)
-////                    Log.i("socketRequest", raw.size.toString())
-////                    val sighned_token = Encryption.encrypt(uid.slice(IntRange(raw.size - 16, raw.size - 1)).toByteArray(), idToken!!)
-//                    socket.emit("auth", uid, idToken)
-//                    authorized = true
-//                } else { // Handle error -> task.getException();
-//                    //TODO handle error
-//                }
-//            }
+    }
 
-
-//        socket.on(Socket.EVENT_CONNECT_ERROR) {
-//            Log.i("SocketService", "Socket error")
-//        }
+    override fun onDestroy() {
+        super.onDestroy()
+//        socket.close()
     }
 
     override fun onHandleIntent(intent: Intent?) {

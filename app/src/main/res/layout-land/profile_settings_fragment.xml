@@ -33,25 +33,32 @@
 
             <EditText
                     android:id="@+id/realnameEdit"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:layout_weight="90"
                     android:gravity="start"
                     android:inputType="textPersonName"
                     android:text="Realname" />
 
-            <Button
+            <ImageView
                     android:id="@+id/renameRealnameButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="10"
-                    android:background="@color/colorPrimary"
-                    android:ems="5"
-                    android:saveEnabled="false"
-                    android:text="@string/loadRenameButton" />
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/roundcorner"
+                    tools:srcCompat="@drawable/ic_accept" />
+
+            <ImageView
+                    android:id="@+id/cancelRealnameButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/roundcorner"
+                    android:visibility="gone"
+                    tools:srcCompat="@drawable/ic_cancel" />
         </LinearLayout>
 
         <LinearLayout
@@ -64,22 +71,31 @@
 
             <EditText
                     android:id="@+id/nicknameEdit"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:layout_weight="90"
                     android:inputType="textPersonName"
                     android:text="Nickname" />
 
-            <Button
+            <ImageView
                     android:id="@+id/renameNicknameButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="10"
-                    android:background="@color/colorPrimary"
-                    android:text="@string/loadRenameButton" />
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/roundcorner"
+                    tools:srcCompat="@drawable/ic_accept" />
+
+            <ImageView
+                    android:id="@+id/cancelNicknameButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/roundcorner"
+                    android:visibility="gone"
+                    tools:srcCompat="@drawable/ic_cancel" />
 
         </LinearLayout>
 

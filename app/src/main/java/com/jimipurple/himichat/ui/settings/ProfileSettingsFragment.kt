@@ -5,26 +5,23 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.BaseFragment
+import com.jimipurple.himichat.NavigationActivity
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.MessagesDBHelper
-import com.jimipurple.himichat.models.User
 import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.regex.Pattern
@@ -52,8 +49,67 @@ class ProfileSettingsFragment : BaseFragment() {
 //        loadAvatarButton.setOnClickListener { loadAvatarCallback() }
         avatarView.setOnClickListener { app!!.loadAvatarCallback() }
         deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
+        nicknameEdit.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                nicknameEdit.setTextColor(resources.getColor(R.color.white))
+//                cancelNicknameButton.visibility = View.VISIBLE
+            }
+        })
+        realnameEdit.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                realnameEdit.setTextColor(resources.getColor(R.color.white))
+//                cancelRealnameButton.visibility = View.VISIBLE
+            }
+        })
+        renameNicknameButton.setOnClickListener { setNickname() }
+        renameRealnameButton.setOnClickListener { setRealname() }
+        cancelNicknameButton.setOnClickListener { updateNickname() }
+        cancelRealnameButton.setOnClickListener { updateRealname() }
+        logoutButton.setOnClickListener { app!!.logoutCallback() }
 
         updateAvatar()
+        updateNickname()
+        updateRealname()
+    }
+
+    private fun updateNickname() {
+        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+            if (it.isSuccessful) {
+                val userData = it.result!!
+                nickname = userData.get("nickname") as String?
+                if (nickname == null) {
+                    nickname = ""
+                }
+                nicknameEdit.setText(nickname)
+                nicknameEdit.setTextColor(resources.getColor(R.color.white))
+                cancelNicknameButton.visibility = View.GONE
+            } else {
+                Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+            }
+        }
+    }
+
+    private fun updateRealname() {
+        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+            if (it.isSuccessful) {
+                val userData = it.result!!
+                realname = userData.get("real_name") as String?
+                if (realname == null) {
+                    realname = ""
+                }
+                realnameEdit.setText(realname)
+                realnameEdit.setTextColor(resources.getColor(R.color.white))
+                cancelRealnameButton.visibility = View.GONE
+            } else {
+                Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+            }
+        }
     }
 
     override fun onCreateView(
@@ -64,69 +120,13 @@ class ProfileSettingsFragment : BaseFragment() {
         return inflater.inflate(R.layout.profile_settings_fragment, container, false)
     }
     fun updateAvatar() {
-//        val data = mapOf("id" to mAuth!!.uid!!)
-//        functions
-//            .getHttpsCallable("getUser")
-//            .call(data).continueWith { task ->
-//                val result = task.result?.data as HashMap<String, Any>
-//                Log.i("settings", result.toString())
-//                nicknameEdit.setText(result["nickname"] as String)
-//                realnameEdit.setText(result["realname"] as String)
-//                nickname = result["nickname"] as String
-//                realname = result["realname"] as String
-//                renameNicknameButton.setOnClickListener { loadUserData() }
-//                renameRealnameButton.setOnClickListener { loadUserData() }
-//                logoutButton.setOnClickListener { logoutCallback() }
-//                val url = Uri.parse(result["avatar"] as String)
-//                if (url != null) {
-//                    val bitmap = LruCache(context!!)[result["avatar"] as String]
-//                    if (bitmap != null) {
-//                        avatarView.setImageBitmap(bitmap)
-//                    } else {
-//                        Glide.with(this)
-//                            .asBitmap()
-//                            .load(url)
-//                            .into(object : CustomTarget<Bitmap>(){
-//                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-//                                    avatarView.setImageBitmap(resource)
-//                                    LruCache(context!!).set(url.toString(), resource)
-//                                    Log.i("Profile", "bitmap from $url is loaded and set to imageView")
-//                                }
-//                                override fun onLoadCleared(placeholder: Drawable?) {
-//                                    // this is called when imageView is cleared on lifecycle call or for
-//                                    // some other reason.
-//                                    // if you are referencing the bitmap somewhere else too other than this imageView
-//                                    // clear it here as you can no longer have the bitmap
-////                                    avatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
-//                                }
-//
-//                                override fun onLoadFailed(errorDrawable: Drawable?) {
-//                                    super.onLoadFailed(errorDrawable)
-//                                    Log.e("Profile", "Загрузка изображения не удалась $url")
-//                                }
-//                            })
-//                    }
-//                } else {
-//                    Log.i("Profile", "avatar wasn't received")
-//                }
-//            }
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
-                nickname = userData.get("nickname") as String?
-                if (nickname == null) {
-                    nickname = ""
-                }
-                realname = userData.get("real_name") as String?
-                if (realname == null) {
-                    realname = ""
-                }
                 avatar = userData.get("avatar") as String?
                 if (avatar == null) {
                     avatar = ""
                 }
-                val user = User(mAuth!!.uid!!, nickname!!, realname!!, avatar!!)
-
                 Glide.with(this)
                     .asBitmap()
                     .load(avatar)
@@ -149,50 +149,65 @@ class ProfileSettingsFragment : BaseFragment() {
                             Log.e("Profile", "Загрузка изображения не удалась $avatar")
                         }
                     })
-                nicknameEdit.setText(nickname)
-                realnameEdit.setText(realname)
-                renameNicknameButton.setOnClickListener { loadUserData() }
-                renameRealnameButton.setOnClickListener { loadUserData() }
-                logoutButton.setOnClickListener { app!!.logoutCallback() }
             } else {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
         }
     }
 
-//    fun newInstance(page: Int): ProfileSettingsFragment {
-//        val args = Bundle()
-//        args.putInt(ARG_PAGE, page)
-//        val fragment = ProfileSettingsFragment()
-//        fragment.arguments = args
-//        return fragment
-//    }
+    private fun setNickname() {
+        if (isNicknameValid(nicknameEdit.text.toString())){
+            nickname = nicknameEdit.text.toString()
+            firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("nickname" to  nickname)).addOnSuccessListener { (app!!.currentActivity as NavigationActivity).updateAvatar() }
+            cancelNicknameButton.visibility = View.GONE
+        } else {
+            nicknameEdit.setTextColor(resources.getColor(R.color.red))
+//            firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+//                if (it.isSuccessful) {
+//                    val userData = it.result!!
+//                    nickname = userData.get("nickname") as String?
+//                    if (nickname == null) {
+//                        nickname = ""
+//                    }
+//                    nicknameEdit.setText(nickname)
+//                } else {
+//                    Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+//                }
+//            }
+        }
+    }
+
+    private fun setRealname() {
+        if (realnameEdit.text.isNotEmpty()){
+            realname = realnameEdit.text.toString()
+            firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("nickname" to  realname))
+            cancelRealnameButton.visibility = View.GONE
+        } else {
+            realnameEdit.setTextColor(resources.getColor(R.color.red))
+//            firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+//                if (it.isSuccessful) {
+//                    val userData = it.result!!
+//                    realname = userData.get("nickname") as String?
+//                    if (realname == null) {
+//                        realname = ""
+//                    }
+//                    realnameEdit.setText(realname)
+//                } else {
+//                    Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+//                }
+//            }
+        }
+    }
 
     fun deleteAllMessages() {
         MessagesDBHelper(c!!).deleteAllMessages()
     }
 
     fun isNicknameValid(nickname: String): Boolean {
-        val expression  = "^[a-z0-9_-]{4,15}\$"
+        val expression  = "^[^0-9][^@#\$%^%&*_()]+\$"
         val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
         val matcher = pattern.matcher(nickname)
         return matcher.matches()
-    }
-
-    private fun loadUserData() {
-        if (isNicknameValid(nicknameEdit.text.toString()) && realnameEdit.text.toString() != ""){
-            nickname = nicknameEdit.text.toString()
-            realname = realnameEdit.text.toString()
-            val data = mapOf("id" to mAuth!!.uid!!, "nickname" to nickname, "realname" to realname)
-            functions!!
-                .getHttpsCallable("getUser")
-                .call(data).continueWith { task ->
-                    //
-                }
-        } else {
-            nicknameEdit.setText(nickname)
-            realnameEdit.setText(realname)
-        }
     }
 
     override fun onRequestPermissionsResult(

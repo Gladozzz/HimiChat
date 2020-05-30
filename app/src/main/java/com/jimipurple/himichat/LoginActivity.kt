@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -26,7 +25,6 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.Encryption
-import com.jimipurple.himichat.models.User
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.login_mode_layout.*
 import kotlinx.android.synthetic.main.register_mode_layout.*
@@ -41,6 +39,7 @@ class LoginActivity : BaseActivity() {
 //    private var functions: FirebaseFunctions? = null
     private var RC_SIGN_IN = 0
     private var CHANNEL_ID = "himichat_messages"
+    private var CHANNEL_ID_INVITES = "himichat_invites"
     private var keydb = KeysDBHelper(this)
     private var googleSignInClient: GoogleSignInClient? = null
 
@@ -193,16 +192,21 @@ class LoginActivity : BaseActivity() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.channel_name)
+            val name = getString(R.string.channel_name_messages)
+            val nameInvites = getString(R.string.channel_name_invites)
             val descriptionText = getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val channelInvites = NotificationChannel(CHANNEL_ID_INVITES, nameInvites, importance).apply {
                 description = descriptionText
             }
             // Register the channel with the system
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channelInvites)
         }
     }
 
@@ -287,6 +291,8 @@ class LoginActivity : BaseActivity() {
 //        val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
 //        startActivity(newIntent)
 //        finish()
+
+        startService(Intent(this, SocketService::class.java))
         val newIntent = Intent(applicationContext, NavigationActivity::class.java)
         startActivity(newIntent)
         finish()
@@ -375,24 +381,8 @@ class LoginActivity : BaseActivity() {
                                 val document: DocumentSnapshot? = task.result
                                 if (document != null) {
                                     if (document.exists()) {
-                                        Log.d("googleAuth", "Document exists!")
-                                        val userData = document
-//                                        nickname = userData.get("nickname") as String?
-//                                        realname = userData.get("real_name") as String?
-//                                        avatar = userData.get("avatar") as String?
-//                                        if (nickname == null) {
-//                                            nickname = account.givenName
-//                                            firestore!!.collection("users").document(profile_id!!).update("nickname", nickname)
-//                                        }
-//                                        if (realname == null) {
-//                                            realname = account.displayName
-//                                            firestore!!.collection("users").document(profile_id!!).update("real_name", realname)
-//                                        }
-//                                        if (avatar == null) {
-//                                            avatar = account.photoUrl!!.path
-//                                            firestore!!.collection("users").document(profile_id!!).update("avatar", avatar)
-//                                        }
-//                                        val user = User(profile_id!!, nickname!!, realname!!, avatar!!)
+                                        Log.d("googleAuth", "Document exists! Auth")
+                                        successful()
                                     } else {
                                         Log.d("googleAuth:create", "Document does not exist!")
                                         val userData = mapOf(
@@ -452,7 +442,6 @@ class LoginActivity : BaseActivity() {
                         .addOnFailureListener { exception ->
                             Log.d("googleAuth:create", "get failed with ", exception)
                         }
-                    successful()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("googleAuth:create", "signInWithCredential:failure", task.exception)

@@ -68,7 +68,7 @@ class NavigationActivity : BaseActivity() {
 
         storage = FirebaseStorage.getInstance()
 
-        startService(Intent(this, SocketService::class.java))
+//        startService(Intent(this, SocketService::class.java))
 
 //        val data = mapOf("id" to mAuth!!.uid!!)
 //        functions!!
@@ -91,8 +91,6 @@ class NavigationActivity : BaseActivity() {
 //                        }
 //                }
 //            }
-
-
 
 //        val fab: FloatingActionButton = findViewById(R.id.fab)
 //        fab.setOnClickListener { view ->

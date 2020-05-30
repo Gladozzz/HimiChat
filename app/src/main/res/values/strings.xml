@@ -68,8 +68,12 @@
     <string name="toast_load_avatar_warning">loading avatar can take some time</string>
     <string name="toast_future_feature">Future feature</string>
 
-    <string name="channel_name">HimiChat messages</string>
+    <string name="channel_name_messages">HimiChat messages</string>
+    <string name="channel_name_invites">HimiChat invites</string>
     <string name="channel_description">Channel of receiving himichat messages</string>
+
+    <string name="notification_invite">new invite</string>
+    <string name="notification_invite_desc">You were invited to be friends by </string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
