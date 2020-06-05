@@ -32,8 +32,6 @@ import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.models.User
 import com.google.gson.Gson
-import com.jimipurple.himichat.ui.dialog.DialogFragment
-import com.jimipurple.himichat.utills.FirestoreRequest
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.LruCache as PicLruCache
@@ -65,32 +63,7 @@ class NavigationActivity : BaseActivity() {
         setContentView(R.layout.activity_navigation)
         val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
         setSupportActionBar(toolbar)
-
         storage = FirebaseStorage.getInstance()
-
-//        startService(Intent(this, SocketService::class.java))
-
-//        val data = mapOf("id" to mAuth!!.uid!!)
-//        functions!!
-//            .getHttpsCallable("getFriends")
-//            .call(data).continueWith { task ->
-//                val result = task.result?.data as java.util.HashMap<String, Any>
-//                if (result["found"] as Boolean) {
-//                    val friends = result["friends"] as ArrayList<String>
-//                    val data1 = mapOf("ids" to friends)
-//                    functions!!
-//                        .getHttpsCallable("getUsers")
-//                        .call(data1).continueWith { task ->
-//                            val result1 = task.result?.data as java.util.HashMap<String, Any>
-//                            if (result1["found"] == true) {
-//                                val users = result1["users"] as ArrayList<java.util.HashMap<String, Any>>
-//                                val unfound = result1["unfound"] as ArrayList<String>
-//                                val arr = hashMapToUser(users)
-//                                LruCache<String, ArrayList<User>>(cacheSize).put("friends", arr)
-//                            }
-//                        }
-//                }
-//            }
 
 //        val fab: FloatingActionButton = findViewById(R.id.fab)
 //        fab.setOnClickListener { view ->

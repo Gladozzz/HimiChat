@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.firestore.FieldPath
 import com.google.gson.Gson
 import com.jimipurple.himichat.BaseFragment
 import com.jimipurple.himichat.R
@@ -164,39 +165,41 @@ class FriendsFragment : BaseFragment() {
                 if (friendsIDs != null) {
                     emptyFriendsListMessage.visibility = View.GONE
                     FriendsList.visibility = View.VISIBLE
-                    for (i in 0 until friendsIDs.size) {
-                        firestore!!.collection("users").document(friendsIDs[i]).get().addOnCompleteListener{ doc ->
-                            if (doc.isSuccessful) {
-                                val friendData = doc.result!!
-                                var nickname = friendData.get("nickname") as String?
+                    firestore!!.collection("users").whereIn(FieldPath.documentId(), friendsIDs).get().addOnCompleteListener {usersDocs ->
+                        if (usersDocs.isSuccessful) {
+                            val result = usersDocs.result!!
+                            val docs = result.documents
+                            for (userDoc in docs) {
+                                val friendData = userDoc.data!!
+                                var nickname = friendData["nickname"] as String?
                                 if (nickname == null) {
                                     nickname = ""
                                 }
-                                var realname = friendData.get("real_name") as String?
+                                var realname = friendData["real_name"] as String?
                                 if (realname == null) {
                                     realname = ""
                                 }
-                                var avatar = friendData.get("avatar") as String?
+                                var avatar = friendData["avatar"] as String?
                                 if (avatar == null) {
                                     avatar = ""
                                 }
-                                val user = User(friendsIDs[i], nickname, realname, avatar)
+                                val user = User(userDoc.id, nickname, realname, avatar)
                                 friends.add(user)
+                                Log.i("FirestoreRequest", "friends add.")
+                            }
+                            if (friends.isNotEmpty()) {
+                                val adapter = FriendsListAdapter(c!!, friends, profile, sendMsg)
+                                FriendsList.adapter = adapter
+                                //friendRequests.layoutManager = LinearLayoutManager(this)
+                                Log.i("FirestoreRequest", "friends $friends")
+                                Log.i("FirestoreRequest", "friends loaded.")
                             } else {
-                                Log.e("FirestoreRequest", "Error getting documents.", doc.exception)
+                                Log.e("FirestoreRequest", "No one of friends were loaded.")
                             }
-                            if (i == friendsIDs.size -1) {
-                                if (friends.isNotEmpty()) {
-                                    val adapter = FriendsListAdapter(c!!, friends, profile, sendMsg)
-                                    FriendsList.adapter = adapter
-                                    //friendRequests.layoutManager = LinearLayoutManager(this)
-                                    Log.e("FirestoreRequest", "friends loaded.")
-                                } else {
-                                    Log.e("FirestoreRequest", "No one of friends were loaded.")
-                                }
-                                val strings = usersToStrings(friends)
-                                pref.putListString("friends", strings)
-                            }
+                            val strings = usersToStrings(friends)
+                            pref.putListString("friends", strings)
+                        } else {
+                            Log.e("FirestoreRequest", "Error getting documents.", usersDocs.exception)
                         }
                     }
                 } else {

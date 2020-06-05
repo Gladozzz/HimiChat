@@ -40,10 +40,6 @@ import kotlinx.android.synthetic.main.fragment_dialog.*
 //passion is a key bro (⌐■_■)
 class DialogFragment : BaseFragment() {
 
-    //    private var mAuth: FirebaseAuth? = null
-//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//    private var firebaseToken: String  = ""
-//    private var functions = FirebaseFunctions.getInstance()
     private var db : MessagesDBHelper? = null
     private var id: String? = null
     private var friend_id: String? = null
@@ -53,7 +49,6 @@ class DialogFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        c.setContentView(R.layout.fragment_dialog)
         mAuth = FirebaseAuth.getInstance()
         id = mAuth!!.uid!!
         db = MessagesDBHelper(c!!)
@@ -126,12 +121,6 @@ class DialogFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-////        tbar!!.title = null
-//        tbar!!.subtitle = null
-////        tbar!!.setLogo(null)
-////        tbar!!.setTitle(R.string.menu_dialogues)
-////        val act = app!!.currentActivity!!
-//        app!!.setToolbar(null, null)
         val socket = SocketService.socket
         socket.off("online_list")
         MessagingService.isDialog = false
@@ -222,32 +211,6 @@ class DialogFragment : BaseFragment() {
 
                 Log.i("msgTest", data["token"])
             }
-//            val data1 = hashMapOf("id" to receiverId)
-//            functions
-//                .getHttpsCallable("getPublicKey")
-//                .call(data1).addOnCompleteListener { task ->
-//                    if (!task.isSuccessful) {
-//                        val e = task.exception
-//                        if (e is FirebaseFunctionsException) {
-//                            val code = e.code
-//                            val details = e.details
-//                            Log.i("dialogMessage", "error get PublicKey $details \n$code")
-//                        }
-//                    } else {
-//                        val result = task.result?.data as HashMap<String, Any>
-//                        val kp = KeysDBHelper(applicationContext).getKeyPair(mAuth!!.uid!!)
-//                        if (result["found"] as Boolean && kp != null) {
-//                            val pk = (result["public_key"] as String).toByteArray(Charsets.ISO_8859_1)
-//                            sendEncryptedMessage(receiverId, senderId, text, msg, kp, pk)
-//                            Log.i("dialogMessage", "sendEncryptedMessage data $data")
-////                            reloadMsgs()
-//                        } else {
-//                            sendMessage(receiverId, senderId, text, msg)
-//                            Log.i("dialogMessage", "sendMessage data $data")
-////                            reloadMsgs()
-//                        }
-//                    }
-//                }
             firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(requireActivity(), OnCompleteListener<DocumentSnapshot>() {
                 if (it.isSuccessful) {
 //                    db!!.pushMessage(msg)
@@ -382,7 +345,7 @@ class DialogFragment : BaseFragment() {
 
     val FCMReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-//            reloadMsgs()-
+//            reloadMsgs()
         }
     }
 }

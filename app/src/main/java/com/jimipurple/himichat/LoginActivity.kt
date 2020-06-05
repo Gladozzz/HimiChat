@@ -33,10 +33,6 @@ import java.util.regex.Pattern
 
 class LoginActivity : BaseActivity() {
 
-//    private var mAuth: FirebaseAuth? = null
-//    private var firestore: FirebaseFirestore? = null
-//    private var firebaseToken: String  = ""
-//    private var functions: FirebaseFunctions? = null
     private var RC_SIGN_IN = 0
     private var CHANNEL_ID = "himichat_messages"
     private var CHANNEL_ID_INVITES = "himichat_invites"
@@ -81,31 +77,6 @@ class LoginActivity : BaseActivity() {
                         val rn = realNameEdit.text.toString()
                         val currentUID: String = mAuth!!.currentUser!!.uid
                         Log.i("auth:data", "current email: $currentUID, nickname: $nickname")
-//                        val user = HashMap<String, Any>()
-//                        user["id"] = currentUID
-//                        user["nickname"] = nickname
-//                        user["avatar"] = ""
-//                        user["real_name"] = rn
-//                        user["email"] = email
-//                        user["public_key"] = email
-//                        //firestore.collection("users").document(currentUID).set(user
-//                        var res = functions!!
-//                            .getHttpsCallable("setUser")
-//                            .call(user).addOnCompleteListener { task ->
-//                                try {
-//                                    Log.i("setUser", "result " + task.result?.data.toString())
-//                                } catch (e: Exception) {
-//                                    Log.i("setUser", "error " + e.message)
-//                                }
-//                            }
-//                        pushTokenToServer()
-//                        var kp = keydb.getKeyPair(currentUID)
-//                        if (kp == null) {
-//                            generateKeys()
-//                            kp = keydb.getKeyPair(currentUID)
-//                        }
-//                        pushKeysToServer(kp!!.publicKey)
-//                        successful()
                         val userData = mapOf(
                             "id" to currentUID,
                             "nickname" to nickname,
@@ -272,7 +243,7 @@ class LoginActivity : BaseActivity() {
     }
 
     fun isNicknameValid(nickname: String): Boolean {
-        val expression  = "^[a-z0-9_-]{4,15}\$"
+        val expression  = "^[^0-9][^@#\$%^%&*_()]{3,15}+\$"
         val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
         val matcher = pattern.matcher(nickname)
         return matcher.matches()
@@ -280,18 +251,7 @@ class LoginActivity : BaseActivity() {
 
     //moment when authentication, token check and keys check are successful
     private fun successful() {
-//        val kp = Encryption.generateKeyPair()
-//        val test1 = Base64.encodeToString(kp.publicKey, Base64.DEFAULT)
-//        val test2 = Base64.decode(test1, Base64.DEFAULT)
-//        var test3 = test2.size
-//        Log.i("keys_TEST", "pub ${kp.publicKey.contentToString()}")
-//        Log.i("keys_TEST", "test1 $test1")
-//        Log.i("keys_TEST", "test2 ${test2.contentToString()}")
-//        Log.i("keys_TEST", "test3 $test3")
-//        val newIntent = Intent(applicationContext, DialoguesActivity::class.java)
-//        startActivity(newIntent)
-//        finish()
-
+        pushTokenToServer()
         startService(Intent(this, SocketService::class.java))
         val newIntent = Intent(applicationContext, NavigationActivity::class.java)
         startActivity(newIntent)
@@ -334,21 +294,7 @@ class LoginActivity : BaseActivity() {
             ) { instanceIdResult: InstanceIdResult ->
                 val newToken = instanceIdResult.token
                 Log.i("auth:start", newToken)
-                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
-                    .edit().putString("firebaseToken", newToken).apply()
-//                val data = hashMapOf(
-//                    "userId" to uid,
-//                    "token" to newToken
-//                )
-//                var res = functions!!
-//                    .getHttpsCallable("setToken")
-//                    .call(data).addOnCompleteListener { task ->
-//                        try {
-//                            Log.i("setToken", "setToken result " + task.result?.data.toString())
-//                        } catch (e: Exception) {
-//                            Log.i("setToken", "setToken error " + e.message)
-//                        }
-//                    }
+                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("firebaseToken", newToken).apply()
                 firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("token" to  newToken))
             }
     }

@@ -22,6 +22,7 @@ import com.jimipurple.himichat.BaseFragment
 import com.jimipurple.himichat.NavigationActivity
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.MessagesDBHelper
+import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import java.util.regex.Pattern
@@ -73,6 +74,7 @@ class ProfileSettingsFragment : BaseFragment() {
         cancelRealnameButton.setOnClickListener { updateRealname() }
         logoutButton.setOnClickListener { app!!.logoutCallback() }
 
+        uptadeBySaved()
         updateAvatar()
         updateNickname()
         updateRealname()
@@ -86,6 +88,7 @@ class ProfileSettingsFragment : BaseFragment() {
                 if (nickname == null) {
                     nickname = ""
                 }
+                SharedPreferencesUtility(c!!).putString("nickname", nickname!!)
                 nicknameEdit.setText(nickname)
                 nicknameEdit.setTextColor(resources.getColor(R.color.white))
                 cancelNicknameButton.visibility = View.GONE
@@ -103,6 +106,7 @@ class ProfileSettingsFragment : BaseFragment() {
                 if (realname == null) {
                     realname = ""
                 }
+                SharedPreferencesUtility(c!!).putString("realname", realname!!)
                 realnameEdit.setText(realname)
                 realnameEdit.setTextColor(resources.getColor(R.color.white))
                 cancelRealnameButton.visibility = View.GONE
@@ -119,6 +123,25 @@ class ProfileSettingsFragment : BaseFragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.profile_settings_fragment, container, false)
     }
+    fun uptadeBySaved() {
+        val pref = SharedPreferencesUtility(c!!)
+        val savedNickname = pref.getString("nickname")
+        val savedRealname = pref.getString("realname")
+        var savedAvatar = pref.getString("avatar")
+        nicknameEdit.setText(savedNickname)
+        realnameEdit.setText(savedRealname)
+        if (savedAvatar != null) {
+            val bitmap = LruCache(c!!)[savedAvatar]
+            if (bitmap != null) {
+                avatarView.setImageBitmap(bitmap)
+                Log.i("ProfileSettings", "avatar was loaded from cache")
+            } else {
+                Log.e("ProfileSettings", "Avatar is not in cache. Preload can be done")
+            }
+        } else {
+            Log.e("ProfileSettings", "avatar was not in SharedPrefences")
+        }
+    }
     fun updateAvatar() {
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
@@ -134,6 +157,7 @@ class ProfileSettingsFragment : BaseFragment() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                             avatarView.setImageBitmap(resource)
                             LruCache(context!!).set(avatar!!, resource)
+                            SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
                             Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
                         }
                         override fun onLoadCleared(placeholder: Drawable?) {
@@ -141,7 +165,6 @@ class ProfileSettingsFragment : BaseFragment() {
                             // some other reason.
                             // if you are referencing the bitmap somewhere else too other than this imageView
                             // clear it here as you can no longer have the bitmap
-//                                    avatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
                         }
 
                         override fun onLoadFailed(errorDrawable: Drawable?) {
@@ -204,7 +227,7 @@ class ProfileSettingsFragment : BaseFragment() {
     }
 
     fun isNicknameValid(nickname: String): Boolean {
-        val expression  = "^[^0-9][^@#\$%^%&*_()]+\$"
+        val expression  = "^[^0-9][^@#\$%^%&*_()]{3,15}+\$"
         val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
         val matcher = pattern.matcher(nickname)
         return matcher.matches()

@@ -27,10 +27,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-//private const val serverURL = "http://192.168.1.171:3000/"
-//private const val serverURL = "http://www.himichat.space:3000/"
-//private const val serverURL = "https://www.himichat.space:443/"
-//private const val serverURL = "https://82.146.60.200:443/"
 private const val serverURL = "http://82.146.60.200:80/"
 
 class SocketService : IntentService("SocketService") {
@@ -108,16 +104,6 @@ class SocketService : IntentService("SocketService") {
             }
             authorized = false
         }
-//        socket.on("online_list") { args ->
-//            val data = args[0] as String
-//            Log.i("SocketService", "online_list $data")
-//            val online = SharedPreferencesUtility(applicationContext).getListString("online")
-//            if (online != null) {
-////                online.remove(data)
-//                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().remove("online").apply()
-////                SharedPreferencesUtility(applicationContext).putListString("online", online)
-//            }
-//        }
         socket.on("receiving_encrypted_message") { args ->
             Log.i("SocketService", "receiving_encrypted_message " + args[0])
             val db = MessagesDBHelper(applicationContext)

@@ -118,6 +118,18 @@
                 android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/button_send_message" />
+
+        <Button
+                android:id="@+id/profileInviteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="4"
+                android:background="@drawable/roundcorner"
+                android:paddingLeft="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/button_Invite"
+                android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>

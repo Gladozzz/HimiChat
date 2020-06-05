@@ -64,8 +64,6 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         db.execSQL(SQL_CREATE_TABLE_UNDELIVERED_MESSAGES)
         FirebaseApp.initializeApp(c)
         mAuth = FirebaseAuth.getInstance()
-        Log.i("huitenka", "1123123123123123123123123")
-        Log.i("huitenka", "123 " + mAuth!!.uid!!)
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // This database is only a cache for online data, so its upgrade policy is
