@@ -72,6 +72,7 @@ class FriendRequestsFragment : BaseFragment() {
                 val result = task.result?.data as HashMap<String, Any>
                 if (result["accept"] == true) {
                     Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
+                    requireActivity().recreate()
                 } else {
                     Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
                 }
@@ -85,6 +86,7 @@ class FriendRequestsFragment : BaseFragment() {
                 val result = task.result?.data as HashMap<String, Any>
                 if (result["accept"] == true) {
                     Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_complete), Toast.LENGTH_SHORT).show()
+                    requireActivity().recreate()
                 } else {
                     Toast.makeText(c!!, "${fr.nickname} " + resources.getString(R.string.toast_accept_invite_error), Toast.LENGTH_SHORT).show()
                 }

@@ -7,16 +7,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.firebase.firestore.FieldValue
 import com.jimipurple.himichat.BaseFragment
+import com.jimipurple.himichat.NavigationActivity
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.User
 import com.squareup.picasso.LruCache
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.fragment_find_friend.*
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.fragment_profile.nicknameEdit
 import kotlinx.android.synthetic.main.fragment_profile.profileEditButton
@@ -40,13 +41,11 @@ class ProfileFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        mAuth = FirebaseAuth.getInstance()
+        profile_id = requireArguments()["profile_id"] as String
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        profile_id = requireArguments()["profile_id"] as String
         if (profile_id == mAuth!!.uid!!) {
             setOwnProfileMode()
         } else {
@@ -66,16 +65,33 @@ class ProfileFragment : BaseFragment() {
             navController.navigate(R.id.nav_settings, b)
         }
         profileRemoveFriendButton.setOnClickListener {
-//            val data = mapOf("ids" to ids)
+            val data = mapOf("id" to mAuth!!.uid!!, "friendId" to profile_id!!)
 //            functions!!
-//                .getHttpsCallable("getUsers")
+//                .getHttpsCallable("removeFriend")
 //                .call(data).continueWith { task ->
 //                    val result = task.result?.data as HashMap<String, Any>
-//                    Log.i("dialogsAct", result.toString())
-//                    if (result["found"] == true) {
-//
+//                    Log.i("removeFriend", "result $result")
+//                    if (task.exception != null) {
+//                        Log.e("removeFriend", "exception " + task.exception.toString())
 //                    }
+//                }.addOnSuccessListener {
+//                    Toast.makeText(c!!, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
+//                    requireActivity().recreate()
+//                }.addOnFailureListener {
+//                    Log.e("removeFriend", "error " + it.message + " " + it.cause)
+//                    Toast.makeText(c!!, R.string.toast_remove_friend_error, Toast.LENGTH_LONG).show()
 //                }
+            val uid = mAuth!!.uid!!
+            //removing all existing invites of between those users
+            firestore!!.collection("users").document(uid).update(mapOf("invited_by" to  FieldValue.arrayRemove(profile_id!!)))
+            firestore!!.collection("users").document(profile_id!!).update(mapOf("invites" to  FieldValue.arrayRemove(uid)))
+            firestore!!.collection("users").document(uid).update(mapOf("invites" to  FieldValue.arrayRemove(profile_id!!)))
+            firestore!!.collection("users").document(profile_id!!).update(mapOf("invited_by" to  FieldValue.arrayRemove(uid)))
+            //removing from friends list's
+            firestore!!.collection("users").document(profile_id!!).update(mapOf("friends" to  FieldValue.arrayRemove(uid)))
+            firestore!!.collection("users").document(uid).update(mapOf("friends" to  FieldValue.arrayRemove(profile_id!!)))
+            Toast.makeText(c!!, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
+            requireActivity().recreate()
         }
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
@@ -142,26 +158,50 @@ class ProfileFragment : BaseFragment() {
     }
 
     private fun setOwnProfileMode() {
-        profileRemoveFriendButton.visibility = View.GONE
-        profileSendMessageButton.visibility = View.GONE
-        profileInviteButton.visibility = View.GONE
+        if (profileRemoveFriendButton != null) {
+            profileRemoveFriendButton.visibility = View.GONE
+        }
+        if (profileSendMessageButton != null) {
+            profileSendMessageButton.visibility = View.GONE
+        }
+        if (profileInviteButton != null) {
+            profileInviteButton.visibility = View.GONE
+        }
 
-        profileEditButton.visibility = View.VISIBLE
+        if (profileEditButton != null) {
+            profileEditButton.visibility = View.VISIBLE
+        }
     }
 
     private fun setAnotherProfileMode() {
-        profileSendMessageButton.visibility = View.GONE
-        profileRemoveFriendButton.visibility = View.GONE
-        profileEditButton.visibility = View.GONE
+        if (profileSendMessageButton != null) {
+            profileSendMessageButton.visibility = View.GONE
+        }
+        if (profileRemoveFriendButton != null) {
+            profileRemoveFriendButton.visibility = View.GONE
+        }
+        if (profileEditButton != null) {
+            profileEditButton.visibility = View.GONE
+        }
 
-        profileInviteButton.visibility = View.VISIBLE
+        if (profileInviteButton != null) {
+            profileInviteButton.visibility = View.VISIBLE
+        }
     }
 
     private fun setFriendProfileMode() {
-        profileSendMessageButton.visibility = View.VISIBLE
-        profileRemoveFriendButton.visibility = View.VISIBLE
+        if (profileSendMessageButton != null) {
+            profileSendMessageButton.visibility = View.VISIBLE
+        }
+        if (profileRemoveFriendButton != null) {
+            profileRemoveFriendButton.visibility = View.VISIBLE
+        }
 
-        profileEditButton.visibility = View.GONE
-        profileInviteButton.visibility = View.GONE
+        if (profileEditButton != null) {
+            profileEditButton.visibility = View.GONE
+        }
+        if (profileInviteButton != null) {
+            profileInviteButton.visibility = View.GONE
+        }
     }
 }

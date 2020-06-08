@@ -74,7 +74,7 @@ class ProfileSettingsFragment : BaseFragment() {
         cancelRealnameButton.setOnClickListener { updateRealname() }
         logoutButton.setOnClickListener { app!!.logoutCallback() }
 
-        uptadeBySaved()
+        updateBySaved()
         updateAvatar()
         updateNickname()
         updateRealname()
@@ -123,7 +123,7 @@ class ProfileSettingsFragment : BaseFragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.profile_settings_fragment, container, false)
     }
-    fun uptadeBySaved() {
+    private fun updateBySaved() {
         val pref = SharedPreferencesUtility(c!!)
         val savedNickname = pref.getString("nickname")
         val savedRealname = pref.getString("realname")
@@ -142,7 +142,7 @@ class ProfileSettingsFragment : BaseFragment() {
             Log.e("ProfileSettings", "avatar was not in SharedPrefences")
         }
     }
-    fun updateAvatar() {
+    private fun updateAvatar() {
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
@@ -150,13 +150,17 @@ class ProfileSettingsFragment : BaseFragment() {
                 if (avatar == null) {
                     avatar = ""
                 }
-                Glide.with(this)
+                val bitmap = LruCache(c!!.applicationContext)[avatar!!]
+                if (bitmap != null) {
+                    avatarView.setImageBitmap(bitmap)
+                }
+                Glide.with(c!!)
                     .asBitmap()
                     .load(avatar)
                     .into(object : CustomTarget<Bitmap>(){
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                             avatarView.setImageBitmap(resource)
-                            LruCache(context!!).set(avatar!!, resource)
+                            LruCache(c!!).set(avatar!!, resource)
                             SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
                             Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
                         }
@@ -222,11 +226,11 @@ class ProfileSettingsFragment : BaseFragment() {
         }
     }
 
-    fun deleteAllMessages() {
+    private fun deleteAllMessages() {
         MessagesDBHelper(c!!).deleteAllMessages()
     }
 
-    fun isNicknameValid(nickname: String): Boolean {
+    private fun isNicknameValid(nickname: String): Boolean {
         val expression  = "^[^0-9][^@#\$%^%&*_()]{3,15}+\$"
         val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
         val matcher = pattern.matcher(nickname)

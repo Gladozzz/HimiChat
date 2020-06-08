@@ -172,6 +172,7 @@ class SettingsFragment : BaseFragment() {
                                             ref!!.downloadUrl.addOnSuccessListener { uri ->
                                                 Log.i("avatar_load", "onSuccess: uri= $uri")
                                                 Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
+                                                requireActivity().recreate()
                                                 setAvatar(uri)
                                             }
                                         }

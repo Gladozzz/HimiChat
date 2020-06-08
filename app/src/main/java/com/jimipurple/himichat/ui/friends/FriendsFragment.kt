@@ -163,7 +163,9 @@ class FriendsFragment : BaseFragment() {
                 val friendsIDs = userData.get("friends") as? ArrayList<String>?
                 val friends = ArrayList<User>()
                 if (friendsIDs != null) {
-                    emptyFriendsListMessage.visibility = View.GONE
+                    if (emptyFriendsListMessage != null) {
+                        emptyFriendsListMessage.visibility = View.GONE
+                    }
                     FriendsList.visibility = View.VISIBLE
                     firestore!!.collection("users").whereIn(FieldPath.documentId(), friendsIDs).get().addOnCompleteListener {usersDocs ->
                         if (usersDocs.isSuccessful) {

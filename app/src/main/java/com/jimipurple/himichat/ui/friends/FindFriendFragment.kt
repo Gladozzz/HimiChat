@@ -214,6 +214,7 @@ class FindFriendFragment : BaseFragment() {
                         val result = task.result?.data as HashMap<String, Any>
                         if (result["invite"] == true) {
                             Toast.makeText(c!!, R.string.toast_invite_successful, Toast.LENGTH_LONG).show()
+                            requireActivity().recreate()
                         } else if (result["invite"] == false) {
                             if (result["reason"] == "already invited") {
                                 Toast.makeText(c!!, R.string.toast_invite_already, Toast.LENGTH_LONG).show()
