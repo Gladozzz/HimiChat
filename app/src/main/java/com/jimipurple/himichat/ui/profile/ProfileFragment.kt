@@ -64,6 +64,33 @@ class ProfileFragment : BaseFragment() {
             val navController = findNavController()
             navController.navigate(R.id.nav_settings, b)
         }
+        profileInviteButton.setOnClickListener {
+            val uid = mAuth!!.currentUser!!.uid
+            val data = mapOf("inviterId" to uid, "id" to profile_id)
+            Log.i("inviteUser", "id of inviting user $profile_id")
+            Log.i("inviteUser", "uid $uid")
+            //firestore.collection("users").document(foundId).set(data, SetOptions.merge())
+            functions!!
+                .getHttpsCallable("inviteUser")
+                .call(data)
+                .continueWith { task ->
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then result will throw an Exception which will be
+                    // propagated down.
+                    val result = task.result?.data as HashMap<String, Any>
+                    if (result["invite"] == true) {
+                        Toast.makeText(c!!, R.string.toast_invite_successful, Toast.LENGTH_LONG).show()
+                        requireActivity().recreate()
+                    } else if (result["invite"] == false) {
+                        Log.e("inviteUser", "reason ${result["reason"]}")
+                        if (result["reason"] == "already invited") {
+                            Toast.makeText(c!!, R.string.toast_invite_already, Toast.LENGTH_LONG).show()
+                        } else if (result["reason"] == "already invited you") {
+                            Toast.makeText(c!!, R.string.toast_invite_already_you, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+        }
         profileRemoveFriendButton.setOnClickListener {
             val data = mapOf("id" to mAuth!!.uid!!, "friendId" to profile_id!!)
 //            functions!!

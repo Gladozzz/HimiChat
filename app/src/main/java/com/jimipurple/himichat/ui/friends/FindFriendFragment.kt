@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.firebase.firestore.FieldValue
 import com.jimipurple.himichat.*
 import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.fragment_find_friend.*
@@ -156,6 +157,19 @@ class FindFriendFragment : BaseFragment() {
                                                                 val navController = findNavController()
                                                                 navController.navigate(R.id.nav_dialog, b)
                                                             }
+                                                            findfriendRemoveFriendButton.setOnClickListener {
+                                                                val uid = mAuth!!.uid!!
+                                                                //removing all existing invites of between those users
+                                                                firestore!!.collection("users").document(uid).update(mapOf("invited_by" to  FieldValue.arrayRemove(foundId)))
+                                                                firestore!!.collection("users").document(foundId).update(mapOf("invites" to  FieldValue.arrayRemove(uid)))
+                                                                firestore!!.collection("users").document(uid).update(mapOf("invites" to  FieldValue.arrayRemove(foundId)))
+                                                                firestore!!.collection("users").document(foundId).update(mapOf("invited_by" to  FieldValue.arrayRemove(uid)))
+                                                                //removing from friends list's
+                                                                firestore!!.collection("users").document(foundId).update(mapOf("friends" to  FieldValue.arrayRemove(uid)))
+                                                                firestore!!.collection("users").document(uid).update(mapOf("friends" to  FieldValue.arrayRemove(foundId)))
+                                                                Toast.makeText(c!!, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
+                                                                requireActivity().recreate()
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -212,10 +226,12 @@ class FindFriendFragment : BaseFragment() {
                         // has failed then result will throw an Exception which will be
                         // propagated down.
                         val result = task.result?.data as HashMap<String, Any>
+                        Log.i("inviteUser", "result $result")
                         if (result["invite"] == true) {
                             Toast.makeText(c!!, R.string.toast_invite_successful, Toast.LENGTH_LONG).show()
                             requireActivity().recreate()
                         } else if (result["invite"] == false) {
+                            Log.e("inviteUser", "reason ${result["reason"]}")
                             if (result["reason"] == "already invited") {
                                 Toast.makeText(c!!, R.string.toast_invite_already, Toast.LENGTH_LONG).show()
                             } else if (result["reason"] == "already invited you") {
