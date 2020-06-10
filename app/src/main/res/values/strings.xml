@@ -97,6 +97,7 @@
     <string name="menu_dialog">Dialog</string>
     <string name="menu_friends">Friends</string>
     <string name="menu_find_friend">Find friend</string>
+    <string name="menu_friend_requests">Friend requests</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_profile">Profile</string>
 </resources>

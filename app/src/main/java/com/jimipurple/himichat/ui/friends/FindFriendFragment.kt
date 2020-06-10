@@ -60,6 +60,7 @@ class FindFriendFragment : BaseFragment() {
     @UnstableDefault
     private fun findButtonOnClick() {
         if (nicknameEdit.text.isNotEmpty()) {
+            progressBar.visibility = View.VISIBLE
             var nickname = nicknameEdit.text.toString()
             if (isNicknameValid(nickname)) {
                 var data = hashMapOf(
@@ -178,6 +179,7 @@ class FindFriendFragment : BaseFragment() {
                                                     findfriendRemoveFriendButton.visibility = View.GONE
                                                     findfriendInviteButton.visibility = View.GONE
                                                 }
+                                                progressBar.visibility = View.GONE
                                                 makeVisibleFound()
                                                 foundNickname.setText(nickname)
                                                 findfriendRealNameEdit.setText(rn)
@@ -188,23 +190,28 @@ class FindFriendFragment : BaseFragment() {
                                                 Log.i("findUser:get", "friendsIDs $friendsIDs")
                                             } else {
                                                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                                                progressBar.visibility = View.GONE
                                             }
                                         }
                                     } else {
                                         Log.e("FirestoreRequest", "Error getting documents.", it.exception)
+                                        progressBar.visibility = View.GONE
                                     }
                                 }
                             } else {
                                 Log.i("findUser:find", "Пользователь с ником $nickname не найден")
+                                progressBar.visibility = View.GONE
 //                                Toast.makeText(c!!, R.string.toast_user_nickname_not_found, Toast.LENGTH_LONG).show()
                             }
                         } catch (e: Exception) {
                             Log.i("findUser:find", "error " + e.message)
+                            progressBar.visibility = View.GONE
                         }
                         //messageInput.setText("")
                     }
             } else {
 //                Toast.makeText(c!!, R.string.toast_nickname_not_valid, Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
         }
     }

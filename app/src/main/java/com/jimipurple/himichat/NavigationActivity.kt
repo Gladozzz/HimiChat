@@ -134,7 +134,7 @@ class NavigationActivity : BaseActivity() {
                     bar.setLogo(null)
                 }
                 R.id.nav_friend_requests -> {
-                    bar!!.setTitle(R.string.menu_find_friend)
+                    bar!!.setTitle(R.string.menu_friend_requests)
                     bar.subtitle = ""
                     bar.setLogo(null)
                 }

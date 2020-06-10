@@ -191,7 +191,9 @@ class FriendsFragment : BaseFragment() {
                             }
                             if (friends.isNotEmpty()) {
                                 val adapter = FriendsListAdapter(c!!, friends, profile, sendMsg)
-                                FriendsList.adapter = adapter
+                                if (FriendsList != null) {
+                                    FriendsList.adapter = adapter
+                                }
                                 //friendRequests.layoutManager = LinearLayoutManager(this)
                                 Log.i("FirestoreRequest", "friends $friends")
                                 Log.i("FirestoreRequest", "friends loaded.")
