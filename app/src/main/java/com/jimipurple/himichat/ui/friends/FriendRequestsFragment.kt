@@ -134,12 +134,12 @@ class FriendRequestsFragment : BaseFragment() {
     private fun receivedButtonOnClick() {
         val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
-        val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+        val adapterOfCached = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
             override fun onItemClicked(item: FriendRequest) {
                 profile(item)
             }
         }, cancel,  block, accept)
-        friendRequests.adapter = adapter
+        friendRequests.adapter = adapterOfCached
         reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
         sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
@@ -236,12 +236,12 @@ class FriendRequestsFragment : BaseFragment() {
     private fun sentButtonOnClick() {
         val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
-        val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
+        val adapterOfCached = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
             override fun onItemClicked(item: FriendRequest) {
                 profile(item)
             }
         }, cancel,  block, accept)
-        friendRequests.adapter = adapter
+        friendRequests.adapter = adapterOfCached
         reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
         sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{

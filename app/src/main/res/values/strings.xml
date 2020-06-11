@@ -23,6 +23,8 @@
     <string name="label_empty_friends_list">No friends</string>
     <string name="label_empty_users_list">No users for your request</string>
     <string name="label_empty_dialogues_list">No dialogues yet</string>
+    <string name="label_invalid_nickname">Invalid nickname</string>
+    <string name="label_no_user_with_this_nickname">No user with this nickname</string>
 
     <string name="button_sign_out">sign out</string>
     <string name="button_delete_all_messages">delete all messages</string>
