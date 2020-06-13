@@ -1,7 +1,6 @@
 package com.jimipurple.himichat
 
 import android.Manifest
-import android.app.FragmentManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,32 +11,29 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.Window
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.material.navigation.NavigationView
-import androidx.appcompat.widget.Toolbar
-import android.view.Menu
-import android.view.Window
-import android.view.animation.Animation
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.get
-import androidx.fragment.app.FragmentTransaction
-import androidx.navigation.NavOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.storage.FirebaseStorage
-import com.jimipurple.himichat.models.User
 import com.google.gson.Gson
+import com.jimipurple.himichat.models.User
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.LruCache as PicLruCache
@@ -105,6 +101,12 @@ class NavigationActivity : BaseActivity() {
             Log.i("savedTitle", "onCreate title $title")
             bar!!.title = title
             bar.subtitle = subtitle
+        }
+        navView.setNavigationItemSelectedListener { item ->
+            item.isChecked = true
+            navController.navigate(item.itemId, null, navOptions)
+            drawerLayout.closeDrawers()
+            true
         }
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             when(destination.id) {

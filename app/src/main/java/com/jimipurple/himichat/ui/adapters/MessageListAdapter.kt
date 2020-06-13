@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -139,7 +140,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
     inner class UnreceivedMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
         private val text = itemView.findViewById(R.id.unreceivedMessageText) as TextView
-        private val send = itemView.findViewById(R.id.sendUnreceivedMessageButton) as ImageButton
+        private val send = itemView.findViewById(R.id.sendUnreceivedMessageButton) as ProgressBar
 
         override fun bind(item: Message) {
             text.text = item.text
