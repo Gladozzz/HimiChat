@@ -57,12 +57,12 @@ class ProfileFragment : BaseFragment() {
             b.putString("nickname", nickname)
             b.putString("avatar", avatar)
             val navController = findNavController()
-            navController.navigate(R.id.nav_dialog, b)
+            navController.navigate(R.id.nav_dialog, b, navOptions)
         }
         profileEditButton.setOnClickListener {
             val b = Bundle()
             val navController = findNavController()
-            navController.navigate(R.id.nav_settings, b)
+            navController.navigate(R.id.nav_settings, b, navOptions)
         }
         profileInviteButton.setOnClickListener {
             val uid = mAuth!!.currentUser!!.uid

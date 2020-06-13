@@ -1,5 +1,6 @@
 package com.jimipurple.himichat
 
+import android.R
 import android.annotation.SuppressLint
 //import android.app.ProgressDialog
 import android.content.Context
@@ -11,6 +12,8 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.NavOptions
 import com.google.android.gms.common.util.VisibleForTesting
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -33,6 +36,11 @@ open class BaseFragment : Fragment() {
     var tbar: Toolbar? = null
     var title: CharSequence? = null
     var subtitle: CharSequence? = null
+    var navOptions = NavOptions.Builder()
+        .setLaunchSingleTop(true)  // Used to prevent multiple copies of the same destination
+        .setEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
+        .setPopEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
+        .build()
 
 //    protected var mMyApp: MyApp? = null
 

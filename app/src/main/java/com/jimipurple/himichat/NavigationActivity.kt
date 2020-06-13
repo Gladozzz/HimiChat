@@ -1,6 +1,7 @@
 package com.jimipurple.himichat
 
 import android.Manifest
+import android.app.FragmentManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -21,11 +22,16 @@ import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.Window
+import android.view.animation.Animation
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.get
+import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.NavOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -46,6 +52,11 @@ class NavigationActivity : BaseActivity() {
     private var nickname: String? = null
     private var realname: String? = null
     private var storage: FirebaseStorage? = null
+    var navOptions = NavOptions.Builder()
+        .setLaunchSingleTop(true)  // Used to prevent multiple copies of the same destination
+        .setEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
+        .setPopEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
+        .build()
 
     private fun hashMapToUser(h : ArrayList<java.util.HashMap<String, Any>>) : ArrayList<User> {
         val u : ArrayList<User> = ArrayList<User>()
@@ -64,6 +75,8 @@ class NavigationActivity : BaseActivity() {
         val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
         setSupportActionBar(toolbar)
         storage = FirebaseStorage.getInstance()
+        overridePendingTransition(com.jimipurple.himichat.R.animator.fragment_fade_in, com.jimipurple.himichat.R.animator.fragment_fade_in)
+
 
 //        val fab: FloatingActionButton = findViewById(R.id.fab)
 //        fab.setOnClickListener { view ->

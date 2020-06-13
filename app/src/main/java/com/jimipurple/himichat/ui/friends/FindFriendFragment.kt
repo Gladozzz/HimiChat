@@ -127,7 +127,7 @@ class FindFriendFragment : BaseFragment() {
                                                                         val b = Bundle()
                                                                         b.putString("profile_id", id)
                                                                         val navController = findNavController()
-                                                                        navController.navigate(R.id.nav_profile, b)
+                                                                        navController.navigate(R.id.nav_profile, b, navOptions)
                                                                     }
                                                                 }
                                                                 override fun onLoadCleared(placeholder: Drawable?) {
@@ -158,7 +158,7 @@ class FindFriendFragment : BaseFragment() {
                                                                 b.putString("nickname", nickname)
                                                                 b.putString("avatar", avatar)
                                                                 val navController = findNavController()
-                                                                navController.navigate(R.id.nav_dialog, b)
+                                                                navController.navigate(R.id.nav_dialog, b, navOptions)
                                                             }
                                                             findfriendRemoveFriendButton.setOnClickListener {
                                                                 val uid = mAuth!!.uid!!

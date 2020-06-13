@@ -9,9 +9,17 @@
             android:id="@+id/nav_dialogues"
             android:name="com.jimipurple.himichat.ui.dialogues.DialoguesFragment"
             android:label="@string/menu_dialogues"
-            tools:layout="@layout/fragment_dialogues" >
+            tools:layout="@layout/fragment_dialogues"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out" >
         <action
                 android:id="@+id/action_nav_dialogues_to_nav_dialog"
+                app:enterAnim="@animator/fragment_fade_in"
+                app:exitAnim="@animator/fragment_fade_out"
+                app:popEnterAnim="@animator/fragment_fade_in"
+                app:popExitAnim="@animator/fragment_fade_out"
                 app:destination="@id/nav_dialog" />
     </fragment>
 
@@ -19,7 +27,11 @@
             android:id="@+id/nav_dialog"
             android:name="com.jimipurple.himichat.ui.dialog.DialogFragment"
             android:label="@string/menu_dialog"
-            tools:layout="@layout/fragment_dialog">
+            tools:layout="@layout/fragment_dialog"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out">
 
             <argument
                     android:name="friend_id"
@@ -50,12 +62,24 @@
             tools:layout="@layout/fragment_friends" >
         <action
                 android:id="@+id/action_nav_friends_to_nav_dialog"
+                app:enterAnim="@animator/fragment_fade_in"
+                app:exitAnim="@animator/fragment_fade_out"
+                app:popEnterAnim="@animator/fragment_fade_in"
+                app:popExitAnim="@animator/fragment_fade_out"
                 app:destination="@id/nav_dialog" />
         <action
                 android:id="@+id/action_nav_friends_to_nav_find_friend"
+                app:enterAnim="@animator/fragment_fade_in"
+                app:exitAnim="@animator/fragment_fade_out"
+                app:popEnterAnim="@animator/fragment_fade_in"
+                app:popExitAnim="@animator/fragment_fade_out"
                 app:destination="@id/nav_find_friend" />
         <action
                 android:id="@+id/action_nav_friends_to_nav_friend_requests"
+                app:enterAnim="@animator/fragment_fade_in"
+                app:exitAnim="@animator/fragment_fade_out"
+                app:popEnterAnim="@animator/fragment_fade_in"
+                app:popExitAnim="@animator/fragment_fade_out"
                 app:destination="@id/nav_friend_requests" />
     </fragment>
 
@@ -64,18 +88,49 @@
             android:name="com.jimipurple.himichat.ui.friends.FindFriendFragment"
             android:label="@string/menu_find_friend"
             tools:layout="@layout/fragment_find_friend" >
+        <action
+                android:id="@+id/confirmationAction"
+                app:enterAnim="@animator/fragment_fade_in"
+                app:exitAnim="@animator/fragment_fade_out"
+                app:popEnterAnim="@animator/fragment_fade_in"
+                app:popExitAnim="@animator/fragment_fade_out"
+                />
     </fragment>
 
     <fragment
             android:id="@+id/nav_friend_requests"
             android:name="com.jimipurple.himichat.ui.friends.FriendRequestsFragment"
             android:label="@string/menu_friend_requests"
-            tools:layout="@layout/fragment_friend_requests" >
+            tools:layout="@layout/fragment_friend_requests"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out" >
     </fragment>
 
     <fragment
             android:id="@+id/nav_settings"
             android:name="com.jimipurple.himichat.ui.settings.SettingsFragment"
             android:label="@string/menu_settings"
-            tools:layout="@layout/fragment_settings" /><action android:id="@+id/action_global_nav_profile" app:destination="@id/nav_profile"/>
+            tools:layout="@layout/fragment_settings" />
+    <action android:id="@+id/action_global_nav_profile"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_profile"/>
+    <action android:id="@+id/action_global_nav_settings"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_settings"/>
+    <action android:id="@+id/action_global_nav_friends"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_friends"/>
+    <action android:id="@+id/action_global_nav_dialogues"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_dialogues"/>
 </navigation>

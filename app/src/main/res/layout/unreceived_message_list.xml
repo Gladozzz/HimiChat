@@ -16,14 +16,12 @@
             android:gravity="left"
             android:padding="5dp">
 
-        <ImageButton
+        <ProgressBar
                 android:id="@+id/sendUnreceivedMessageButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@color/colorPrimary"
                 android:padding="0dp"
-                android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_up" />
+                android:scaleType="centerInside" />
 
         <TextView
                 android:id="@+id/unreceivedMessageText"

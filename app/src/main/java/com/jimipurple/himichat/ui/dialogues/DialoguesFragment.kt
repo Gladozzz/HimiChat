@@ -132,12 +132,12 @@ class DialoguesFragment : BaseFragment() {
                     b.putString("nickname", dialog.nickname)
                     b.putString("avatar", dialog.avatar)
                     val navController = findNavController()
-                    navController.navigate(R.id.nav_dialog, b)
+                    navController.navigate(R.id.nav_dialog, b, navOptions)
                 }
                 val onHoldCallback = {dialog: Dialog -> Unit
 //                    dialoguesButtonOnClick()
                     val navController = findNavController()
-                    navController.navigate(R.id.nav_dialogues)
+                    navController.navigate(R.id.nav_dialogues, null, navOptions)
                 }
                 dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
                     override fun onItemClicked(item: Dialog) {
@@ -242,12 +242,12 @@ class DialoguesFragment : BaseFragment() {
                                 b.putString("nickname", dialog.nickname)
                                 b.putString("avatar", dialog.avatar)
                                 val navController = findNavController()
-                                navController.navigate(R.id.nav_dialog, b)
+                                navController.navigate(R.id.nav_dialog, b, navOptions)
                             }
                             val onHoldCallback = {dialog: Dialog -> Unit
 //                            dialoguesButtonOnClick()
                                 val navController = findNavController()
-                                navController.navigate(R.id.nav_dialogues)
+                                navController.navigate(R.id.nav_dialogues, null, navOptions)
                             }
                             dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
                                 override fun onItemClicked(item: Dialog) {
@@ -296,7 +296,7 @@ class DialoguesFragment : BaseFragment() {
 //                            b.putString("nickname", dialog.nickname)
 //                            b.putString("avatar", dialog.avatar)
 //                            val navController = findNavController()
-//                            navController.navigate(R.id.nav_dialog, b)
+//                            navController.navigate(R.id.nav_dialog, b, navOptions)
 //                        }
 //                        val onHoldCallback = {dialog: Dialog -> Unit
 //                            dialoguesButtonOnClick()

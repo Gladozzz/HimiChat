@@ -98,7 +98,7 @@ class FriendsFragment : BaseFragment() {
                     val b = Bundle()
                     b.putString("profile_id", u.id)
                     val navController = findNavController()
-                    navController.navigate(R.id.nav_profile, b)
+                    navController.navigate(R.id.nav_profile, b, navOptions)
                 } else {
                     Log.i("FirestoreRequest", "Error getting documents.", it.exception)
                 }
@@ -110,7 +110,7 @@ class FriendsFragment : BaseFragment() {
             b.putString("nickname", u.nickname)
             b.putString("avatar", u.avatar)
             val navController = findNavController()
-            navController.navigate(R.id.nav_dialog, b)
+            navController.navigate(R.id.nav_dialog, b, navOptions)
         }
 
         val pref = SharedPreferencesUtility(c!!.applicationContext)
@@ -219,11 +219,11 @@ class FriendsFragment : BaseFragment() {
 
     private fun findFriendButtonOnClick() {
         val navController = findNavController()
-        navController.navigate(R.id.nav_find_friend)
+        navController.navigate(R.id.nav_find_friend, null, navOptions)
     }
 
     private fun friendRequestsButtonOnClick() {
         val navController = findNavController()
-        navController.navigate(R.id.nav_friend_requests)
+        navController.navigate(R.id.nav_friend_requests, null, navOptions)
     }
 }
