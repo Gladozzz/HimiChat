@@ -143,7 +143,7 @@ class LoginActivity : BaseActivity() {
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("auth:signIn", "signInWithEmail:failure", task.exception)
-                        Log.i("auth:signIn", task.exception?.message)
+                        Log.i("auth:signIn", "message " + task.exception?.message)
                         Log.i("auth:signIn", task.exception.toString())
                         if (task.exception.toString() == "com.google.firebase.auth.FirebaseAuthInvalidCredentialsException") {
                             Toast.makeText(
