@@ -96,6 +96,7 @@ class LoginActivity : BaseActivity() {
                                 }
                                 pushKeysToServer(kp!!.publicKey)
                                 successful()
+                                Log.i("testSuccessful", "successful 99")
                             }
                             .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
                     } else {
@@ -138,6 +139,7 @@ class LoginActivity : BaseActivity() {
                         }
                         pushKeysToServer(kp!!.publicKey)
                         successful()
+                        Log.i("testSuccessful", "successful 142")
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("auth:signIn", "signInWithEmail:failure", task.exception)
@@ -214,6 +216,7 @@ class LoginActivity : BaseActivity() {
             pushTokenToServer()
 
             successful()
+            Log.i("testSuccessful", "successful 219")
         } else {
             Log.i("auth:start", "Пользователь не авторизован")
         }
@@ -251,6 +254,7 @@ class LoginActivity : BaseActivity() {
 
     //moment when authentication, token check and keys check are successful
     private fun successful() {
+        Log.i("testSuccessful", "successful")
         pushTokenToServer()
         startService(Intent(this, SocketService::class.java))
         val newIntent = Intent(applicationContext, NavigationActivity::class.java)
@@ -328,7 +332,9 @@ class LoginActivity : BaseActivity() {
                                 if (document != null) {
                                     if (document.exists()) {
                                         Log.d("googleAuth", "Document exists! Auth")
+                                        pushTokenToServer()
                                         successful()
+                                        Log.i("testSuccessful", "successful 337")
                                     } else {
                                         Log.d("googleAuth:create", "Document does not exist!")
                                         val userData = mapOf(
@@ -350,6 +356,7 @@ class LoginActivity : BaseActivity() {
                                                 }
                                                 pushKeysToServer(kp!!.publicKey)
                                                 successful()
+                                                Log.i("testSuccessful", "successful 359")
                                             }
                                             .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
                                     }
@@ -374,6 +381,7 @@ class LoginActivity : BaseActivity() {
                                             }
                                             pushKeysToServer(kp!!.publicKey)
                                             successful()
+                                            Log.i("testSuccessful", "successful 384")
                                         }
                                         .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
                                 }

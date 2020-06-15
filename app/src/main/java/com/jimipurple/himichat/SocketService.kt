@@ -53,6 +53,12 @@ class SocketService : IntentService("SocketService") {
     }
 
     private fun onAllEvents() {
+        socket.off(Socket.EVENT_CONNECT)
+        socket.off("auth_response")
+        socket.off("auth_request")
+        socket.off("disconnect")
+        socket.off("receiving_encrypted_message")
+        socket.off("confirm_delivery")
         socket.on(Socket.EVENT_CONNECT) {
             Log.i("SocketService", "Socket Connected!")
             try {

@@ -66,6 +66,7 @@ class NavigationActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i("testSuccessful", "successful onCreate")
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_navigation)
         val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
