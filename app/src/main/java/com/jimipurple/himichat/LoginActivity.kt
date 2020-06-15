@@ -95,8 +95,8 @@ class LoginActivity : BaseActivity() {
                                     kp = keydb.getKeyPair(currentUID)
                                 }
                                 pushKeysToServer(kp!!.publicKey)
-                                successful()
                                 Log.i("testSuccessful", "successful 99")
+                                successful()
                             }
                             .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
                     } else {
@@ -138,8 +138,8 @@ class LoginActivity : BaseActivity() {
                             kp = keydb.getKeyPair(currentUID)
                         }
                         pushKeysToServer(kp!!.publicKey)
-                        successful()
                         Log.i("testSuccessful", "successful 142")
+                        successful()
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("auth:signIn", "signInWithEmail:failure", task.exception)
@@ -183,6 +183,11 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    public override fun onDestroy() {
+        super.onDestroy()
+        Log.i("testSuccessful", "onDestroy")
+    }
+
     public override fun onStart() {
         super.onStart()
 
@@ -215,8 +220,8 @@ class LoginActivity : BaseActivity() {
             //updating token
             pushTokenToServer()
 
-            successful()
             Log.i("testSuccessful", "successful 219")
+            successful()
         } else {
             Log.i("auth:start", "Пользователь не авторизован")
         }
@@ -258,8 +263,8 @@ class LoginActivity : BaseActivity() {
         pushTokenToServer()
         startService(Intent(this, SocketService::class.java))
         val newIntent = Intent(applicationContext, NavigationActivity::class.java)
-        startActivity(newIntent)
         finish()
+        startActivity(newIntent)
     }
 
     //Generating new key pair and removing old
@@ -332,9 +337,9 @@ class LoginActivity : BaseActivity() {
                                 if (document != null) {
                                     if (document.exists()) {
                                         Log.d("googleAuth", "Document exists! Auth")
+                                        Log.i("testSuccessful", "successful 339")
                                         pushTokenToServer()
                                         successful()
-                                        Log.i("testSuccessful", "successful 337")
                                     } else {
                                         Log.d("googleAuth:create", "Document does not exist!")
                                         val userData = mapOf(
@@ -355,8 +360,8 @@ class LoginActivity : BaseActivity() {
                                                     kp = keydb.getKeyPair(currentUID)
                                                 }
                                                 pushKeysToServer(kp!!.publicKey)
-                                                successful()
                                                 Log.i("testSuccessful", "successful 359")
+                                                successful()
                                             }
                                             .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
                                     }
@@ -380,8 +385,8 @@ class LoginActivity : BaseActivity() {
                                                 kp = keydb.getKeyPair(currentUID)
                                             }
                                             pushKeysToServer(kp!!.publicKey)
-                                            successful()
                                             Log.i("testSuccessful", "successful 384")
+                                            successful()
                                         }
                                         .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
                                 }

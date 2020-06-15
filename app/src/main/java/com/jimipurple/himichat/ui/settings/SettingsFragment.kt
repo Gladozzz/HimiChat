@@ -154,7 +154,29 @@ class SettingsFragment : BaseFragment() {
 //                            Log.i("setAvatar", "error " + e.message)
 //                        }
 //                    }
-                firestore!!.collection("users").document(mAuth!!.uid!!).update("avatar", uri.toString())
+                firestore!!.collection("users").document(mAuth!!.uid!!).update("avatar", uri.toString()).addOnCompleteListener { task1 ->
+                    try {
+                        val i = Log.i(
+                            "setAvatar",
+                            "result " + task1.result?.toString()
+                        )
+                        if (task1.isSuccessful) {
+                            Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+                            val f = fragmentAdapter!!.getCurrentFragment()!!
+                            if (f is ProfileSettingsFragment) {
+                                f.updateAvatar()
+                            }
+                            val a = requireActivity()
+                            if (a is NavigationActivity) {
+                                a.updateAvatar()
+                            }
+                        } else {
+                            Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.i("setAvatar", "error " + e.message)
+                    }
+                }
             }
             Glide.with(this)
                 .asBitmap()
@@ -175,6 +197,8 @@ class SettingsFragment : BaseFragment() {
                                                 requireActivity().recreate()
                                                 setAvatar(uri)
                                             }
+                                        }.addOnFailureListener {
+                                            Log.i("avatar_load", "onFailure: error= ${it.message}")
                                         }
                                 }
                             }
@@ -189,6 +213,8 @@ class SettingsFragment : BaseFragment() {
                                                 Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
                                                 setAvatar(uri)
                                             }
+                                        }.addOnFailureListener {
+                                            Log.i("avatar_load", "onFailure: error= ${it.message}")
                                         }
                                 }
                             }
@@ -203,6 +229,8 @@ class SettingsFragment : BaseFragment() {
                                                 Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
                                                 setAvatar(uri)
                                             }
+                                        }.addOnFailureListener {
+                                            Log.i("avatar_load", "onFailure: error= ${it.message}")
                                         }
                                 }
                             }

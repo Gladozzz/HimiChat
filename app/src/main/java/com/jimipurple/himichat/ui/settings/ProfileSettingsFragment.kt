@@ -142,7 +142,7 @@ class ProfileSettingsFragment : BaseFragment() {
             Log.e("ProfileSettings", "avatar was not in SharedPrefences")
         }
     }
-    private fun updateAvatar() {
+    fun updateAvatar() {
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
