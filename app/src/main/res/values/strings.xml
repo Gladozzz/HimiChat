@@ -10,6 +10,10 @@
     <string name="design">Design</string>
     <string name="something">Something goes wrong</string>
     <string name="enter_msg">Enter message</string>
+    <string name="day">day</string>
+    <string name="night">night</string>
+    <string name="theme">theme</string>
+    <string name="dark_mode">Dark Mode</string>
 
     <string name="web_client_id" translatable="false">195021957274-o2hlc401ln8feoplko4ql11gfc677q0o.apps.googleusercontent.com</string>
 

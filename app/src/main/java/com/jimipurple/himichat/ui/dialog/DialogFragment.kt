@@ -129,7 +129,7 @@ class DialogFragment : BaseFragment() {
         try {
             requireActivity().unregisterReceiver(FCMReceiver)
         } catch (e: Exception) {
-            Log.e("DialogFragment", e.message)
+            Log.e("DialogFragment", "e " + e.message)
         }
     }
 

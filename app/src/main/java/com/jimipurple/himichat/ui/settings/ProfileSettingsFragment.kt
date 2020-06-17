@@ -3,6 +3,7 @@ package com.jimipurple.himichat.ui.settings
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -10,9 +11,12 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -39,9 +43,22 @@ class ProfileSettingsFragment : BaseFragment() {
     private var realname: String? = null
     private var avatar: String? = null
     private val ARG_PAGE = "ARG_PAGE"
+    private var currentTheme: Resources.Theme? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sp = c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+        val darkMode = sp.getBoolean("night_mode", false)
+        currentTheme = when (darkMode) {
+            true -> {
+                sp.edit().putBoolean("night_mode", true).apply()
+                ContextThemeWrapper(c!!, R.style.NightTheme).theme
+            }
+            false -> {
+                sp.edit().putBoolean("night_mode", false).apply()
+                ContextThemeWrapper(c!!, R.style.DayTheme).theme
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,7 +72,7 @@ class ProfileSettingsFragment : BaseFragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                nicknameEdit.setTextColor(resources.getColor(R.color.white))
+                nicknameEdit.setTextColor(getColorFromAttr())
 //                cancelNicknameButton.visibility = View.VISIBLE
             }
         })
@@ -64,7 +81,7 @@ class ProfileSettingsFragment : BaseFragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                realnameEdit.setTextColor(resources.getColor(R.color.white))
+                realnameEdit.setTextColor(getColorFromAttr())
 //                cancelRealnameButton.visibility = View.VISIBLE
             }
         })
@@ -89,9 +106,11 @@ class ProfileSettingsFragment : BaseFragment() {
                     nickname = ""
                 }
                 SharedPreferencesUtility(c!!).putString("nickname", nickname!!)
-                nicknameEdit.setText(nickname)
-                nicknameEdit.setTextColor(resources.getColor(R.color.white))
-                cancelNicknameButton.visibility = View.GONE
+                if (nicknameEdit != null) {
+                    nicknameEdit.setText(nickname)
+                    nicknameEdit.setTextColor(getColorFromAttr())
+                    cancelNicknameButton.visibility = View.GONE
+                }
             } else {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
@@ -106,14 +125,24 @@ class ProfileSettingsFragment : BaseFragment() {
                 if (realname == null) {
                     realname = ""
                 }
-                SharedPreferencesUtility(c!!).putString("realname", realname!!)
-                realnameEdit.setText(realname)
-                realnameEdit.setTextColor(resources.getColor(R.color.white))
-                cancelRealnameButton.visibility = View.GONE
+                if (realnameEdit != null) {
+                    SharedPreferencesUtility(c!!).putString("realname", realname!!)
+                    realnameEdit.setText(realname)
+                    realnameEdit.setTextColor(getColorFromAttr())
+                    cancelRealnameButton.visibility = View.GONE
+                }
             } else {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
         }
+    }
+
+    @ColorInt
+    fun getColorFromAttr(): Int {
+        val typedValue = TypedValue()
+        currentTheme!!.resolveAttribute(R.attr.primaryTextColor, typedValue, true)
+        @ColorInt val color = typedValue.data
+        return typedValue.data
     }
 
     override fun onCreateView(
@@ -159,10 +188,14 @@ class ProfileSettingsFragment : BaseFragment() {
                     .load(avatar)
                     .into(object : CustomTarget<Bitmap>(){
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            avatarView.setImageBitmap(resource)
-                            LruCache(c!!).set(avatar!!, resource)
-                            SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
-                            Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
+                            try {
+                                avatarView.setImageBitmap(resource)
+                                LruCache(c!!).set(avatar!!, resource)
+                                SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
+                                Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
+                            } catch (e: Exception) {
+                                Log.e("Profile", "e " + e.message)
+                            }
                         }
                         override fun onLoadCleared(placeholder: Drawable?) {
                             // this is called when imageView is cleared on lifecycle call or for
@@ -183,12 +216,13 @@ class ProfileSettingsFragment : BaseFragment() {
     }
 
     private fun setNickname() {
-        if (isNicknameValid(nicknameEdit.text.toString())){
-            nickname = nicknameEdit.text.toString()
-            firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("nickname" to  nickname)).addOnSuccessListener { (app!!.currentActivity as NavigationActivity).updateAvatar() }
-            cancelNicknameButton.visibility = View.GONE
-        } else {
-            nicknameEdit.setTextColor(resources.getColor(R.color.red))
+        if (nicknameEdit != null) {
+            if (isNicknameValid(nicknameEdit.text.toString())){
+                nickname = nicknameEdit.text.toString()
+                firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("nickname" to  nickname)).addOnSuccessListener { (app!!.currentActivity as NavigationActivity).updateAvatar() }
+                cancelNicknameButton.visibility = View.GONE
+            } else {
+                nicknameEdit.setTextColor(resources.getColor(R.color.red))
 //            firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
 //                if (it.isSuccessful) {
 //                    val userData = it.result!!
@@ -201,6 +235,7 @@ class ProfileSettingsFragment : BaseFragment() {
 //                    Log.i("FirestoreRequest", "Error getting documents.", it.exception)
 //                }
 //            }
+            }
         }
     }
 

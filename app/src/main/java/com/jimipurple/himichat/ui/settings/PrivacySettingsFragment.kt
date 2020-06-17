@@ -32,6 +32,6 @@ class PrivacySettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.design_settings_fragment, container, false)
+        return inflater.inflate(R.layout.privacy_settings_fragment, container, false)
     }
 }

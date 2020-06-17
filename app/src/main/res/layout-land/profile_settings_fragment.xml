@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"
+        android:background="?attr/primaryDark"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:weightSum="100">
@@ -32,14 +32,16 @@
                 android:weightSum="100">
 
             <EditText
-                    android:id="@+id/realnameEdit"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="90"
-                    android:gravity="start"
-                    android:inputType="textPersonName"
-                    android:text="Realname" />
+                android:id="@+id/realnameEdit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_weight="90"
+                android:backgroundTint="?attr/primaryTextColor"
+                android:gravity="start"
+                android:inputType="textPersonName"
+                android:text="Realname"
+                android:textColor="?attr/primaryTextColor" />
 
             <ImageView
                     android:id="@+id/renameRealnameButton"
@@ -70,13 +72,15 @@
                 android:weightSum="100">
 
             <EditText
-                    android:id="@+id/nicknameEdit"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="90"
-                    android:inputType="textPersonName"
-                    android:text="Nickname" />
+                android:id="@+id/nicknameEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="90"
+                android:backgroundTint="?attr/primaryTextColor"
+                android:inputType="textPersonName"
+                android:text="Nickname"
+                android:textColor="?attr/primaryTextColor" />
 
             <ImageView
                     android:id="@+id/renameNicknameButton"

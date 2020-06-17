@@ -1,6 +1,7 @@
 package com.jimipurple.himichat
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -43,6 +44,7 @@ class NavigationActivity : BaseActivity() {
     private val RESULT_LOAD_IMAGE = 1
     private val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2
     private val GET_FROM_GALLERY = 3
+    private var currentTheme: Boolean = false
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private var nickname: String? = null
@@ -66,6 +68,20 @@ class NavigationActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sp = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+        currentTheme = sp.getBoolean("night_mode", false)
+        when (currentTheme) {
+            true -> {
+                sp.edit().putBoolean("night_mode", true).apply()
+                setTheme(R.style.NightTheme)
+            }
+            false -> {
+                sp.edit().putBoolean("night_mode", false).apply()
+                setTheme(R.style.DayTheme)
+            }
+        }
+
         Log.i("testSuccessful", "successful onCreate")
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_navigation)

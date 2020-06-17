@@ -1,12 +1,35 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="NightTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="primary">@color/colorPrimary</item>
+        <item name="primaryDark">@color/colorPrimaryDark</item>
+        <item name="accent">@color/colorAccent</item>
+        <item name="primaryTextColor">@color/white</item>
+        <item name="сloudSent">@drawable/sent_message_cloud</item>
+        <item name="сloudReceived">@drawable/received_message_cloud</item>
+<!--        <item name="сloudSent">@color/colorCloudSent</item>-->
+<!--        <item name="сloudReceived">@color/colorCloudReceived</item>-->
+    </style>
+    <style name="DayTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimary">@color/colorPrimaryDay</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkDay</item>
+        <item name="colorAccent">@color/colorAccentDay</item>
+        <item name="primary">@color/colorPrimaryDay</item>
+        <item name="primaryDark">@color/colorPrimaryDarkDay</item>
+        <item name="accent">@color/colorAccentDay</item>
+        <item name="primaryTextColor">@color/black</item>
+        <item name="сloudSent">@drawable/sent_message_cloud_day</item>
+        <item name="сloudReceived">@drawable/received_message_cloud_day</item>
+<!--        <item name="сloudSent">@color/colorCloudSentDay</item>-->
+<!--        <item name="сloudReceived">@color/colorCloudReceivedDay</item>-->
     </style>
 
 
@@ -29,7 +52,7 @@
 <!--        <color name="colorAccentDark2">#8659A5</color>-->
 <!--    </style>-->
 
-    <style name="AppTheme.NoActionBar">
+    <style name="NightTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

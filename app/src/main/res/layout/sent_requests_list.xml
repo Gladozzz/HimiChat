@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
+        android:background="?attr/primaryDark"
         android:orientation="horizontal">
 
     <LinearLayout
@@ -30,36 +30,39 @@
                 android:orientation="vertical">
 
             <TextView
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:text="name"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                    android:textStyle="bold" />
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:text="name"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textColor="?attr/primaryTextColor"
+                android:textStyle="bold" />
 
             <TextView
-                    android:id="@+id/realName"
-                    android:layout_width="match_parent"
-                    android:layout_height="65dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="5dp"
-                    android:text=""
-                    android:textSize="16sp" />
+                android:id="@+id/realName"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"
+                android:text=""
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="16sp" />
         </LinearLayout>
 
         <ImageButton
-                android:id="@+id/cancelButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="25dp"
-                android:layout_weight="1"
-                android:background="@color/colorPrimaryDark"
-                android:padding="0dp"
-                android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_cancel" />
+            android:id="@+id/cancelButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="25dp"
+            android:layout_weight="1"
+            android:background="?attr/primaryDark"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            android:tint="?attr/primaryTextColor"
+            app:srcCompat="@drawable/ic_cancel" />
     </LinearLayout>
 </LinearLayout>

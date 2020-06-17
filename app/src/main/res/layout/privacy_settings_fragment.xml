@@ -13,17 +13,13 @@
     app:layout_anchorGravity="center"
     tools:context=".NavigationActivity">
 
-    <Switch
-        android:id="@+id/switchTheme"
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/dark_mode"
+        android:text="@string/toast_future_feature"
         android:textColor="?attr/primaryTextColor"
-        android:thumbTint="@color/colorPrimary"
-        android:trackTint="@color/dialog_message_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

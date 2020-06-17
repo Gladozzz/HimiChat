@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.friends.FriendRequestsFragment"
-        android:background="@color/colorPrimaryDark">
+        android:background="?attr/primaryDark">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendRequests"
@@ -26,20 +26,21 @@
             tools:listitem="@layout/received_requests_list" />
 
     <TextView
-            android:id="@+id/emptyRequestsListMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:paddingStart="10dp"
-            android:text="@string/label_empty_request_list"
-            android:textSize="20sp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/emptyRequestsListMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:paddingStart="10dp"
+        android:text="@string/label_empty_request_list"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
             android:id="@+id/reсeivedButton"

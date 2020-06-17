@@ -59,176 +59,192 @@ class FindFriendFragment : BaseFragment() {
 
     @UnstableDefault
     private fun findButtonOnClick() {
-        if (nicknameEdit.text.isNotEmpty()) {
-            progressBar.visibility = View.VISIBLE
-            noUserMessage.visibility = View.GONE
-            wrongNicknameMessage.visibility = View.GONE
-            var nickname = nicknameEdit.text.toString()
-            if (isNicknameValid(nickname)) {
-                var data = hashMapOf(
-                    "nickname" to nickname
-                )
-                var id = ""
-                var res = functions!!
-                    .getHttpsCallable("findUser")
-                    .call(data).addOnCompleteListener { task ->
-                        try {
-                            Log.i("findUser:find", "result " + task.result?.data.toString())
-                            var result = task.result?.data as HashMap<String, Any>
-                            if (result["found"] as Boolean) {
-                                id = result["id"] as String
-                                foundId = id
-                                Log.i("findUser:find", "id $id")
-                                data = hashMapOf(
-                                    "id" to id
-                                )
-                                firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
-                                    if (it.isSuccessful) {
-                                        val userData = it.result!!
-                                        val friendsIDs = userData.get("friends") as? ArrayList<String>?
-                                        firestore!!.collection("users").document(id).get().addOnCompleteListener{
+        try {
+            if (nicknameEdit.text.isNotEmpty()) {
+                progressBar.visibility = View.VISIBLE
+                noUserMessage.visibility = View.GONE
+                wrongNicknameMessage.visibility = View.GONE
+                var nickname = nicknameEdit.text.toString()
+                if (isNicknameValid(nickname)) {
+                    var data = hashMapOf(
+                        "nickname" to nickname
+                    )
+                    var id = ""
+                    var res = functions!!
+                        .getHttpsCallable("findUser")
+                        .call(data).addOnCompleteListener { task ->
+                            try {
+                                Log.i("findUser:find", "result " + task.result?.data.toString())
+                                var result = task.result?.data as HashMap<String, Any>
+                                if (result["found"] as Boolean) {
+                                    id = result["id"] as String
+                                    foundId = id
+                                    Log.i("findUser:find", "id $id")
+                                    data = hashMapOf(
+                                        "id" to id
+                                    )
+                                    firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+                                        try {
                                             if (it.isSuccessful) {
-                                                findfriendSendMessageButton.visibility = View.GONE
-                                                findfriendRemoveFriendButton.visibility = View.GONE
-                                                findfriendInviteButton.visibility = View.VISIBLE
                                                 val userData = it.result!!
-                                                Log.i("findUser:get", "result $userData")
-//                                                id = userData["id"] as String
-                                                try {
-                                                    nickname = userData["nickname"] as String
-                                                } catch (e: Exception) {
-                                                    nickname = ""
-                                                    Log.i("findUser:get", e.message)
-                                                }
-                                                var rn = ""
-                                                try {
-                                                    rn = userData["real_name"] as String
-                                                } catch (e: Exception) {
-                                                    rn = ""
-                                                    Log.i("findUser:get", e.message)
-                                                }
-                                                val avatar = try {
-                                                    userData["avatar"] as String
-                                                } catch (e: Exception) {
-                                                    null
-                                                }
-                                                if (avatar != null) {
-                                                    val bitmap = LruCache(c!!)[avatar]
-                                                    if (bitmap != null) {
-                                                        findfriendAvatarView.setImageBitmap(bitmap)
-                                                    } else {
-                                                        Glide.with(this)
-                                                            .asBitmap()
-                                                            .load(avatar)
-                                                            .into(object : CustomTarget<Bitmap>(){
-                                                                override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
+                                                val friendsIDs = userData.get("friends") as? ArrayList<String>?
+                                                firestore!!.collection("users").document(id).get().addOnCompleteListener{
+                                                    try {
+                                                        if (it.isSuccessful) {
+                                                            findfriendSendMessageButton.visibility = View.GONE
+                                                            findfriendRemoveFriendButton.visibility = View.GONE
+                                                            findfriendInviteButton.visibility = View.VISIBLE
+                                                            val userData = it.result!!
+                                                            Log.i("findUser:get", "result $userData")
+                                                            //                                                id = userData["id"] as String
+                                                            try {
+                                                                nickname = userData["nickname"] as String
+                                                            } catch (e: Exception) {
+                                                                nickname = ""
+                                                                Log.i("findUser:get", e.message)
+                                                            }
+                                                            var rn = ""
+                                                            try {
+                                                                rn = userData["real_name"] as String
+                                                            } catch (e: Exception) {
+                                                                rn = ""
+                                                                Log.i("findUser:get", e.message)
+                                                            }
+                                                            val avatar = try {
+                                                                userData["avatar"] as String
+                                                            } catch (e: Exception) {
+                                                                null
+                                                            }
+                                                            if (avatar != null) {
+                                                                val bitmap = LruCache(c!!)[avatar]
+                                                                if (bitmap != null) {
                                                                     findfriendAvatarView.setImageBitmap(bitmap)
-                                                                    findfriendAvatarView.setOnClickListener {
-                                                                        val b = Bundle()
-                                                                        b.putString("profile_id", id)
-                                                                        val navController = findNavController()
-                                                                        navController.navigate(R.id.nav_profile, b, navOptions)
+                                                                } else {
+                                                                    Glide.with(this)
+                                                                        .asBitmap()
+                                                                        .load(avatar)
+                                                                        .into(object : CustomTarget<Bitmap>(){
+                                                                            override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
+                                                                                findfriendAvatarView.setImageBitmap(bitmap)
+                                                                                findfriendAvatarView.setOnClickListener {
+                                                                                    val b = Bundle()
+                                                                                    b.putString("profile_id", id)
+                                                                                    val navController = findNavController()
+                                                                                    navController.navigate(R.id.nav_profile, b, navOptions)
+                                                                                }
+                                                                            }
+                                                                            override fun onLoadCleared(placeholder: Drawable?) {
+                                                                                // this is called when imageView is cleared on lifecycle call or for
+                                                                                // some other reason.
+                                                                                // if you are referencing the bitmap somewhere else too other than this imageView
+                                                                                // clear it here as you can no longer have the bitmap
+                                                                            }
+
+                                                                            override fun onLoadFailed(errorDrawable: Drawable?) {
+                                                                                super.onLoadFailed(errorDrawable)
+                                                                                Log.e("Profile", "Загрузка изображения не удалась $avatar")
+                                                                            }
+                                                                        })
+                                                                }
+                                                            } else {
+                                                                Log.i("findUser", "avatar wasn't received")
+                                                            }
+                                                            if (friendsIDs != null) {
+                                                                for (i in friendsIDs) {
+                                                                    if (foundId == i) {
+                                                                        findfriendSendMessageButton.visibility = View.VISIBLE
+                                                                        findfriendRemoveFriendButton.visibility = View.VISIBLE
+                                                                        findfriendInviteButton.visibility = View.GONE
+                                                                        findfriendSendMessageButton.setOnClickListener {
+                                                                            val b = Bundle()
+                                                                            b.putString("friend_id", foundId)
+                                                                            b.putString("nickname", nickname)
+                                                                            b.putString("avatar", avatar)
+                                                                            val navController = findNavController()
+                                                                            navController.navigate(R.id.nav_dialog, b, navOptions)
+                                                                        }
+                                                                        findfriendRemoveFriendButton.setOnClickListener {
+                                                                            val uid = mAuth!!.uid!!
+                                                                            //removing all existing invites of between those users
+                                                                            firestore!!.collection("users").document(uid).update(mapOf("invited_by" to  FieldValue.arrayRemove(foundId)))
+                                                                            firestore!!.collection("users").document(foundId).update(mapOf("invites" to  FieldValue.arrayRemove(uid)))
+                                                                            firestore!!.collection("users").document(uid).update(mapOf("invites" to  FieldValue.arrayRemove(foundId)))
+                                                                            firestore!!.collection("users").document(foundId).update(mapOf("invited_by" to  FieldValue.arrayRemove(uid)))
+                                                                            //removing from friends list's
+                                                                            firestore!!.collection("users").document(foundId).update(mapOf("friends" to  FieldValue.arrayRemove(uid)))
+                                                                            firestore!!.collection("users").document(uid).update(mapOf("friends" to  FieldValue.arrayRemove(foundId)))
+                                                                            Toast.makeText(c!!, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
+                                                                            requireActivity().recreate()
+                                                                        }
                                                                     }
                                                                 }
-                                                                override fun onLoadCleared(placeholder: Drawable?) {
-                                                                    // this is called when imageView is cleared on lifecycle call or for
-                                                                    // some other reason.
-                                                                    // if you are referencing the bitmap somewhere else too other than this imageView
-                                                                    // clear it here as you can no longer have the bitmap
-                                                                }
-
-                                                                override fun onLoadFailed(errorDrawable: Drawable?) {
-                                                                    super.onLoadFailed(errorDrawable)
-                                                                    Log.e("Profile", "Загрузка изображения не удалась $avatar")
-                                                                }
-                                                            })
-                                                    }
-                                                } else {
-                                                    Log.i("findUser", "avatar wasn't received")
-                                                }
-                                                if (friendsIDs != null) {
-                                                    for (i in friendsIDs) {
-                                                        if (foundId == i) {
-                                                            findfriendSendMessageButton.visibility = View.VISIBLE
-                                                            findfriendRemoveFriendButton.visibility = View.VISIBLE
-                                                            findfriendInviteButton.visibility = View.GONE
-                                                            findfriendSendMessageButton.setOnClickListener {
-                                                                val b = Bundle()
-                                                                b.putString("friend_id", foundId)
-                                                                b.putString("nickname", nickname)
-                                                                b.putString("avatar", avatar)
-                                                                val navController = findNavController()
-                                                                navController.navigate(R.id.nav_dialog, b, navOptions)
                                                             }
-                                                            findfriendRemoveFriendButton.setOnClickListener {
-                                                                val uid = mAuth!!.uid!!
-                                                                //removing all existing invites of between those users
-                                                                firestore!!.collection("users").document(uid).update(mapOf("invited_by" to  FieldValue.arrayRemove(foundId)))
-                                                                firestore!!.collection("users").document(foundId).update(mapOf("invites" to  FieldValue.arrayRemove(uid)))
-                                                                firestore!!.collection("users").document(uid).update(mapOf("invites" to  FieldValue.arrayRemove(foundId)))
-                                                                firestore!!.collection("users").document(foundId).update(mapOf("invited_by" to  FieldValue.arrayRemove(uid)))
-                                                                //removing from friends list's
-                                                                firestore!!.collection("users").document(foundId).update(mapOf("friends" to  FieldValue.arrayRemove(uid)))
-                                                                firestore!!.collection("users").document(uid).update(mapOf("friends" to  FieldValue.arrayRemove(foundId)))
-                                                                Toast.makeText(c!!, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
-                                                                requireActivity().recreate()
+                                                            if (foundId == mAuth!!.uid!!) {
+                                                                findfriendSendMessageButton.visibility = View.GONE
+                                                                findfriendRemoveFriendButton.visibility = View.GONE
+                                                                findfriendInviteButton.visibility = View.GONE
                                                             }
+                                                            progressBar.visibility = View.GONE
+                                                            makeVisibleFound()
+                                                            foundNickname.setText(nickname)
+                                                            findfriendRealNameEdit.setText(rn)
+                                                            Log.i("findUser:get", "id $id")
+                                                            Log.i("findUser:get", "nickname $nickname")
+                                                            Log.i("findUser:get", "real name $rn")
+                                                            Log.i("findUser:get", "avatar $avatar")
+                                                            Log.i("findUser:get", "friendsIDs $friendsIDs")
+                                                        } else {
+                                                            Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                                                            progressBar.visibility = View.GONE
+                                                            noUserMessage.visibility = View.GONE
+                                                            wrongNicknameMessage.visibility = View.GONE
                                                         }
+                                                    } catch (e: Exception) {
+                                                        Log.i("findUser:find", "error " + e.message)
                                                     }
                                                 }
-                                                if (foundId == mAuth!!.uid!!) {
-                                                    findfriendSendMessageButton.visibility = View.GONE
-                                                    findfriendRemoveFriendButton.visibility = View.GONE
-                                                    findfriendInviteButton.visibility = View.GONE
-                                                }
-                                                progressBar.visibility = View.GONE
-                                                makeVisibleFound()
-                                                foundNickname.setText(nickname)
-                                                findfriendRealNameEdit.setText(rn)
-                                                Log.i("findUser:get", "id $id")
-                                                Log.i("findUser:get", "nickname $nickname")
-                                                Log.i("findUser:get", "real name $rn")
-                                                Log.i("findUser:get", "avatar $avatar")
-                                                Log.i("findUser:get", "friendsIDs $friendsIDs")
                                             } else {
-                                                Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                                                Log.e("FirestoreRequest", "Error getting documents.", it.exception)
                                                 progressBar.visibility = View.GONE
-                                                noUserMessage.visibility = View.GONE
+                                                noUserMessage.visibility = View.VISIBLE
                                                 wrongNicknameMessage.visibility = View.GONE
                                             }
+                                        } catch (e: Exception) {
+                                            Log.i("findUser:find", "error " + e.message)
                                         }
-                                    } else {
-                                        Log.e("FirestoreRequest", "Error getting documents.", it.exception)
-                                        progressBar.visibility = View.GONE
-                                        noUserMessage.visibility = View.VISIBLE
-                                        wrongNicknameMessage.visibility = View.GONE
                                     }
-                                }
-                            } else {
-                                Log.i("findUser:find", "Пользователь с ником $nickname не найден")
-                                progressBar.visibility = View.GONE
-                                noUserMessage.visibility = View.VISIBLE
-                                wrongNicknameMessage.visibility = View.GONE
+                                } else {
+                                    Log.i("findUser:find", "Пользователь с ником $nickname не найден")
+                                    progressBar.visibility = View.GONE
+                                    noUserMessage.visibility = View.VISIBLE
+                                    wrongNicknameMessage.visibility = View.GONE
 //                                Toast.makeText(c!!, R.string.toast_user_nickname_not_found, Toast.LENGTH_LONG).show()
+                                }
+                            } catch (e: Exception) {
+                                Log.i("findUser:find", "error " + e.message)
+                                try {
+                                    progressBar.visibility = View.GONE
+                                    noUserMessage.visibility = View.VISIBLE
+                                    wrongNicknameMessage.visibility = View.GONE
+                                } catch (e: Exception) {
+                                    Log.i("findUser:find", "error " + e.message)
+                                }
                             }
-                        } catch (e: Exception) {
-                            Log.i("findUser:find", "error " + e.message)
-                            progressBar.visibility = View.GONE
-                            noUserMessage.visibility = View.VISIBLE
-                            wrongNicknameMessage.visibility = View.GONE
+                            //messageInput.setText("")
                         }
-                        //messageInput.setText("")
-                    }
-            } else {
+                } else {
 //                Toast.makeText(c!!, R.string.toast_nickname_not_valid, Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
+                    noUserMessage.visibility = View.GONE
+                    wrongNicknameMessage.visibility = View.VISIBLE
+                }
+            } else {
                 progressBar.visibility = View.GONE
                 noUserMessage.visibility = View.GONE
-                wrongNicknameMessage.visibility = View.VISIBLE
+                wrongNicknameMessage.visibility = View.GONE
             }
-        } else {
-            progressBar.visibility = View.GONE
-            noUserMessage.visibility = View.GONE
-            wrongNicknameMessage.visibility = View.GONE
+        } catch (e: Exception) {
+            Log.i("findUser:get", "message " + e.message)
         }
     }
 

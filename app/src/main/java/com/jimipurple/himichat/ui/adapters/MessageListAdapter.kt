@@ -1,13 +1,17 @@
 package com.jimipurple.himichat.ui.adapters
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.Log
+import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
@@ -86,7 +90,8 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             else -> {
                 return ItemViewType.UNDELIVERED_MESSAGE
             }
-        }    }
+        }
+    }
 
     inner class ReceivedMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
@@ -166,7 +171,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
                     "text" to text,
                     "token" to context.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
                 )
-                Log.i("msgTest", context.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+                Log.i("msgTest", "token " + context.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
                 var res = functions
                     .getHttpsCallable("sendMessage")
                     .call(data).addOnCompleteListener { task ->

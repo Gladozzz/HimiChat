@@ -43,10 +43,23 @@ class LoginActivity : BaseActivity() {
     private var nickname: String? = null
     private var realname: String? = null
     private var avatar: String? = null
+    private var currentTheme: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        val sp = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+        currentTheme = sp.getBoolean("night_mode", false)
+        when (currentTheme) {
+            true -> {
+                sp.edit().putBoolean("night_mode", true).apply()
+                setTheme(R.style.NightTheme)
+            }
+            false -> {
+                sp.edit().putBoolean("night_mode", false).apply()
+                setTheme(R.style.DayTheme)
+            }
+        }
 //        FirebaseApp.initializeApp(applicationContext)
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance()

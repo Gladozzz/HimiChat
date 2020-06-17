@@ -14,17 +14,17 @@
             android:layout_height="match_parent" />
 
     <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="@color/colorPrimaryDark"
-            android:fitsSystemWindows="true"
-            android:isScrollContainer="false"
-            app:headerLayout="@layout/nav_header_navigation2"
-            app:itemIconTint="@color/white_five"
-            app:itemTextAppearance="@style/TextAppearance.AppCompat.Large"
-            app:itemTextColor="@color/white_five"
-            app:menu="@menu/activity_navigation_drawer" />
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="?attr/primaryDark"
+        android:fitsSystemWindows="true"
+        android:isScrollContainer="false"
+        app:headerLayout="@layout/nav_header_navigation2"
+        app:itemIconTint="?attr/primaryTextColor"
+        app:itemTextAppearance="@style/TextAppearance.AppCompat.Large"
+        app:itemTextColor="?attr/primaryTextColor"
+        app:menu="@menu/activity_navigation_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"
+        android:background="?attr/primaryDark"
         android:gravity="center"
         android:orientation="vertical"
         tools:context=".LoginActivity">
@@ -15,23 +15,26 @@
             android:orientation="horizontal">
 
         <TextView
-                android:id="@+id/emailLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:background="#00FFFCFC"
-                android:text="@string/label_email" />
+            android:id="@+id/emailLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:background="#00FFFCFC"
+            android:text="@string/label_email"
+            android:textColor="?attr/primaryTextColor" />
 
         <EditText
-                android:id="@+id/emailRegisterEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:ems="10"
-                android:inputType="textEmailAddress" />
+            android:id="@+id/emailRegisterEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="?attr/primaryTextColor"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:textColor="?attr/primaryTextColor" />
 
     </LinearLayout>
 
@@ -41,21 +44,24 @@
             android:orientation="horizontal">
 
         <TextView
-                android:id="@+id/passwordLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/label_password" />
+            android:id="@+id/passwordLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/label_password"
+            android:textColor="?attr/primaryTextColor" />
 
         <EditText
-                android:id="@+id/passwordRegisterEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:ems="10"
-                android:inputType="textPassword" />
+            android:id="@+id/passwordRegisterEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="?attr/primaryTextColor"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:textColor="?attr/primaryTextColor" />
 
     </LinearLayout>
 
@@ -65,22 +71,25 @@
             android:orientation="horizontal">
 
         <TextView
-                android:id="@+id/passwordRepeatLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/label_password_repeat"
-                android:visibility="visible" />
+            android:id="@+id/passwordRepeatLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/label_password_repeat"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="visible" />
 
         <EditText
-                android:id="@+id/passwordRepeatEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:ems="10"
-                android:inputType="textPassword"
-                android:visibility="visible" />
+            android:id="@+id/passwordRepeatEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="?attr/primaryTextColor"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="visible" />
     </LinearLayout>
 
     <LinearLayout
@@ -89,24 +98,27 @@
             android:orientation="horizontal">
 
         <TextView
-                android:id="@+id/nicknameLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/label_nickname"
-                android:visibility="visible" />
+            android:id="@+id/nicknameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/label_nickname"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="visible" />
 
         <EditText
-                android:id="@+id/nicknameEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:visibility="visible" />
+            android:id="@+id/nicknameEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="?attr/primaryTextColor"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="visible" />
 
     </LinearLayout>
 
@@ -116,24 +128,27 @@
             android:orientation="horizontal">
 
         <TextView
-                android:id="@+id/realNameLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/label_real_name"
-                android:visibility="visible" />
+            android:id="@+id/realNameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/label_real_name"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="visible" />
 
         <EditText
-                android:id="@+id/realNameEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:visibility="visible" />
+            android:id="@+id/realNameEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="?attr/primaryTextColor"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:textColor="?attr/primaryTextColor"
+            android:visibility="visible" />
     </LinearLayout>
 
     <Button

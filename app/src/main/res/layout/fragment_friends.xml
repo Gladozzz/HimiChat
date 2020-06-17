@@ -5,7 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.friends.FriendsFragment" android:background="@color/colorPrimaryDark">
+        tools:context=".ui.friends.FriendsFragment" android:background="?attr/primaryDark">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/FriendsList"
@@ -45,13 +45,14 @@
             app:layout_constraintStart_toEndOf="@+id/findFriendButton" />
 
     <TextView
-            android:id="@+id/emptyFriendsListMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_empty_friends_list"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone" />
+        android:id="@+id/emptyFriendsListMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_empty_friends_list"
+        android:textColor="?attr/primaryTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

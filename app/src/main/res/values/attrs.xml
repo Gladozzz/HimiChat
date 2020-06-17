@@ -2,6 +2,13 @@
 
     <attr name="MessageInput" format="reference"/>
 
+    <attr name="primary" format="color|reference"/>
+    <attr name="primaryDark" format="color|reference"/>
+    <attr name="accent" format="color|reference"/>
+    <attr name="primaryTextColor" format="color|reference"/>
+    <attr name="сloudSent" format="color|reference"/>
+    <attr name="сloudReceived" format="color|reference"/>
+
     <declare-styleable name="MessageInput">
         <attr name="inputButtonBackground" format="reference"/>
         <attr name="inputButtonDefaultBgColor" format="color|reference"/>

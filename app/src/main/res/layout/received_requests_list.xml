@@ -9,72 +9,76 @@
         android:orientation="horizontal">
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:gravity="left"
-            android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:background="?attr/primaryDark"
+        android:gravity="left"
+        android:orientation="horizontal">
 
         <ImageView
-                android:id="@+id/avatarReceivedRequest"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="left"
-                android:maxWidth="1dp"
-                android:maxHeight="1dp"
-                app:srcCompat="@drawable/defaultavatar" />
+            android:id="@+id/avatarReceivedRequest"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="left"
+            android:maxWidth="1dp"
+            android:maxHeight="1dp"
+            app:srcCompat="@drawable/defaultavatar" />
 
         <LinearLayout
-                android:layout_width="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="100"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="100"
-                android:orientation="vertical">
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:text="name"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textColor="?attr/primaryTextColor"
+                android:textStyle="bold" />
 
             <TextView
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:text="name"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                    android:textStyle="bold" />
-
-            <TextView
-                    android:id="@+id/realName"
-                    android:layout_width="match_parent"
-                    android:layout_height="65dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="5dp"
-                    android:text=""
-                    android:textSize="16sp" />
+                android:id="@+id/realName"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"
+                android:text=""
+                android:textSize="16sp" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:layout_width="50dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/acceptButton"
                 android:layout_width="50dp"
-                android:layout_height="100dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:layout_height="50dp"
+                android:background="?attr/primaryDark"
+                android:padding="0dp"
+                android:scaleType="centerInside"
+                android:tint="?attr/primaryTextColor"
+                app:srcCompat="@drawable/ic_accept" />
 
             <ImageButton
-                    android:id="@+id/acceptButton"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@color/colorPrimaryDark"
-                    android:padding="0dp"
-                    android:scaleType="centerInside"
-                    app:srcCompat="@drawable/ic_accept" />
-
-            <ImageButton
-                    android:id="@+id/blockButton"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@color/colorPrimaryDark"
-                    android:padding="0dp"
-                    android:scaleType="centerInside"
-                    app:srcCompat="@drawable/ic_block" />
+                android:id="@+id/blockButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?attr/primaryDark"
+                android:padding="0dp"
+                android:scaleType="centerInside"
+                android:tint="?attr/primaryTextColor"
+                app:srcCompat="@drawable/ic_block" />
         </LinearLayout>
     </LinearLayout>
 
