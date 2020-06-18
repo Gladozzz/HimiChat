@@ -45,6 +45,7 @@
             <TextView
                 android:id="@+id/realName"
                 android:layout_width="match_parent"
+                android:textColor="?attr/primaryTextColor"
                 android:layout_height="65dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginLeft="15dp"
