@@ -1,6 +1,7 @@
 package com.jimipurple.himichat
 
 import android.app.IntentService
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -22,7 +23,6 @@ import com.jimipurple.himichat.models.UndeliveredMessage
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import io.socket.client.IO
 import io.socket.client.Socket
-import kotlinx.coroutines.Job
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -171,32 +171,54 @@ class SocketService : IntentService("SocketService") {
                             Log.i("SocketService", "notifed")
                             //Picasso.get().load(avatar).get()
                             // Create an explicit intent for an Activity in your app
-                            val b = Bundle()
-                            b.putString("friend_id", sender_id)
-                            b.putString("nickname", nickname)
-                            b.putString("avatar", avatar)
-                            val pendingIntent = NavDeepLinkBuilder(applicationContext)
-                                .setComponentName(NavigationActivity::class.java)
-                                .setGraph(R.navigation.mobile_navigation)
-                                .setDestination(R.id.nav_dialog)
-                                .setArguments(b)
-                                .createPendingIntent()
 
-                            val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                .setContentTitle(nickname)
-                                .setContentText(text)
-                                .setSmallIcon(R.mipmap.ic_launcher_round)
-                                .setPriority(NotificationCompat.PRIORITY_MAX)
-                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher_round).toBitmap())
-                                // Set the intent that will fire when the user taps the notification
-                                .setContentIntent(pendingIntent)
-                                .setAutoCancel(true)
-                            //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
-                            with(NotificationManagerCompat.from(applicationContext)) {
-                                // notificationId is a unique int for each notification that you must define
-                                val m = random!!.nextInt(9999 - 1000) + 1000
-                                notify(m, builder.build())
+                            firestore.collection("users").document(sender_id).get().addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val senderData = task.result!!
+                                    val senderNickname = senderData["nickname"] as String
+                                    val senderAvatar = senderData["avatar"] as String
+                                    val b = Bundle()
+                                    b.putString("friend_id", sender_id)
+                                    b.putString("nickname", senderNickname)
+                                    b.putString("avatar", senderAvatar)
+                                    val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                                        .setComponentName(NavigationActivity::class.java)
+                                        .setGraph(R.navigation.mobile_navigation)
+                                        .setDestination(R.id.nav_dialog)
+                                        .setArguments(b)
+                                        .createPendingIntent()
+//                                    val pendingIntent = Intent(applicationContext, NavigationActivity::class.java)
+//                                    pendingIntent.putExtra("sender",b)
+                                    // Create PendingIntent
+
+                                    // Create PendingIntent
+//                                    val resultIntent =
+//                                        Intent(applicationContext, NavigationActivity::class.java).putExtra("sender", b)
+//                                    resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                                    val resultPendingIntent =
+//                                        PendingIntent.getActivity(
+//                                            this, 0, resultIntent,
+//                                            PendingIntent.FLAG_CANCEL_CURRENT
+//                                        )
+                                    val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                                        .setContentTitle(senderNickname)
+                                        .setContentText(text)
+                                        .setSmallIcon(R.mipmap.ic_launcher_round)
+                                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                        .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher_round).toBitmap())
+                                        // Set the intent that will fire when the user taps the notification
+                                        .setContentIntent(pendingIntent)
+                                        .setAutoCancel(true)
+                                    //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                                    with(NotificationManagerCompat.from(applicationContext)) {
+                                        // notificationId is a unique int for each notification that you must define
+                                        val m = random!!.nextInt(9999 - 1000) + 1000
+                                        notify(m, builder.build())
+                                    }
+                                } else {
+                                    Log.e("FirestoreRequest", "Error getting documents.", task.exception)
+                                }
                             }
                         }
                     } else {
@@ -265,7 +287,7 @@ class SocketService : IntentService("SocketService") {
                     Log.i("SocketServiceOnline", usersToCheck.toString())
                     socket.emit("online_check", usersToCheck.joinToString(separator = ":"))
                 }
-                Thread.sleep(5000)
+                Thread.sleep(2000)
             }
         })
 

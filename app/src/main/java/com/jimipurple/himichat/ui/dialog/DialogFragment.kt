@@ -46,7 +46,6 @@ class DialogFragment : BaseFragment() {
     private var avatar: String? = null
     private var nickname: String? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
@@ -60,8 +59,9 @@ class DialogFragment : BaseFragment() {
         subtitle = resources.getString(R.string.offline)
 
         app = c!!.applicationContext as MyApp
-        tbar!!.title = nickname
-        tbar!!.setSubtitle(R.string.offline)
+//        this.setOffline()
+//        tbar!!.title = nickname
+//        tbar!!.setSubtitle(R.string.offline)
 //        ac = app!!.currentActivity!! as AppCompatActivity
 //        bar = ac!!.supportActionBar!!
 
@@ -96,10 +96,26 @@ class DialogFragment : BaseFragment() {
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+//        requireActivity().recreate()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val linearLayoutManager = LinearLayoutManager(c)
         linearLayoutManager.stackFromEnd = true
         messageList.layoutManager = linearLayoutManager
+        title = nickname
+        subtitle = resources.getString(R.string.offline)
+
+        app = c!!.applicationContext as MyApp
+//        this.setOffline()
+//        tbar!!.title = nickname
+//        tbar!!.setSubtitle(R.string.offline)
+        val act = app!!.currentActivity!!
+        val t = act.supportActionBar!!
+        t.setTitle(nickname)
+        t.setSubtitle(R.string.offline)
         reloadMsgs()
         dialogMessageInput.button!!.setOnClickListener { onSendBtnClick() }
     }
@@ -183,7 +199,6 @@ class DialogFragment : BaseFragment() {
             }
         }, delete, edit, onHold)
         messageList.adapter = adapter
-//        Thread.sleep(200)
         messageList.scrollToPosition(adapter.itemCount)
     }
 
@@ -229,8 +244,7 @@ class DialogFragment : BaseFragment() {
                 } else {
                     Log.i("dialogMessage", "Error getting documents.", it.exception)
                 }
-            }
-            )
+            })
             //sendMessage(receiverId, senderId, text, msg)
             //Log.i("dialogMessage", "data $data")
 //            reloadMsgs()
@@ -332,6 +346,7 @@ class DialogFragment : BaseFragment() {
 //        val t = act.actionBar
         val act = app!!.currentActivity!!
         val t = act.supportActionBar!!
+        t.setTitle(nickname)
         t!!.setSubtitle(R.string.offline)
     }
 
@@ -340,6 +355,29 @@ class DialogFragment : BaseFragment() {
 //        val t = act.actionBar
         val act = app!!.currentActivity!!
         val t = act.supportActionBar!!
+        val url = Uri.parse(avatar)
+        if (url != null) {
+            val bitmap = com.squareup.picasso.LruCache(c!!)[avatar!!]
+            if (bitmap != null) {
+                t.setLogo(BitmapDrawable(bitmap))
+            } else {
+                Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        com.squareup.picasso.LruCache(c!!).set(avatar!!, bitmap!!)
+                        t.setLogo(BitmapDrawable(bitmap))
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                    }
+                })
+            }
+        } else {
+            Log.i("Profile", "avatar wasn't received")
+        }
+        t.setTitle(nickname)
         t!!.setSubtitle(R.string.online)
     }
 

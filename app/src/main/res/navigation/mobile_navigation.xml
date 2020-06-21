@@ -128,6 +128,12 @@
             app:exitAnim="@animator/fragment_fade_out"
             app:popEnterAnim="@animator/fragment_fade_in"
             app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_friends"/>
+    <action android:id="@+id/action_global_nav_dialog"
+        app:enterAnim="@animator/fragment_fade_in"
+        app:exitAnim="@animator/fragment_fade_out"
+        app:popEnterAnim="@animator/fragment_fade_in"
+        app:popExitAnim="@animator/fragment_fade_out"
+        app:destination="@id/nav_dialog" />
     <action android:id="@+id/action_global_nav_dialogues"
             app:enterAnim="@animator/fragment_fade_in"
             app:exitAnim="@animator/fragment_fade_out"

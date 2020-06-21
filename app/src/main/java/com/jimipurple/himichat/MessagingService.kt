@@ -1,35 +1,26 @@
 package com.jimipurple.himichat
 
-import android.app.PendingIntent
-import android.util.Log
-import com.google.firebase.messaging.FirebaseMessagingService
-import com.google.firebase.messaging.RemoteMessage
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavDeepLinkBuilder
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.encryption.Encryption
 import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
-import com.jimipurple.himichat.models.User
-import com.squareup.picasso.LruCache
-import kotlinx.android.synthetic.main.fragment_profile.*
 import java.util.*
 
 
@@ -143,35 +134,51 @@ class MessagingService : FirebaseMessagingService() {
                                     callbackOnMessageReceived()
                                 }
                                 if (!isDialog || isDialog && currentDialog != sender_id) {
-                                    Log.i("msgServiceTread", "notifed")
-                                    //Picasso.get().load(avatar).get()
-                                    // Create an explicit intent for an Activity in your app
-                                    val b = Bundle()
-                                    b.putString("friend_id", sender_id)
-                                    b.putString("nickname", nickname)
-                                    b.putString("avatar", avatar)
-                                    val pendingIntent = NavDeepLinkBuilder(applicationContext)
-                                        .setComponentName(NavigationActivity::class.java)
-                                        .setGraph(R.navigation.mobile_navigation)
-                                        .setDestination(R.id.nav_dialog)
-                                        .setArguments(b)
-                                        .createPendingIntent()
-                                    val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setPriority(NotificationCompat.PRIORITY_MAX)
-                                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                        .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
-                                        .setContentTitle(nickname)
-                                        .setContentText(text)
-                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                        // Set the intent that will fire when the user taps the notification
-                                        .setContentIntent(pendingIntent)
-                                        .setAutoCancel(true)
-                                    //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
-                                    with(NotificationManagerCompat.from(applicationContext)) {
-                                        // notificationId is a unique int for each notification that you must define
-                                        val m = random!!.nextInt(9999 - 1000) + 1000
-                                        notify(m, builder.build())
+                                    firestore!!.collection("users").document(sender_id).get().addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            val senderData = task.result!!
+                                            val senderNickname = senderData["nickname"] as String
+                                            val senderAvatar = senderData["avatar"] as String
+                                            Log.i("msgServiceTread", "notifed")
+                                            //Picasso.get().load(avatar).get()
+                                            // Create an explicit intent for an Activity in your app
+                                            val b = Bundle()
+                                            b.putString("friend_id", sender_id)
+                                            b.putString("nickname", senderNickname)
+                                            b.putString("avatar", senderAvatar)
+                                            val pendingIntent =
+                                                NavDeepLinkBuilder(applicationContext)
+                                                    .setComponentName(NavigationActivity::class.java)
+                                                    .setGraph(R.navigation.mobile_navigation)
+                                                    .setDestination(R.id.nav_dialog)
+                                                    .setArguments(b)
+                                                    .createPendingIntent()
+                                            val builder = NotificationCompat.Builder(
+                                                applicationContext,
+                                                CHANNEL_ID
+                                            )
+                                                .setSmallIcon(R.mipmap.ic_launcher)
+                                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                                .setLargeIcon(
+                                                    resources.getDrawable(R.mipmap.ic_launcher)
+                                                        .toBitmap()
+                                                )
+                                                .setContentTitle(nickname)
+                                                .setContentText(text)
+                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                                // Set the intent that will fire when the user taps the notification
+                                                .setContentIntent(pendingIntent)
+                                                .setAutoCancel(true)
+                                            //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                                            with(NotificationManagerCompat.from(applicationContext)) {
+                                                // notificationId is a unique int for each notification that you must define
+                                                val m = random!!.nextInt(9999 - 1000) + 1000
+                                                notify(m, builder.build())
+                                            }
+                                        } else {
+                                            Log.e("FirestoreRequest", "Error getting documents.", task.exception)
+                                        }
                                     }
                                 }
                         }
@@ -306,6 +313,17 @@ class MessagingService : FirebaseMessagingService() {
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
     }
+
+    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
 
     override fun onMessageSent(p0: String) {
         super.onMessageSent(p0)

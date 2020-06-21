@@ -330,8 +330,9 @@ class DialoguesFragment : BaseFragment() {
         super.onDestroy()
         try {
             requireActivity().unregisterReceiver(FCMReceiverDialogues)
+            SocketService.setCallbackOnMessageReceived {  }
         } catch (e: Exception) {
-            Log.e("DialoguesFragment", e.message)
+            Log.e("DialoguesFragment", "e " + e.message)
         }
     }
 

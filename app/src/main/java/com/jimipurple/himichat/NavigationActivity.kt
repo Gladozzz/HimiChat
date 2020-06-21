@@ -1,7 +1,8 @@
 package com.jimipurple.himichat
 
 import android.Manifest
-import android.app.Activity
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -13,7 +14,6 @@ import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
 import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -41,6 +42,7 @@ import com.squareup.picasso.LruCache as PicLruCache
 
 class NavigationActivity : BaseActivity() {
 
+    private val NAVIGATE_TO_SENDER = 6
     private val RESULT_LOAD_IMAGE = 1
     private val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2
     private val GET_FROM_GALLERY = 3
@@ -50,6 +52,7 @@ class NavigationActivity : BaseActivity() {
     private var nickname: String? = null
     private var realname: String? = null
     private var storage: FirebaseStorage? = null
+    private var navCon: NavController? = null
     var navOptions = NavOptions.Builder()
         .setLaunchSingleTop(true)  // Used to prevent multiple copies of the same destination
         .setEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
@@ -66,9 +69,22 @@ class NavigationActivity : BaseActivity() {
         return u
     }
 
+    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (!isMyServiceRunning(SocketService::class.java)) {
+            startService(Intent(applicationContext, SocketService::class.java))
+        }
         val sp = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
         currentTheme = sp.getBoolean("night_mode", false)
         when (currentTheme) {
@@ -99,12 +115,11 @@ class NavigationActivity : BaseActivity() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
+        navCon = navController
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_dialogues, R.id.nav_friends, R.id.nav_settings
-            ), drawerLayout
+            navController.graph, drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -126,6 +141,7 @@ class NavigationActivity : BaseActivity() {
             true
         }
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            Log.i("navController", "called " + destination.label)
             when(destination.id) {
                 R.id.nav_dialogues -> {
                     bar!!.setTitle(R.string.menu_dialogues)
@@ -133,6 +149,9 @@ class NavigationActivity : BaseActivity() {
                     bar.setLogo(null)
                 }
                 R.id.nav_dialog -> {
+                    Log.i("navController", "arg " + arguments?.get("nickname"))
+                    Log.i("navController", "arg " + arguments?.get("avatar"))
+                    bar!!.setTitle(R.string.menu_dialog)
                     val title = arguments!!["nickname"] as String
                     val avatar = arguments["avatar"] as String
                     bar!!.title = title
@@ -190,6 +209,26 @@ class NavigationActivity : BaseActivity() {
         mMyApp!!.currentActivity = this
         mMyApp!!.tbar = toolbar
         mMyApp!!.bar = bar
+
+        val extras = intent.extras
+        if (extras != null) {
+            val sender = intent.getBundleExtra("sender")
+            if (sender != null) {
+                val senderName = sender.getString("nickname")
+                val senderId = sender.getString("friend_id")
+                Log.i("NAVIGATE_TO_SENDER", "senderId $senderId")
+                val senderAvatar = sender.getString("avatar")
+                val b = Bundle()
+                b.putString("friend_id", senderId)
+                b.putString("nickname", senderName)
+                b.putString("avatar", senderAvatar)
+                navCon!!.navigate(R.id.nav_dialog, b, navOptions)
+            } else {
+                Log.i("NAVIGATE_TO_SENDER", "Bundle is null")
+            }
+        } else {
+            Log.i("NAVIGATE_TO_SENDER", "Extras is null")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -354,6 +393,21 @@ class NavigationActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            NAVIGATE_TO_SENDER -> {
+                val sender = data!!.getBundleExtra("sender")!!
+                val senderName = sender.getString("nickname")
+                val senderId = sender.getString("friend_id")
+                Log.i("NAVIGATE_TO_SENDER", "onActivityResult senderId $senderId")
+                val senderAvatar = sender.getString("avatar")
+                val b = Bundle()
+                b.putString("friend_id", senderId)
+                b.putString("nickname", senderName)
+                b.putString("avatar", senderAvatar)
+                navCon!!.navigate(R.id.nav_dialog, b, navOptions)
+                return
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
