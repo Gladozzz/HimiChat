@@ -112,10 +112,35 @@ class DialogFragment : BaseFragment() {
 //        this.setOffline()
 //        tbar!!.title = nickname
 //        tbar!!.setSubtitle(R.string.offline)
-        val act = app!!.currentActivity!!
-        val t = act.supportActionBar!!
-        t.setTitle(nickname)
-        t.setSubtitle(R.string.offline)
+        val handler = Handler(c!!.mainLooper)
+        handler.post(Runnable {
+            val act = app!!.currentActivity!!
+            val t = act.supportActionBar!!
+            t.setTitle(nickname)
+            t.setSubtitle(R.string.offline)
+            val url = Uri.parse(avatar)
+            if (url != null) {
+                val bitmap = com.squareup.picasso.LruCache(c!!)[avatar!!]
+                if (bitmap != null) {
+                    t.setLogo(BitmapDrawable(bitmap))
+                } else {
+                    Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                            com.squareup.picasso.LruCache(c!!).set(avatar!!, bitmap!!)
+                            t.setLogo(BitmapDrawable(bitmap))
+                        }
+
+                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                            Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                        }
+                    })
+                }
+            } else {
+                Log.i("Profile", "avatar wasn't received")
+            }
+        })
         reloadMsgs()
         dialogMessageInput.button!!.setOnClickListener { onSendBtnClick() }
     }
@@ -355,29 +380,29 @@ class DialogFragment : BaseFragment() {
 //        val t = act.actionBar
         val act = app!!.currentActivity!!
         val t = act.supportActionBar!!
-        val url = Uri.parse(avatar)
-        if (url != null) {
-            val bitmap = com.squareup.picasso.LruCache(c!!)[avatar!!]
-            if (bitmap != null) {
-                t.setLogo(BitmapDrawable(bitmap))
-            } else {
-                Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        com.squareup.picasso.LruCache(c!!).set(avatar!!, bitmap!!)
-                        t.setLogo(BitmapDrawable(bitmap))
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
-                    }
-                })
-            }
-        } else {
-            Log.i("Profile", "avatar wasn't received")
-        }
-        t.setTitle(nickname)
+//        val url = Uri.parse(avatar)
+//        if (url != null) {
+//            val bitmap = com.squareup.picasso.LruCache(c!!)[avatar!!]
+//            if (bitmap != null) {
+//                t.setLogo(BitmapDrawable(bitmap))
+//            } else {
+//                Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+//                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+//                        com.squareup.picasso.LruCache(c!!).set(avatar!!, bitmap!!)
+//                        t.setLogo(BitmapDrawable(bitmap))
+//                    }
+//
+//                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+//
+//                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+//                        Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+//                    }
+//                })
+//            }
+//        } else {
+//            Log.i("Profile", "avatar wasn't received")
+//        }
+//        t.setTitle(nickname)
         t!!.setSubtitle(R.string.online)
     }
 

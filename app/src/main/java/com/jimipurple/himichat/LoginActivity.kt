@@ -327,6 +327,10 @@ class LoginActivity : BaseActivity() {
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
+//        val api =
+//        googleSignInClient!!.asGoogleApiClient().disconnect()
+//        googleSignInClient!!.asGoogleApiClient().connect()
+//        googleSignInClient!!.asGoogleApiClient().clearDefaultAccountAndReconnect()
         val signInIntent = googleSignInClient!!.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }

@@ -15,19 +15,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.jimipurple.himichat.*
+import com.jimipurple.himichat.BaseFragment
+import com.jimipurple.himichat.LoginActivity
+import com.jimipurple.himichat.NavigationActivity
+import com.jimipurple.himichat.R
 import com.jimipurple.himichat.ui.adapters.SettingsPageAdapter
 import com.squareup.picasso.RequestCreator
 import kotlinx.android.synthetic.main.fragment_settings.*
-import kotlinx.android.synthetic.main.fragment_settings.viewpager_main
 import kotlinx.io.ByteArrayOutputStream
 import java.io.File
 
@@ -69,15 +76,41 @@ class SettingsFragment : BaseFragment() {
 
     private fun logoutButtonOnClick() {
         try {
-            mAuth!!.signOut()
-            SystemClock.sleep(100)
-            val i = Intent(c!!.applicationContext, LoginActivity::class.java)
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(i)
+//            val gso =
+//                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+//
+//            val googleSignInClient = GoogleSignIn.getClient(c!!.applicationContext, gso)
+//            googleSignInClient.signOut()
+//                .addOnCompleteListener {
+//                    if (it.isSuccessful) {
+//                        mAuth!!.signOut()
+//                        SystemClock.sleep(100)
+//                        val i = Intent(c!!.applicationContext, LoginActivity::class.java)
+//                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//                        startActivity(i)
+//                    }}
+
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.web_client_id))
+                .requestEmail()
+                .build()
+            val googleSignInClient = GoogleSignIn.getClient(c!!, gso)
+            googleSignInClient.revokeAccess()
+            googleSignInClient.signOut().addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.i("logout:success", "success from settings ")
+                    mAuth!!.signOut()
+                    SystemClock.sleep(100)
+                    val i = Intent(c!!.applicationContext, LoginActivity::class.java)
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(i)
+                    Runtime.getRuntime().exit(0)
+                } else {
+                    Log.e("logout:fail", "e " + it.exception)
+                }
+            }
         } catch (e: Exception) {
-            Log.e("logout:fail", e.message)
-        } finally {
-            Runtime.getRuntime().exit(0)
+            Log.e("logout:fail", "e " + e.message)
         }
     }
 
