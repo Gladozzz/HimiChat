@@ -101,14 +101,14 @@ class FindFriendFragment : BaseFragment() {
                                                                 nickname = userData["nickname"] as String
                                                             } catch (e: Exception) {
                                                                 nickname = ""
-                                                                Log.i("findUser:get", e.message)
+                                                                Log.i("findUser:get", "e " + e.message)
                                                             }
                                                             var rn = ""
                                                             try {
                                                                 rn = userData["real_name"] as String
                                                             } catch (e: Exception) {
                                                                 rn = ""
-                                                                Log.i("findUser:get", e.message)
+                                                                Log.i("findUser:get", "e " + e.message)
                                                             }
                                                             val avatar = try {
                                                                 userData["avatar"] as String

@@ -249,11 +249,13 @@ class DialoguesFragment : BaseFragment() {
                                 val navController = findNavController()
                                 navController.navigate(R.id.nav_dialogues, null, navOptions)
                             }
-                            dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
-                                override fun onItemClicked(item: Dialog) {
-                                    clickCallback(item)
-                                }
-                            }, onHoldCallback)
+                            if (dialoguesList != null) {
+                                dialoguesList.adapter = DialoguesListAdapter(c!!, dialogs,  object : DialoguesListAdapter.Callback {
+                                    override fun onItemClicked(item: Dialog) {
+                                        clickCallback(item)
+                                    }
+                                }, onHoldCallback)
+                            }
                         }
                     }
 

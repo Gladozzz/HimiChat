@@ -146,8 +146,7 @@ class MessagingService : FirebaseMessagingService() {
                                             b.putString("friend_id", sender_id)
                                             b.putString("nickname", senderNickname)
                                             b.putString("avatar", senderAvatar)
-                                            val pendingIntent =
-                                                NavDeepLinkBuilder(applicationContext)
+                                            val pendingIntent = NavDeepLinkBuilder(applicationContext)
                                                     .setComponentName(NavigationActivity::class.java)
                                                     .setGraph(R.navigation.mobile_navigation)
                                                     .setDestination(R.id.nav_dialog)

@@ -71,6 +71,13 @@
                     android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
                     android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
+
+        <uses-library android:name="android.test.runner"
+            android:required="false" />
+        <uses-library android:name="android.test.base"
+            android:required="false" />
+        <uses-library android:name="android.test.mock"
+            android:required="false" />
     </application>
 
 </manifest>

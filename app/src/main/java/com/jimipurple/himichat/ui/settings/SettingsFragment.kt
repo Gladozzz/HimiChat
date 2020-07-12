@@ -76,20 +76,6 @@ class SettingsFragment : BaseFragment() {
 
     private fun logoutButtonOnClick() {
         try {
-//            val gso =
-//                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
-//
-//            val googleSignInClient = GoogleSignIn.getClient(c!!.applicationContext, gso)
-//            googleSignInClient.signOut()
-//                .addOnCompleteListener {
-//                    if (it.isSuccessful) {
-//                        mAuth!!.signOut()
-//                        SystemClock.sleep(100)
-//                        val i = Intent(c!!.applicationContext, LoginActivity::class.java)
-//                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                        startActivity(i)
-//                    }}
-
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.web_client_id))
                 .requestEmail()

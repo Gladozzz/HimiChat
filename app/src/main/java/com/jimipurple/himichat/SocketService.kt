@@ -123,7 +123,7 @@ class SocketService : IntentService("SocketService") {
             val receiver_public_key = args[5] as String?
             val signature = args[6] as String?
 
-            val kp = KeysDBHelper(applicationContext).getKeyPair(Base64.decode(receiver_public_key, Base64.DEFAULT))
+            val kp = keydb.getKeyPair(Base64.decode(receiver_public_key, Base64.DEFAULT))
             if (kp != null) {
                 val data = mapOf("id" to sender_id)
                 //TODO
@@ -228,6 +228,7 @@ class SocketService : IntentService("SocketService") {
             } else {
                 //TODO Добавление сообщения в диалог с оповещениемс об ошибке расшифрования
             }
+            db.close()
         }
         socket.on("confirm_delivery") { args ->
             Log.i("SocketService", "confirm_delivery $args")
@@ -251,11 +252,13 @@ class SocketService : IntentService("SocketService") {
             } else {
                 Log.i("SocketService", "undelivered message wasn't found")
             }
+            db.close()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        keydb.close()
 //        socket.close()
     }
 

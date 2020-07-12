@@ -174,6 +174,53 @@ class DialogFragment : BaseFragment() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        val socket = SocketService.socket
+        socket.off("online_list")
+        MessagingService.isDialog = false
+        MessagingService.setCallbackOnMessageRecieved { }
+        SocketService.setCallbackOnMessageReceived {  }
+        try {
+            requireActivity().unregisterReceiver(FCMReceiver)
+        } catch (e: Exception) {
+            Log.e("DialogFragment", "e " + e.message)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
+        SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
+        SocketService.usersToCheck = arrayListOf(friend_id!!)
+        MessagingService.isDialog = true
+        MessagingService.currentDialog = friend_id!!
+        val socket = SocketService.socket
+        socket.on("online_list") { args ->
+            val online = args[0] as String
+//            Log.i("SocketServiceOnline", "online_list $online")
+            if (online != "") {
+                c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("online", online).apply()
+                var userOnline = false
+                online.split(":").forEach {
+                    if (it == friend_id) {
+                        userOnline = true
+                    }
+                }
+                val handler = Handler(c!!.mainLooper)
+                handler.post(Runnable {
+                    if (userOnline) {
+//                        tbar!!.setSubtitle(R.string.online)
+                        setOnline()
+                    } else {
+//                        tbar!!.setSubtitle(R.string.offline)
+                        setOffline()
+                    }
+                })
+            }
+        }
+    }
+
     fun reloadMsgs() {
         val allMsgs = db!!.getMessages()
         val msgs = ArrayList<Message>()
@@ -287,7 +334,7 @@ class DialogFragment : BaseFragment() {
         )
 //        messageInput.setText("")
         db!!.pushMessage(msg)
-        Log.i("msgTest", c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+        Log.i("msgTest", "token: " + c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
         functions!!
             .getHttpsCallable("sendMessage")
             .call(data).addOnCompleteListener { task ->

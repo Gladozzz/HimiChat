@@ -1,7 +1,7 @@
 package com.jimipurple.himichat.encryption
 
 import android.net.Uri
-import android.util.Log
+//import android.util.Log
 import org.whispersystems.curve25519.Curve25519
 import org.whispersystems.curve25519.Curve25519KeyPair
 import java.io.File
@@ -42,7 +42,7 @@ object Encryption {
         //SecureRandom().nextBytes(iv)
         //val spec = GCMParameterSpec(128, iv)
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec, IvParameterSpec(iv))
-        Log.i("generateKeysIV", String(cipher.iv, Charsets.UTF_8))
+//        Log.d("generateKeysIV", String(cipher.iv, Charsets.UTF_8))
         //cipher.iv
         return cipher.doFinal(clear)
     }
@@ -57,7 +57,7 @@ object Encryption {
         //SecureRandom().nextBytes(iv)
         //val spec = GCMParameterSpec(128, iv)
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec, IvParameterSpec(iv))
-        Log.i("generateKeysIV", String(cipher.iv, Charsets.UTF_8))
+//        Log.d("generateKeysIV", String(cipher.iv, Charsets.UTF_8))
         //cipher.iv
         return cipher.doFinal(clear)
     }
