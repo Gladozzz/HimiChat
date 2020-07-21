@@ -219,7 +219,7 @@ class MessagingService : FirebaseMessagingService() {
                                 Log.i("msgService", "receiver_public_key $receiver_public_key")
                                 Log.i("msgService", "signature $signature")
                                 //val db = MessagesDBHelper(applicationContext)
-                                val msg = ReceivedMessage(null, sender_id, receiver_id, text, Date().time, null, null)
+                                val msg = ReceivedMessage(null, sender_id, receiver_id, text, Calendar.getInstance().timeInMillis, null, null)
                                 val data1 = mapOf(
                                     "senderId" to sender_id,
                                     "deliveredId" to remoteMessage.data["delivered_id"]!!,
@@ -283,7 +283,7 @@ class MessagingService : FirebaseMessagingService() {
                     Log.i("msgService", "delivered_id ${remoteMessage.data["delivered_id"]!!}")
                     Log.i("msgService", unmsg.toString())
                     if (unmsg != null) {
-                        val msg = SentMessage(null, mAuth!!.uid!!, unmsg.receiverId, unmsg.text, Date().time, null, null)
+                        val msg = SentMessage(null, mAuth!!.uid!!, unmsg.receiverId, unmsg.text, Calendar.getInstance().timeInMillis, null, null)
                         db.deleteUndeliveredMessage(remoteMessage.data["delivered_id"]!!)
                         db.pushMessage(msg)
                         Log.i("msgService", msg.toString())

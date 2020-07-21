@@ -1,6 +1,7 @@
 package com.jimipurple.himichat.ui.settings
 
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -17,6 +18,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.core.app.ActivityCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -64,8 +66,19 @@ class ProfileSettingsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
-//        loadAvatarButton.setOnClickListener { loadAvatarCallback() }
-        avatarView.setOnClickListener { app!!.loadAvatarCallback() }
+        avatarView.setOnClickListener {
+            val a = requireActivity()
+            if (a is NavigationActivity) {
+//                a.loadAvatarButtonOnClick()
+                loadAvatarButtonOnClick()
+            }
+        }
+        logoutButton.setOnClickListener {
+            val a = requireActivity()
+            if (a is NavigationActivity) {
+                a.logoutButtonOnClick()
+            }
+        }
         deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
         nicknameEdit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
@@ -89,12 +102,31 @@ class ProfileSettingsFragment : BaseFragment() {
         renameRealnameButton.setOnClickListener { setRealname() }
         cancelNicknameButton.setOnClickListener { updateNickname() }
         cancelRealnameButton.setOnClickListener { updateRealname() }
-        logoutButton.setOnClickListener { app!!.logoutCallback() }
 
         updateBySaved()
         updateAvatar()
         updateNickname()
         updateRealname()
+    }
+
+    private fun loadAvatarButtonOnClick() {
+        val a = requireActivity()
+        if (a is NavigationActivity) {
+            if (ActivityCompat.checkSelfPermission(a, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    app!!.currentActivity!!,
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
+                )
+            } else {
+                Log.e("settingsFragment", "PERMISSION GRANTED")
+                val i = Intent(
+                    Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                )
+                startActivityForResult(i, RESULT_LOAD_IMAGE)
+            }
+        }
     }
 
     private fun updateNickname() {

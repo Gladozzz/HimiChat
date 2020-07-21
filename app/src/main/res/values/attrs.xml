@@ -8,6 +8,8 @@
     <attr name="primaryTextColor" format="color|reference"/>
     <attr name="сloudSent" format="color|reference"/>
     <attr name="сloudReceived" format="color|reference"/>
+    <attr name="dateViewShape" format="color|reference"/>
+    <attr name="darkTextColor" format="color"/>
 
     <declare-styleable name="MessageInput">
         <attr name="inputButtonBackground" format="reference"/>

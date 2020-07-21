@@ -62,62 +62,9 @@ class SettingsFragment : BaseFragment() {
 
         val data = mapOf("id" to mAuth!!.uid!!)
 
-        app!!.logoutCallback = {
-            logoutButtonOnClick()
-        }
-        app!!.loadAvatarCallback = {
-            loadAvatarButtonOnClick()
-        }
-
         fragmentAdapter = SettingsPageAdapter(this.childFragmentManager, c!!.applicationContext)
         viewpager_main.adapter = fragmentAdapter
         SettingsTabs.setupWithViewPager(viewpager_main)
-    }
-
-    private fun logoutButtonOnClick() {
-        try {
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
-                .requestEmail()
-                .build()
-            val googleSignInClient = GoogleSignIn.getClient(c!!, gso)
-            googleSignInClient.revokeAccess()
-            googleSignInClient.signOut().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Log.i("logout:success", "success from settings ")
-                    mAuth!!.signOut()
-                    SystemClock.sleep(100)
-                    val i = Intent(c!!.applicationContext, LoginActivity::class.java)
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(i)
-                    Runtime.getRuntime().exit(0)
-                } else {
-                    Log.e("logout:fail", "e " + it.exception)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("logout:fail", "e " + e.message)
-        }
-    }
-
-    private fun loadAvatarButtonOnClick() {
-        if (checkPermission()) {
-            val i = Intent(
-                Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            )
-            startActivityForResult(i, RESULT_LOAD_IMAGE)
-        }
-    }
-
-    private fun checkPermission(): Boolean {
-        return if (ActivityCompat.checkSelfPermission(c!!, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(app!!.currentActivity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
-            false
-        } else {
-            Log.e("settingsFragment", "PERMISSION GRANTED")
-            true
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -19,8 +19,6 @@ class MyApp : Application() {
     var avatar: String? = null
     val Context.myApp: MyApp
         get() = applicationContext as MyApp
-    var logoutCallback: () -> Unit = {}
-    var loadAvatarCallback: () -> Unit = {}
 
     override fun onCreate() {
         super.onCreate()

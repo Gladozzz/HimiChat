@@ -150,7 +150,7 @@ class SocketService : IntentService("SocketService") {
                         Log.i("SocketService", "receiver_public_key $receiver_public_key")
                         Log.i("SocketService", "signature $signature")
                         //val db = MessagesDBHelper(applicationContext)
-                        val msg = ReceivedMessage(null, sender_id!!, receiver_id!!, text, Date().time, null, null)
+                        val msg = ReceivedMessage(null, sender_id!!, receiver_id!!, text, Calendar.getInstance().timeInMillis, null, null)
                         val data1 = mapOf(
                             "senderId" to sender_id,
                             "deliveredId" to delivery_id,
@@ -244,7 +244,7 @@ class SocketService : IntentService("SocketService") {
             Log.i("SocketService", "delivered_id $dId")
             Log.i("SocketService", unmsg.toString())
             if (unmsg != null) {
-                val msg = SentMessage(null, mAuth!!.uid!!, unmsg!!.receiverId, unmsg!!.text, Date().time, null, null)
+                val msg = SentMessage(null, mAuth!!.uid!!, unmsg!!.receiverId, unmsg!!.text, Calendar.getInstance().timeInMillis, null, null)
                 db.deleteUndeliveredMessage(dId.toString())
                 db.pushMessage(msg)
                 Log.i("SocketService", msg.toString())

@@ -5,8 +5,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-    android:background="?attr/primaryDark"
-        android:orientation="horizontal">
+        android:background="?attr/primaryDark"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/receivedMsgDateDividerViewBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:gravity="center"
+        android:foregroundGravity="center"
+        android:orientation="vertical"
+        android:padding="5dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/receivedMsgDateDividerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:foregroundGravity="left"
+            android:gravity="start"
+            android:textColor="?attr/darkTextColor"
+            tools:text="da:te" />
+
+    </LinearLayout>
 
     <LinearLayout
             android:layout_width="match_parent"

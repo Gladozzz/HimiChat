@@ -5,14 +5,16 @@ import com.google.gson.*
 import java.lang.reflect.Type
 import java.security.PrivateKey
 import java.security.PublicKey
+import java.text.SimpleDateFormat
 import java.util.*
 
 
-abstract class Message(mid: Int?, sId: String, rId: String, txt: String) {
+abstract class Message(mid: Int?, sId: String, rId: String, txt: String, d: Long?) {
     var id = mid
     var senderId = sId
     var receiverId = rId
     var text : String = txt
+    var date: Long? = d
 
 
 
@@ -22,7 +24,14 @@ abstract class Message(mid: Int?, sId: String, rId: String, txt: String) {
     }
 }
 
-class ReceivedMessage(mid: Int?, sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(mid, sId, rId, txt) {
+class DateMessage(var dateString: String) {
+    /* Not a Message in the fact. MessageListAdapter needs to handle Message, but i needed to divide items with date. */
+    override fun toString(): String {
+        return "($dateString)"
+    }
+}
+
+class ReceivedMessage(mid: Int?, sId: String, rId: String, txt: String, date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(mid, sId, rId, txt, date) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
@@ -45,8 +54,9 @@ class ReceivedMessage(mid: Int?, sId: String, rId: String, txt: String, var date
         //TODO шифрование открытым ключом из объекта класса
     }
 
-    fun dateString(): String {
-        return ""
+    fun getTimeString(): String {
+        val df = SimpleDateFormat("HH:mm")
+        return df.format(date)
     }
 
     override fun toString(): String {
@@ -55,31 +65,32 @@ class ReceivedMessage(mid: Int?, sId: String, rId: String, txt: String, var date
     }
 }
 
-class SentMessage(mid: Int?, sId: String, rId: String, txt: String, var date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(mid, sId, rId, txt) {
+class SentMessage(mid: Int?, sId: String, rId: String, txt: String, date: Long?, encryptedTxt: String?, pubKey: ByteArray?): Message(mid, sId, rId, txt, date) {
     //var senderId = sId
     //    var receiverId = rId
 //    var text : String = txt
     var encryptedText : String? = encryptedTxt
     var publicKey : ByteArray? = pubKey
 
-    fun getPublicKey() {
-        //TODO получение класса PublicKey на основе свойства publicKey
-    }
+//    fun getPublicKey() {
+//        //TODO получение класса PublicKey на основе свойства publicKey
+//    }
+//
+//    fun decrypt(key : PrivateKey) {
+//        //TODO дешифровка зашифрованного текста
+//    }
+//
+//    fun encrypt(key : PublicKey) {
+//        //TODO шифрование открытым ключом
+//    }
+//
+//    fun encrypt() {
+//        //TODO шифрование открытым ключом из объекта класса
+//    }
 
-    fun decrypt(key : PrivateKey) {
-        //TODO дешифровка зашифрованного текста
-    }
-
-    fun encrypt(key : PublicKey) {
-        //TODO шифрование открытым ключом
-    }
-
-    fun encrypt() {
-        //TODO шифрование открытым ключом из объекта класса
-    }
-
-    fun dateString(): String {
-        return ""
+    fun getTimeString(): String {
+        val df = SimpleDateFormat("HH:mm")
+        return df.format(date)
     }
 
     override fun toString(): String {
@@ -88,7 +99,7 @@ class SentMessage(mid: Int?, sId: String, rId: String, txt: String, var date: Lo
     }
 }
 
-class UndeliveredMessage(sId: String, rId: String, txt: String, dId: Long) : Message(null, sId, rId, txt) {
+class UndeliveredMessage(sId: String, rId: String, txt: String, dId: Long) : Message(null, sId, rId, txt, null) {
     //var receiverId = rId
     //var text : String = txt
     var deliveredId: Long = dId

@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
@@ -32,6 +33,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
@@ -335,15 +338,30 @@ class NavigationActivity : BaseActivity() {
             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
     }
 
-    private fun loadAvatarButtonOnClick() {
-        val i = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-
-        startActivityForResult(i, RESULT_LOAD_IMAGE)
-
-        setupPermissions()
+    fun logoutButtonOnClick() {
+        try {
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.web_client_id))
+                .requestEmail()
+                .build()
+            val googleSignInClient = GoogleSignIn.getClient(this, gso)
+            googleSignInClient.revokeAccess()
+            googleSignInClient.signOut().addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.i("logout:success", "success from settings ")
+                    mAuth!!.signOut()
+                    SystemClock.sleep(100)
+                    val i = Intent(applicationContext, LoginActivity::class.java)
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(i)
+                    Runtime.getRuntime().exit(0)
+                } else {
+                    Log.e("logout:fail", "e " + it.exception)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("logout:fail", "e " + e.message)
+        }
     }
 
     override fun onStart() {

@@ -1,24 +1,27 @@
 package com.jimipurple.himichat.ui.adapters
 
 import android.content.Context
-import android.content.res.Resources
+import android.text.format.DateFormat
 import android.util.Log
-import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.MessagesDBHelper
-import com.jimipurple.himichat.models.*
+import com.jimipurple.himichat.models.Message
+import com.jimipurple.himichat.models.ReceivedMessage
+import com.jimipurple.himichat.models.SentMessage
+import com.jimipurple.himichat.models.UndeliveredMessage
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MessageListAdapter(val context: Context, var items: ArrayList<Message>, val clickCallback: Callback, val deleteCallback: (msg: Message)-> Unit, val editCallback: (msg: Message)-> Unit, val onHoldCallback: (msg: Message)->Unit) : RecyclerView.Adapter<MessageListAdapter.BaseViewHolder>() {
@@ -46,6 +49,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        holder.pos = position
         holder.bind(items[position])
         Log.i("Recycler", "items $items")
 
@@ -67,7 +71,6 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
                     }
                 }
             }
-
             else -> {
                 holder.itemView.setOnCreateContextMenuListener { contextMenu, _, _ ->
                     contextMenu.add(context.getString(R.string.context_menu_item_remove)).setOnMenuItemClickListener {
@@ -80,15 +83,15 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
     }
 
     override fun getItemViewType(position: Int): Int {
-        when (items[position]) {
+        return when (items[position]) {
             is ReceivedMessage -> {
-                return ItemViewType.RECEIVED_MESSAGE
+                ItemViewType.RECEIVED_MESSAGE
             }
             is SentMessage -> {
-                return ItemViewType.SENT_MESSAGE
+                ItemViewType.SENT_MESSAGE
             }
             else -> {
-                return ItemViewType.UNDELIVERED_MESSAGE
+                ItemViewType.UNDELIVERED_MESSAGE
             }
         }
     }
@@ -96,18 +99,53 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
     inner class ReceivedMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
         private val text = itemView.findViewById(R.id.receivedMessageText) as TextView
-        private val date = itemView.findViewById(R.id.receivedMessageDate) as TextView
+        private val dateView = itemView.findViewById(R.id.receivedMessageDate) as TextView
+        private val dateDividerView = itemView.findViewById(R.id.receivedMsgDateDividerView) as TextView
+        private val box = itemView.findViewById(R.id.receivedMsgDateDividerViewBox) as LinearLayout
 
         override fun bind(item: Message) {
+            val calendar: Calendar = Calendar.getInstance()
             val i = item as ReceivedMessage
-            text.text = item.text
-            val d = i.date
-            val dateTime = i.date
-            Log.i("messagesAdapter", "dateTime $dateTime")
-            Log.i("messagesAdapter", "dateLong $d")
-            val df = SimpleDateFormat("HH:mm")
-            val formattedDate = df.format(d)
-            date.text = formattedDate
+            text.text = i.text
+            text.text = i.text
+            if (pos != null && pos!! > 0) {
+                val prevItem = items[pos!! - 1]
+                val d = i.date
+                val prevD = prevItem.date
+                if (d != null) {
+                    val dateTime = i.date
+                    Log.i("messagesAdapter", "dateTime $dateTime")
+                    Log.i("messagesAdapter", "dateLong $d")
+                    val locale = context.resources.configuration.locale
+                    calendar.timeInMillis = d
+                    val formattedTime = i.getTimeString()
+                    val formattedDay = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                    val formattedMonth = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, locale)!!
+                    val formattedYear = calendar.get(Calendar.YEAR).toString()
+                    calendar.timeInMillis = prevD!!
+                    val prevTime = i.getTimeString()
+                    val prevDay = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                    val prevMonth = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, locale)!!
+                    val prevYear = calendar.get(Calendar.YEAR).toString()
+                    if (formattedYear != prevYear) {
+                        dateDividerView.text = ("$formattedDay $formattedMonth $formattedYear")
+                        box.visibility = View.VISIBLE
+                    } else if (formattedDay != prevDay){
+                        dateDividerView.text = ("$formattedDay $formattedMonth")
+                        box.visibility = View.VISIBLE
+                    }
+                    dateView.text = formattedTime
+                }
+            } else {
+                val locale = context.resources.configuration.locale
+                val formattedTime = i.getTimeString()
+                val formattedDay = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                val formattedMonth = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, locale)!!
+                val formattedYear = calendar.get(Calendar.YEAR).toString()
+                dateDividerView.text = ("$formattedDay $formattedMonth $formattedYear")
+                box.visibility = View.VISIBLE
+                dateView.text = formattedTime
+            }
 
 //            itemView.setOnClickListener {
 //                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
@@ -122,19 +160,52 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
     inner class SentMessageHolder(itemView: View) : BaseViewHolder(itemView) {
 
         private val text = itemView.findViewById(R.id.sentMessageText) as TextView
-        private val date = itemView.findViewById(R.id.sentMessageDate) as TextView
+        private val dateView = itemView.findViewById(R.id.sentMessageDate) as TextView
+        private val dateDividerView = itemView.findViewById(R.id.sentMsgDateDividerView) as TextView
+        private val box = itemView.findViewById(R.id.sentMsgDateDividerViewBox) as LinearLayout
 
         override fun bind(item: Message) {
+            val calendar: Calendar = Calendar.getInstance()
             val i = item as SentMessage
             text.text = i.text
-            val d = i.date
-            val dateTime = i.date
-            Log.i("messagesAdapter", "dateTime $dateTime")
-            Log.i("messagesAdapter", "dateLong $d")
-            //val df = SimpleDateFormat("dd-MMM-yyyy")
-            val df = SimpleDateFormat("HH:mm")
-            val formattedDate = df.format(d)
-            date.text = formattedDate
+            if (pos != null && pos!! > 0) {
+                val prevItem = items[pos!! - 1]
+                val d = i.date
+                val prevD = prevItem.date
+                if (d != null) {
+                    val dateTime = i.date
+                    Log.i("messagesAdapter", "dateTime $dateTime")
+                    Log.i("messagesAdapter", "dateLong $d")
+                    val locale = context.resources.configuration.locale
+                    calendar.timeInMillis = d
+                    val formattedTime = i.getTimeString()
+                    val formattedDay = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                    val formattedMonth = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, locale)!!
+                    val formattedYear = calendar.get(Calendar.YEAR).toString()
+                    calendar.timeInMillis = prevD!!
+                    val prevTime = i.getTimeString()
+                    val prevDay = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                    val prevMonth = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, locale)!!
+                    val prevYear = calendar.get(Calendar.YEAR).toString()
+                    if (formattedYear != prevYear) {
+                        dateDividerView.text = ("$formattedDay $formattedMonth $formattedYear")
+                        box.visibility = View.VISIBLE
+                    } else if (formattedDay != prevDay){
+                        dateDividerView.text = ("$formattedDay $formattedMonth")
+                        box.visibility = View.VISIBLE
+                    }
+                    dateView.text = formattedTime
+                }
+            } else {
+                val locale = context.resources.configuration.locale
+                val formattedTime = i.getTimeString()
+                val formattedDay = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                val formattedMonth = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, locale)!!
+                val formattedYear = calendar.get(Calendar.YEAR).toString()
+                dateDividerView.text = ("$formattedDay $formattedMonth $formattedYear")
+                box.visibility = View.VISIBLE
+                dateView.text = formattedTime
+            }
 
 //            itemView.setOnClickListener {
 //                if (adapterPosition != RecyclerView.NO_POSITION) clickCallback.onItemClicked(items[adapterPosition])
@@ -194,6 +265,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
 
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         abstract fun bind(item: Message)
+        var pos: Int? = null
     }
 
     interface Callback {
@@ -205,6 +277,7 @@ class MessageListAdapter(val context: Context, var items: ArrayList<Message>, va
             val RECEIVED_MESSAGE = 0
             val SENT_MESSAGE = 1
             val UNDELIVERED_MESSAGE = 2
+            val DATE_ITEM = 3
         }
     }
 }
