@@ -19,6 +19,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -27,6 +28,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.BaseFragment
 import com.jimipurple.himichat.NavigationActivity
 import com.jimipurple.himichat.R
+import com.jimipurple.himichat.data.FirebaseSource
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.LruCache
@@ -74,10 +76,8 @@ class ProfileSettingsFragment : BaseFragment() {
             }
         }
         logoutButton.setOnClickListener {
-            val a = requireActivity()
-            if (a is NavigationActivity) {
-                a.logoutButtonOnClick()
-            }
+            logoutButton.background = ContextCompat.getDrawable(c!!, R.color.text_button_on_click)
+            FirebaseSource(c!!).logout()
         }
         deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
         nicknameEdit.addTextChangedListener(object : TextWatcher {
@@ -122,7 +122,7 @@ class ProfileSettingsFragment : BaseFragment() {
                 Log.e("settingsFragment", "PERMISSION GRANTED")
                 val i = Intent(
                     Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
                 startActivityForResult(i, RESULT_LOAD_IMAGE)
             }
@@ -173,7 +173,6 @@ class ProfileSettingsFragment : BaseFragment() {
     fun getColorFromAttr(): Int {
         val typedValue = TypedValue()
         currentTheme!!.resolveAttribute(R.attr.primaryTextColor, typedValue, true)
-        @ColorInt val color = typedValue.data
         return typedValue.data
     }
 
@@ -188,7 +187,7 @@ class ProfileSettingsFragment : BaseFragment() {
         val pref = SharedPreferencesUtility(c!!)
         val savedNickname = pref.getString("nickname")
         val savedRealname = pref.getString("realname")
-        var savedAvatar = pref.getString("avatar")
+        val savedAvatar = pref.getString("avatar")
         nicknameEdit.setText(savedNickname)
         realnameEdit.setText(savedRealname)
         if (savedAvatar != null) {

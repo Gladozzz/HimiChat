@@ -27,13 +27,13 @@ class FriendsFragment : BaseFragment() {
 //    private var firebaseToken: String  = ""
 //    private var functions = FirebaseFunctions.getInstance()
 
-    private fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
-        val u : ArrayList<User> = ArrayList<User>()
-        h.forEach {
-            u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
-        }
-        return u
-    }
+//    private fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
+//        val u : ArrayList<User> = ArrayList<User>()
+//        h.forEach {
+//            u.add(User((it["id"] as String), (it["nickname"] as String), (it["realname"] as String), (it["avatar"] as String)))
+//        }
+//        return u
+//    }
 
     private fun usersToStrings(h : ArrayList<User>) : ArrayList<String> {
         val s : ArrayList<String> = ArrayList<String>()

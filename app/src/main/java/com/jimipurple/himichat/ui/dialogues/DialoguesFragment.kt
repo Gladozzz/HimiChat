@@ -149,6 +149,7 @@ class DialoguesFragment : BaseFragment() {
                 Log.i("dialogsTest", "SharedPreferences is empty")
             }
 
+
             val allMsgs = db!!.getMessages()
             val msgs = allMsgs
             val dialogs = ArrayList<Dialog>()

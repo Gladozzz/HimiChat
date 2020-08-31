@@ -4,12 +4,15 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.Dialog
@@ -20,15 +23,15 @@ import java.lang.Exception
 
 class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, val clickCallback: Callback?, val onHoldCallback: (d: Dialog)-> Unit) : RecyclerView.Adapter<DialoguesListAdapter.DialogHolder>() {
 
-    private fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
-        val u : ArrayList<User> = ArrayList<User>()
-        h.forEach {
-            u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
-        }
-        Log.i("convert", h.toString())
-        Log.i("convert", u.toString())
-        return u
-    }
+//    private fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
+//        val u : ArrayList<User> = ArrayList<User>()
+//        h.forEach {
+//            u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
+//        }
+//        Log.i("convert", h.toString())
+//        Log.i("convert", u.toString())
+//        return u
+//    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DialogHolder {
         val view = LayoutInflater.from(parent.context)

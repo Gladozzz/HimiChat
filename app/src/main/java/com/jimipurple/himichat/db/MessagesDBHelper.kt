@@ -134,8 +134,8 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
     }
     fun deleteAllMessages() {
         val db = this.writableDatabase
-        db.execSQL("delete from "+ TableUndeliveredMessages.TABLE_NAME);
-        db.execSQL("delete from "+ TableMessages.TABLE_NAME);
+        db.execSQL("delete from "+ TableUndeliveredMessages.TABLE_NAME)
+        db.execSQL("delete from "+ TableMessages.TABLE_NAME)
         db.close()
     }
     fun deleteMessage(message: Message) {

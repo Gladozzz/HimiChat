@@ -64,7 +64,7 @@
             app:layout_constraintTop_toBottomOf="@+id/nicknameEdit">
 
         <ImageView
-                android:id="@+id/findfriendAvatarView"
+                android:id="@+id/findFriendAvatarView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="top"
@@ -95,7 +95,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="90"
-                android:editable="false"
                 android:inputType="none"
                 android:text="Nickname"
                 android:textColor="?attr/primaryTextColor"
@@ -126,7 +125,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="90"
-                android:editable="false"
                 android:gravity="fill_horizontal"
                 android:inputType="none"
                 android:text="Realname"
@@ -145,50 +143,54 @@
 
 
             <Button
-                    android:id="@+id/profileEditButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_weight="4"
-                    android:background="@drawable/roundcorner"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/button_edit_profile"
-                    android:visibility="gone" />
+                android:id="@+id/profileEditButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="4"
+                android:background="@drawable/button_on_click"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/button_edit_profile"
+                android:visibility="gone" />
 
             <Button
-                    android:id="@+id/findfriendRemoveFriendButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_weight="4"
-                    android:background="@drawable/roundcorner"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/button_remove_friend" />
+                android:id="@+id/findfriendRemoveFriendButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="4"
+                android:background="@drawable/button_on_click"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/button_remove_friend" />
 
             <Button
-                    android:id="@+id/findfriendSendMessageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_weight="4"
-                    android:background="@drawable/roundcorner"
-                    android:paddingLeft="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/button_send_message" />
+                android:id="@+id/findfriendSendMessageButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="4"
+                android:background="@drawable/button_on_click"
+                android:paddingLeft="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/button_send_message" />
 
             <Button
-                    android:id="@+id/findfriendInviteButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_weight="4"
-                    android:background="@drawable/roundcorner"
-                    android:paddingLeft="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/button_Invite"
-                    android:visibility="gone" />
+                android:id="@+id/findfriendInviteButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="4"
+                android:background="@drawable/button_on_click"
+                android:paddingLeft="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/button_Invite"
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>

@@ -206,4 +206,33 @@ data class Msg(
     var date : Date,
     var encryptedText : String?,
     var publicKey : ByteArray?
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Msg
+
+        if (senderId != other.senderId) return false
+        if (receiverId != other.receiverId) return false
+        if (text != other.text) return false
+        if (date != other.date) return false
+        if (encryptedText != other.encryptedText) return false
+        if (publicKey != null) {
+            if (other.publicKey == null) return false
+            if (!publicKey.contentEquals(other.publicKey)) return false
+        } else if (other.publicKey != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = senderId.hashCode()
+        result = 31 * result + receiverId.hashCode()
+        result = 31 * result + text.hashCode()
+        result = 31 * result + date.hashCode()
+        result = 31 * result + (encryptedText?.hashCode() ?: 0)
+        result = 31 * result + (publicKey?.contentHashCode() ?: 0)
+        return result
+    }
+}

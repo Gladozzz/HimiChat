@@ -6,9 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.util.Patterns
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -23,8 +31,10 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
+import com.jimipurple.himichat.data.FirebaseSource
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.Encryption
+import com.jimipurple.himichat.ui.login.AuthViewModel
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.login_mode_layout.*
 import kotlinx.android.synthetic.main.register_mode_layout.*
@@ -39,16 +49,20 @@ class LoginActivity : BaseActivity() {
     private var keydb = KeysDBHelper(this)
     private var googleSignInClient: GoogleSignInClient? = null
 
-    var profile_id : String? = null
+    var profile_id: String? = null
     private var nickname: String? = null
     private var realname: String? = null
     private var avatar: String? = null
     private var currentTheme: Boolean = false
+    private var fbSource: FirebaseSource? = null
+
+    private lateinit var authViewModel: AuthViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         val sp = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+        fbSource = FirebaseSource(applicationContext)
         currentTheme = sp.getBoolean("night_mode", false)
         when (currentTheme) {
             true -> {
@@ -65,67 +79,175 @@ class LoginActivity : BaseActivity() {
         mAuth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         functions = FirebaseFunctions.getInstance()
-        firebaseToken = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")!!
+        firebaseToken = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+            .getString("firebaseToken", "")!!
 
         registerModeButton.setOnClickListener { setRegisterMode() }
         loginModeButton.setOnClickListener { setLoginMode() }
         registerButton.setOnClickListener { registerButtonOnClick() }
         signInButton.setOnClickListener { signInButtonOnClick() }
         signWithGoogleButton.setOnClickListener { signWithGoogleButtonOnClick() }
+
+        authViewModel = ViewModelProviders.of(this)
+            .get(AuthViewModel::class.java)
+
+        //set up model for sign in form
+        authViewModel.authFormState.observe(this@LoginActivity, Observer {
+            val authState = it ?: return@Observer
+
+            // disable login button unless both username / password is valid
+            signInButton.isEnabled = authState.isDataValid
+
+            authEmailInput.isErrorEnabled = false
+            authPasswordInput.isErrorEnabled = false
+            if (authState.emailError != null) {
+                authEmailInput.error = getString(authState.emailError!!)
+                authEmailInput.isErrorEnabled = true
+            }
+            if (authState.passwordError != null) {
+                authPasswordInput.error = getString(authState.passwordError!!)
+                authPasswordInput.isErrorEnabled = true
+            }
+        })
+        emailEdit.afterTextChanged {
+            authViewModel.authDataChanged(
+                emailEdit.text.toString(),
+                passwordSignEdit.text.toString()
+            )
+        }
+        passwordSignEdit.apply {
+            afterTextChanged {
+                authViewModel.authDataChanged(
+                    emailEdit.text.toString(),
+                    passwordSignEdit.text.toString()
+                )
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE ->
+                        signInButtonOnClick()
+                }
+                false
+            }
+        }
+
+        //set up model for sign up form
+        authViewModel.regFormState.observe(this@LoginActivity, Observer {
+            val regState = it ?: return@Observer
+
+            // disable login button unless form is valid
+            registerButton.isEnabled = regState.isDataValid
+
+            regEmailInput.isErrorEnabled = false
+            regPasswordInput.isErrorEnabled = false
+            regPasswordRepeatInput.isErrorEnabled = false
+            regRealnameInput.isErrorEnabled = false
+            regNicknameInput.isErrorEnabled = false
+            if (regState.emailError != null) {
+                regEmailInput.error = getString(regState.emailError!!)
+                regEmailInput.isErrorEnabled = true
+            }
+            if (regState.passwordError != null) {
+                regPasswordInput.error = getString(regState.passwordError!!)
+                regPasswordInput.isErrorEnabled = true
+            }
+            if (regState.passwordRepeatError != null) {
+                regPasswordRepeatInput.error = getString(regState.passwordRepeatError!!)
+                regPasswordRepeatInput.isErrorEnabled = true
+            }
+            if (regState.realNameError != null) {
+                regRealnameInput.error = getString(regState.realNameError!!)
+                regRealnameInput.isErrorEnabled = true
+            }
+            if (regState.nicknameError != null) {
+                regNicknameInput.error = getString(regState.nicknameError!!)
+                regNicknameInput.isErrorEnabled = true
+            }
+        })
+        emailRegisterEdit.afterTextChanged {
+            authViewModel.regDataChanged(
+                emailRegisterEdit.text.toString(),
+                passwordRegisterEdit.text.toString(),
+                passwordRepeatEdit.text.toString(),
+                realNameEdit.text.toString(),
+                nicknameEdit.text.toString()
+            )
+        }
+        passwordRegisterEdit.apply {
+            afterTextChanged {
+                authViewModel.regDataChanged(
+                    emailRegisterEdit.text.toString(),
+                    passwordRegisterEdit.text.toString(),
+                    passwordRepeatEdit.text.toString(),
+                    realNameEdit.text.toString(),
+                    nicknameEdit.text.toString()
+                )
+            }
+//            setOnEditorActionListener { _, actionId, _ ->
+//                when (actionId) {
+//                    EditorInfo.IME_ACTION_DONE ->
+//                        registerButtonOnClick()
+//                }
+//                false
+//            }
+        }
+        passwordRepeatEdit.afterTextChanged {
+            authViewModel.regDataChanged(
+                emailRegisterEdit.text.toString(),
+                passwordRegisterEdit.text.toString(),
+                passwordRepeatEdit.text.toString(),
+                realNameEdit.text.toString(),
+                nicknameEdit.text.toString()
+            )
+        }
+        realNameEdit.afterTextChanged {
+            authViewModel.regDataChanged(
+                emailRegisterEdit.text.toString(),
+                passwordRegisterEdit.text.toString(),
+                passwordRepeatEdit.text.toString(),
+                realNameEdit.text.toString(),
+                nicknameEdit.text.toString()
+            )
+        }
+        nicknameEdit.afterTextChanged {
+            authViewModel.regDataChanged(
+                emailRegisterEdit.text.toString(),
+                passwordRegisterEdit.text.toString(),
+                passwordRepeatEdit.text.toString(),
+                realNameEdit.text.toString(),
+                nicknameEdit.text.toString()
+            )
+        }
+    }
+
+    /**
+     * Extension function to simplify setting an afterTextChanged action to EditText components.
+     */
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun registerButtonOnClick() {
         if (isEmailValid(emailRegisterEdit.text.toString()) && isNicknameValid(nicknameEdit.text.toString()) && passwordRegisterEdit.text.toString() == passwordRepeatEdit.text.toString() && passwordRegisterEdit.text.isNotEmpty()) {
-            val email = emailRegisterEdit.text.toString()
-            val password = passwordRegisterEdit.text.toString()
-            mAuth!!.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("auth:success", "createUserWithEmail:success")
-                        //val user = mAuth!!.currentUser
-
-                        //Добавление никнейма и аватара в Firestore (на этапе регистрации добавляется стандартная)
-                        val nickname = nicknameEdit.text.toString()
-                        val rn = realNameEdit.text.toString()
-                        val currentUID: String = mAuth!!.currentUser!!.uid
-                        Log.i("auth:data", "current email: $currentUID, nickname: $nickname")
-                        val userData = mapOf(
-                            "id" to currentUID,
-                            "nickname" to nickname,
-                            "avatar" to "",
-                            "real_name" to rn,
-                            "email" to email
-                        )
-                        firestore!!.collection("users").document(mAuth!!.uid!!)
-                            .set(userData, SetOptions.merge())
-                            .addOnSuccessListener {
-                                Log.i("LoginActivity", "user data successfully written")
-                                pushTokenToServer()
-                                var kp = keydb.getKeyPair(currentUID)
-                                if (kp == null) {
-                                    generateKeys()
-                                    kp = keydb.getKeyPair(currentUID)
-                                }
-                                pushKeysToServer(kp!!.publicKey)
-                                Log.i("testSuccessful", "successful 99")
-                                successful()
-                            }
-                            .addOnFailureListener { e -> Log.i("LoginActivity", "Error writing user data", e) }
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("auth:failure", "createUserWithEmail:failure", task.exception)
-                        Log.i("auth:failure", task.exception?.message)
-                        Toast.makeText(
-                            this, resources.getString(R.string.toast_auth_error),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        //updateUI(null)
-                        //TODO Обработка ошибки регистрации
-                    }
-
-                    // ...
+            fbSource!!.register(
+                emailRegisterEdit.text.toString(),
+                passwordRegisterEdit.text.toString(),
+                nicknameEdit.text.toString(),
+                realNameEdit.text.toString()
+            ) {
+                if (it) {
+                    successful()
                 }
+            }
         } else {
             Log.i("register:failure", "wrong data email ${emailRegisterEdit.text.toString()}")
         }
@@ -133,44 +255,14 @@ class LoginActivity : BaseActivity() {
 
     private fun signInButtonOnClick() {
         if (isEmailValid(emailEdit.text.toString()) && passwordSignEdit.text.isNotEmpty()) {
-            val email = emailEdit.text.toString()
-            val password = passwordSignEdit.text.toString()
-            mAuth!!.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("auth:signIn", "signInWithEmail:success")
-                        //val user = mAuth!!.currentUser
-                        val currentUser = mAuth!!.currentUser
-                        val currentUID = currentUser!!.uid
-                        pushTokenToServer()
-                        var kp = keydb.getKeyPair(currentUID)
-                        if (kp == null) {
-                            generateKeys()
-                            Log.i("auth:signIn", "New key's generated")
-                            kp = keydb.getKeyPair(currentUID)
-                        }
-                        pushKeysToServer(kp!!.publicKey)
-                        Log.i("testSuccessful", "successful 142")
-                        successful()
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("auth:signIn", "signInWithEmail:failure", task.exception)
-                        Log.i("auth:signIn", "message " + task.exception?.message)
-                        Log.i("auth:signIn", task.exception.toString())
-                        if (task.exception.toString() == "com.google.firebase.auth.FirebaseAuthInvalidCredentialsException") {
-                            Toast.makeText(
-                                this, resources.getString(R.string.toast_auth_error_wrong_password),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        Toast.makeText(
-                            this, resources.getString(R.string.toast_auth_error_user_doesnt_exist),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        //successful()
-                    }
+            fbSource!!.login(
+                emailEdit.text.toString(),
+                passwordSignEdit.text.toString(),
+            ) {
+                if (it) {
+                    successful()
                 }
+            }
         }
     }
 
@@ -185,9 +277,10 @@ class LoginActivity : BaseActivity() {
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
-            val channelInvites = NotificationChannel(CHANNEL_ID_INVITES, nameInvites, importance).apply {
-                description = descriptionText
-            }
+            val channelInvites =
+                NotificationChannel(CHANNEL_ID_INVITES, nameInvites, importance).apply {
+                    description = descriptionText
+                }
             // Register the channel with the system
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -208,7 +301,7 @@ class LoginActivity : BaseActivity() {
         createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
-        if (currentUser != null){
+        if (currentUser != null) {
             currentUser.getIdToken(true)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -256,18 +349,15 @@ class LoginActivity : BaseActivity() {
         nicknameEdit.text.clear()
     }
 
-    fun isEmailValid(email: String): Boolean {
-        val expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"
-        val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
-        val matcher = pattern.matcher(email)
-        return matcher.matches()
-    }
-
     fun isNicknameValid(nickname: String): Boolean {
-        val expression  = "^[^0-9][^@#\$%^%&*_()]{3,15}+\$"
+        val expression = "^[^0-9][^@#\$%^%&*_()]{3,15}+\$"
         val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
         val matcher = pattern.matcher(nickname)
         return matcher.matches()
+    }
+
+    fun isEmailValid(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     //moment when authentication, token check and keys check are successful
@@ -304,7 +394,8 @@ class LoginActivity : BaseActivity() {
 //                    Log.i("setPublicKey", "setPublicKey error " + e.message)
 //                }
 //            }
-        firestore!!.collection("users").document(mAuth!!.uid!!).update("public_key", Blob.fromBytes(key))
+        firestore!!.collection("users").document(mAuth!!.uid!!)
+            .update("public_key", Blob.fromBytes(key))
     }
 
     //Pushing FCM token to Firestore. Using when token is absent in Preferences
@@ -316,8 +407,10 @@ class LoginActivity : BaseActivity() {
             ) { instanceIdResult: InstanceIdResult ->
                 val newToken = instanceIdResult.token
                 Log.i("auth:start", newToken)
-                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("firebaseToken", newToken).apply()
-                firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("token" to  newToken))
+                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit()
+                    .putString("firebaseToken", newToken).apply()
+                firestore!!.collection("users").document(mAuth!!.uid!!)
+                    .update(mapOf("token" to newToken))
             }
     }
 
@@ -362,14 +455,18 @@ class LoginActivity : BaseActivity() {
                                         val userData = mapOf(
                                             "id" to currentUID,
                                             "nickname" to account.email!!.substringBefore("@"),
-                                            "avatar" to account.photoUrl!!.toString().replace("s96-c", "s192-c", true),
+                                            "avatar" to account.photoUrl!!.toString()
+                                                .replace("s96-c", "s192-c", true),
                                             "real_name" to account.displayName,
                                             "email" to account.email
                                         )
                                         firestore!!.collection("users").document(mAuth!!.uid!!)
                                             .set(userData, SetOptions.merge())
                                             .addOnSuccessListener {
-                                                Log.i("googleAuth:create", "user data successfully written")
+                                                Log.i(
+                                                    "googleAuth:create",
+                                                    "user data successfully written"
+                                                )
                                                 pushTokenToServer()
                                                 var kp = keydb.getKeyPair(currentUID)
                                                 if (kp == null) {
@@ -380,21 +477,31 @@ class LoginActivity : BaseActivity() {
                                                 Log.i("testSuccessful", "successful 359")
                                                 successful()
                                             }
-                                            .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
+                                            .addOnFailureListener { e ->
+                                                Log.i(
+                                                    "googleAuth:create",
+                                                    "Error writing user data",
+                                                    e
+                                                )
+                                            }
                                     }
                                 } else {
                                     Log.d("googleAuth:create", "Document does not exist!")
                                     val userData = mapOf(
                                         "id" to currentUID,
                                         "nickname" to account.email!!.substringBefore("@"),
-                                        "avatar" to account.photoUrl!!.toString().replace("s96-c", "s192-c", true),
+                                        "avatar" to account.photoUrl!!.toString()
+                                            .replace("s96-c", "s192-c", true),
                                         "real_name" to account.displayName,
                                         "email" to account.email
                                     )
                                     firestore!!.collection("users").document(mAuth!!.uid!!)
                                         .set(userData, SetOptions.merge())
                                         .addOnSuccessListener {
-                                            Log.i("googleAuth:create", "user data successfully written")
+                                            Log.i(
+                                                "googleAuth:create",
+                                                "user data successfully written"
+                                            )
                                             pushTokenToServer()
                                             var kp = keydb.getKeyPair(currentUID)
                                             if (kp == null) {
@@ -405,7 +512,13 @@ class LoginActivity : BaseActivity() {
                                             Log.i("testSuccessful", "successful 384")
                                             successful()
                                         }
-                                        .addOnFailureListener { e -> Log.i("googleAuth:create", "Error writing user data", e) }
+                                        .addOnFailureListener { e ->
+                                            Log.i(
+                                                "googleAuth:create",
+                                                "Error writing user data",
+                                                e
+                                            )
+                                        }
                                 }
                             } else {
                                 Log.d(
@@ -422,7 +535,8 @@ class LoginActivity : BaseActivity() {
                     // If sign in fails, display a message to the user.
                     Log.w("googleAuth:create", "signInWithCredential:failure", task.exception)
 //                    Snackbar.make(view, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
-                    Toast.makeText(applicationContext, R.string.toast_auth_error, Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, R.string.toast_auth_error, Toast.LENGTH_LONG)
+                        .show()
                 }
             }
     }
@@ -440,5 +554,9 @@ class LoginActivity : BaseActivity() {
                 Log.w("googleAuth", "Google sign in failed", e)
             }
         }
+    }
+
+    private fun showLoginFailed(@StringRes errorString: Int) {
+        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 }

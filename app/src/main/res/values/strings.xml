@@ -106,4 +106,20 @@
     <string name="menu_friend_requests">Friend requests</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_profile">Profile</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_password_repeat">Repeat password</string>
+    <string name="hint_nickname">Nickname</string>
+    <string name="hint_realname">Real name</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_email">Not a valid email</string>
+    <string name="invalid_password">Password must be more than 5 characters and less than 20 characters</string>
+    <string name="invalid_password_repeat">Passwords must be same</string>
+    <string name="invalid_realname">Real name is required</string>
+    <string name="invalid_nickname">Nickname must be more than 3 characters and less than 20 characters</string>
+    <string name="login_failed">"Login failed"</string>
 </resources>

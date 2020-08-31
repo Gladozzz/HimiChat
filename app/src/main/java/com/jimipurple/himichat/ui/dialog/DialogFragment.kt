@@ -34,7 +34,6 @@ import com.jimipurple.himichat.models.UndeliveredMessage
 import com.jimipurple.himichat.ui.adapters.MessageListAdapter
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.design_settings_fragment.*
 import kotlinx.android.synthetic.main.fragment_dialog.*
 
 //passion is a key bro (⌐■_■)
@@ -83,7 +82,7 @@ class DialogFragment : BaseFragment() {
                     }
                 }
                 val handler = Handler(c!!.mainLooper)
-                handler.post(Runnable {
+                handler.post {
                     if (userOnline) {
 //                        tbar!!.setSubtitle(R.string.online)
                         setOnline()
@@ -91,7 +90,7 @@ class DialogFragment : BaseFragment() {
 //                        tbar!!.setSubtitle(R.string.offline)
                         setOffline()
                     }
-                })
+                }
             }
         }
     }
@@ -113,10 +112,10 @@ class DialogFragment : BaseFragment() {
 //        tbar!!.title = nickname
 //        tbar!!.setSubtitle(R.string.offline)
         val handler = Handler(c!!.mainLooper)
-        handler.post(Runnable {
+        handler.post {
             val act = app!!.currentActivity!!
             val t = act.supportActionBar!!
-            t.setTitle(nickname)
+            t.title = nickname
             t.setSubtitle(R.string.offline)
             val url = Uri.parse(avatar)
             if (url != null) {
@@ -133,14 +132,17 @@ class DialogFragment : BaseFragment() {
                         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                         override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                            Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                            Log.i(
+                                "Profile",
+                                "Загрузка изображения не удалась " + url + "\n" + e?.message
+                            )
                         }
                     })
                 }
             } else {
                 Log.i("Profile", "avatar wasn't received")
             }
-        })
+        }
         reloadMsgs()
         dialogMessageInput.button!!.setOnClickListener { onSendBtnClick() }
     }
@@ -208,7 +210,7 @@ class DialogFragment : BaseFragment() {
                     }
                 }
                 val handler = Handler(c!!.mainLooper)
-                handler.post(Runnable {
+                handler.post {
                     if (userOnline) {
 //                        tbar!!.setSubtitle(R.string.online)
                         setOnline()
@@ -216,12 +218,12 @@ class DialogFragment : BaseFragment() {
 //                        tbar!!.setSubtitle(R.string.offline)
                         setOffline()
                     }
-                })
+                }
             }
         }
     }
 
-    fun reloadMsgs() {
+    private fun reloadMsgs() {
         val allMsgs = db!!.getMessages()
         val msgs = ArrayList<Message>()
         val unmsgs = db!!.getUndeliveredMessages()
@@ -296,27 +298,28 @@ class DialogFragment : BaseFragment() {
                 //TODO here i should refresh token
                 token = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
 
-                Log.i("msgTest", data["token"])
+                Log.i("msgTest", "token " + data["token"])
             }
-            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(requireActivity(), OnCompleteListener<DocumentSnapshot>() {
+            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(requireActivity()
+            ) {
                 if (it.isSuccessful) {
-//                    db!!.pushMessage(msg)
+                    //                    db!!.pushMessage(msg)
                     val result = it.result?.get("public_key") as Blob?
                     val kp = KeysDBHelper(c!!).getKeyPair(mAuth!!.uid!!)
                     if (result != null && kp != null) {
                         val pk = result.toBytes()
                         sendEncryptedMessage(receiverId, senderId, text, msg, kp, pk)
                         Log.i("dialogMessage", "sendEncryptedMessage data $data")
-//                            reloadMsgs()
+                        //                            reloadMsgs()
                     } else {
                         sendMessage(receiverId, senderId, text, msg)
                         Log.i("dialogMessage", "sendMessage data $data")
-//                            reloadMsgs()
+                        //                            reloadMsgs()
                     }
                 } else {
                     Log.i("dialogMessage", "Error getting documents.", it.exception)
                 }
-            })
+            }
             //sendMessage(receiverId, senderId, text, msg)
             //Log.i("dialogMessage", "data $data")
 //            reloadMsgs()
@@ -418,8 +421,8 @@ class DialogFragment : BaseFragment() {
 //        val t = act.actionBar
         val act = app!!.currentActivity!!
         val t = act.supportActionBar!!
-        t.setTitle(nickname)
-        t!!.setSubtitle(R.string.offline)
+        t.title = nickname
+        t.setSubtitle(R.string.offline)
     }
 
     private fun setOnline() {
@@ -449,11 +452,11 @@ class DialogFragment : BaseFragment() {
         } else {
             Log.i("Profile", "avatar wasn't received")
         }
-        t.setTitle(nickname)
-        t!!.setSubtitle(R.string.online)
+        t.title = nickname
+        t.setSubtitle(R.string.online)
     }
 
-    val FCMReceiver = object : BroadcastReceiver() {
+    private val FCMReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
 //            reloadMsgs()
         }

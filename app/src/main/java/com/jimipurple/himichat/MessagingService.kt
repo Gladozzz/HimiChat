@@ -307,7 +307,7 @@ class MessagingService : FirebaseMessagingService() {
             Log.i("msgService:onMessage", "Message Notification Body: " + remoteMessage.notification!!.body!!)
         }
 
-        Log.i("msgService:onMessage", applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+        Log.i("msgService:onMessage", "token " + applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.

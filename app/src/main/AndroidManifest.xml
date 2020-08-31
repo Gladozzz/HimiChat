@@ -1,46 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        package="com.jimipurple.himichat">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.jimipurple.himichat">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-            android:label="@string/app_name"
-            android:logo="@drawable/raccoon"
-            android:name=".MyApp"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/NightTheme"
-            android:usesCleartextTraffic="true">
+        android:name=".MyApp"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:logo="@drawable/raccoon"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/NightTheme"
+        android:usesCleartextTraffic="true"
+        android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor">
+
         <service
-                android:name=".SocketService"
-                android:exported="false"
-                android:enabled="true"/>
+            android:name=".SocketService"
+            android:enabled="true"
+            android:exported="false" />
 
         <meta-data
-                android:name="com.google.android.gms.version"
-                android:value="@integer/google_play_services_version" />
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
-                android:name=".NavigationActivity"
-                android:label="@string/title_activity_navigation"
-                android:theme="@style/NightTheme" />
+            android:name=".NavigationActivity"
+            android:label="@string/title_activity_navigation"
+            android:theme="@style/NightTheme" />
 
         <service
-                android:name=".MessagingService"
-                android:enabled="true"
-                android:exported="true">
+            android:name=".MessagingService"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-        <activity android:name=".LoginActivity" android:noHistory="true">
+
+        <activity
+            android:name=".LoginActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,33 +55,36 @@
 
         <service android:name="com.google.firebase.components.ComponentDiscoveryService">
             <meta-data
-                    android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar" />
+                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
-                    android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar" />
+                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
-                    android:name="com.google.firebase.components:com.google.firebase.iid.Registrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar" />
+                android:name="com.google.firebase.components:com.google.firebase.iid.Registrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
-                    android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar" />
+                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
-                    android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar" />
+                android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
-                    android:name="com.google.firebase.components:com.google.firebase.functions.FunctionsRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar" />
+                android:name="com.google.firebase.components:com.google.firebase.functions.FunctionsRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
-                    android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
-                    android:value="com.google.firebase.components.ComponentRegistrar" />
+                android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
 
-        <uses-library android:name="android.test.runner"
+        <uses-library
+            android:name="android.test.runner"
             android:required="false" />
-        <uses-library android:name="android.test.base"
+        <uses-library
+            android:name="android.test.base"
             android:required="false" />
-        <uses-library android:name="android.test.mock"
+        <uses-library
+            android:name="android.test.mock"
             android:required="false" />
     </application>
 

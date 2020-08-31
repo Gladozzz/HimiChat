@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "195021957274-u6bd46jle3jpac9drv4725acopn87bts.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jimipurple.himichat",
+            "certificate_hash": "1460a6339db4d2b374b9947a5fb6953f72109a53"
+          }
+        },
+        {
           "client_id": "195021957274-kgko88nfg14aslms2rnurde8e89ndpud.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

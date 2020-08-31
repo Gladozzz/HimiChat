@@ -1,41 +1,30 @@
 package com.jimipurple.himichat.ui.settings
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.NonNull
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.requestPermissions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.jimipurple.himichat.BaseFragment
-import com.jimipurple.himichat.LoginActivity
 import com.jimipurple.himichat.NavigationActivity
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.ui.adapters.SettingsPageAdapter
 import com.squareup.picasso.RequestCreator
 import kotlinx.android.synthetic.main.fragment_settings.*
-import kotlinx.io.ByteArrayOutputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 

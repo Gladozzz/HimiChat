@@ -42,7 +42,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_weight="90"
-            android:editable="false"
             android:inputType="none"
             android:text="Nickname"
             android:textColor="?attr/primaryTextColor"
@@ -73,7 +72,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_weight="90"
-            android:editable="false"
             android:gravity="fill_horizontal"
             android:inputType="none"
             android:text="Realname"
@@ -101,18 +99,20 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/button_edit_profile"
-                android:visibility="gone" />
+                android:visibility="gone"
+            style="?android:attr/borderlessButtonStyle" />
 
         <Button
-                android:id="@+id/profileRemoveFriendButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="4"
-                android:background="@drawable/roundcorner"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/button_remove_friend" />
+            android:id="@+id/profileRemoveFriendButton"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="4"
+            android:background="@drawable/button_on_click"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/button_remove_friend" />
 
         <Button
                 android:id="@+id/profileSendMessageButton"
@@ -123,7 +123,8 @@
                 android:background="@drawable/roundcorner"
                 android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
-                android:text="@string/button_send_message" />
+                android:text="@string/button_send_message"
+            style="?android:attr/borderlessButtonStyle" />
 
         <Button
                 android:id="@+id/profileInviteButton"
@@ -135,7 +136,8 @@
                 android:paddingLeft="10dp"
                 android:paddingEnd="10dp"
                 android:text="@string/button_Invite"
-                android:visibility="gone" />
+                android:visibility="gone"
+            style="?android:attr/borderlessButtonStyle" />
     </LinearLayout>
 
 </LinearLayout>

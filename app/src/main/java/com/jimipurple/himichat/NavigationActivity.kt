@@ -338,32 +338,6 @@ class NavigationActivity : BaseActivity() {
             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
     }
 
-    fun logoutButtonOnClick() {
-        try {
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
-                .requestEmail()
-                .build()
-            val googleSignInClient = GoogleSignIn.getClient(this, gso)
-            googleSignInClient.revokeAccess()
-            googleSignInClient.signOut().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Log.i("logout:success", "success from settings ")
-                    mAuth!!.signOut()
-                    SystemClock.sleep(100)
-                    val i = Intent(applicationContext, LoginActivity::class.java)
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(i)
-                    Runtime.getRuntime().exit(0)
-                } else {
-                    Log.e("logout:fail", "e " + it.exception)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("logout:fail", "e " + e.message)
-        }
-    }
-
     override fun onStart() {
         super.onStart()
 
@@ -428,8 +402,8 @@ class NavigationActivity : BaseActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        super.onSaveInstanceState(outState, outPersistentState)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
         val bar = supportActionBar!!
         Log.i("savedTitle", "osis savedTitle " + bar.title + " savedSubtitle " + bar.subtitle)
         outState!!.putCharSequence("title", bar.title)

@@ -18,7 +18,6 @@ import com.google.firebase.firestore.FieldValue
 import com.jimipurple.himichat.*
 import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.fragment_find_friend.*
-import kotlinx.serialization.UnstableDefault
 import java.util.regex.Pattern
 
 
@@ -57,7 +56,6 @@ class FindFriendFragment : BaseFragment() {
         findfriendInviteButton.setOnClickListener { inviteButtonOnClick() }
     }
 
-    @UnstableDefault
     private fun findButtonOnClick() {
         try {
             if (nicknameEdit.text.isNotEmpty()) {
@@ -118,15 +116,15 @@ class FindFriendFragment : BaseFragment() {
                                                             if (avatar != null) {
                                                                 val bitmap = LruCache(c!!)[avatar]
                                                                 if (bitmap != null) {
-                                                                    findfriendAvatarView.setImageBitmap(bitmap)
+                                                                    findFriendAvatarView.setImageBitmap(bitmap)
                                                                 } else {
                                                                     Glide.with(this)
                                                                         .asBitmap()
                                                                         .load(avatar)
                                                                         .into(object : CustomTarget<Bitmap>(){
                                                                             override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
-                                                                                findfriendAvatarView.setImageBitmap(bitmap)
-                                                                                findfriendAvatarView.setOnClickListener {
+                                                                                findFriendAvatarView.setImageBitmap(bitmap)
+                                                                                findFriendAvatarView.setOnClickListener {
                                                                                     val b = Bundle()
                                                                                     b.putString("profile_id", id)
                                                                                     val navController = findNavController()

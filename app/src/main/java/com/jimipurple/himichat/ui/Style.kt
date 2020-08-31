@@ -33,10 +33,8 @@ import com.jimipurple.himichat.R
 /**
  * Base class for chat component styles
  */
-abstract class Style protected constructor(context: Context, attrs: AttributeSet) {
-    protected var context: Context
-    protected var resources: Resources
-    protected var attrs: AttributeSet
+abstract class Style protected constructor(protected var context: Context, private var attrs: AttributeSet) {
+    protected var resources: Resources = context.resources
     val systemAccentColor: Int
         get() = getSystemColor(R.attr.colorAccent)
 
@@ -74,11 +72,5 @@ abstract class Style protected constructor(context: Context, attrs: AttributeSet
 
     fun getVectorDrawable(@DrawableRes drawable: Int): Drawable? {
         return ContextCompat.getDrawable(context, drawable)
-    }
-
-    init {
-        this.context = context
-        resources = context.getResources()
-        this.attrs = attrs
     }
 }

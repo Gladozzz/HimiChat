@@ -44,13 +44,13 @@
                 android:textColor="?attr/primaryTextColor" />
 
             <ImageView
-                    android:id="@+id/renameRealnameButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/roundcorner"
-                    tools:srcCompat="@drawable/ic_accept" />
+                android:id="@+id/renameRealnameButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/button_on_click"
+                tools:srcCompat="@drawable/ic_accept" />
 
             <ImageView
                     android:id="@+id/cancelRealnameButton"
@@ -83,13 +83,13 @@
                 android:textColor="?attr/primaryTextColor" />
 
             <ImageView
-                    android:id="@+id/renameNicknameButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/roundcorner"
-                    tools:srcCompat="@drawable/ic_accept" />
+                android:id="@+id/renameNicknameButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/button_on_click"
+                tools:srcCompat="@drawable/ic_accept" />
 
             <ImageView
                     android:id="@+id/cancelNicknameButton"
