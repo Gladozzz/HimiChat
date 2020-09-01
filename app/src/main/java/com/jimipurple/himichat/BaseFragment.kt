@@ -4,8 +4,10 @@ import android.R
 import android.annotation.SuppressLint
 //import android.app.ProgressDialog
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.ActionBar
@@ -41,6 +43,7 @@ open class BaseFragment : Fragment() {
         .setEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
         .setPopEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
         .build()
+    protected var currentTheme: Resources.Theme? = null
 
 //    protected var mMyApp: MyApp? = null
 
@@ -48,6 +51,18 @@ open class BaseFragment : Fragment() {
         super.onCreate(savedInstanceState)
         app = this.c!!.applicationContext as MyApp
         tbar = app!!.tbar
+        val sp = c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+        val darkMode = sp.getBoolean("night_mode", false)
+        currentTheme = when (darkMode) {
+            true -> {
+                sp.edit().putBoolean("night_mode", true).apply()
+                ContextThemeWrapper(c!!, com.jimipurple.himichat.R.style.NightTheme).theme
+            }
+            false -> {
+                sp.edit().putBoolean("night_mode", false).apply()
+                ContextThemeWrapper(c!!, com.jimipurple.himichat.R.style.DayTheme).theme
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -4,7 +4,6 @@ package com.jimipurple.himichat.ui.settings
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -13,13 +12,16 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -33,7 +35,7 @@ import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
-import java.util.regex.Pattern
+import kotlinx.android.synthetic.main.profile_settings_fragment.nicknameEdit
 
 
 class ProfileSettingsFragment : BaseFragment() {
@@ -47,22 +49,10 @@ class ProfileSettingsFragment : BaseFragment() {
     private var realname: String? = null
     private var avatar: String? = null
     private val ARG_PAGE = "ARG_PAGE"
-    private var currentTheme: Resources.Theme? = null
+    private lateinit var profileSettingsViewModel: ProfileSettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sp = c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
-        val darkMode = sp.getBoolean("night_mode", false)
-        currentTheme = when (darkMode) {
-            true -> {
-                sp.edit().putBoolean("night_mode", true).apply()
-                ContextThemeWrapper(c!!, R.style.NightTheme).theme
-            }
-            false -> {
-                sp.edit().putBoolean("night_mode", false).apply()
-                ContextThemeWrapper(c!!, R.style.DayTheme).theme
-            }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,37 +66,82 @@ class ProfileSettingsFragment : BaseFragment() {
             }
         }
         logoutButton.setOnClickListener {
-            logoutButton.background = ContextCompat.getDrawable(c!!, R.color.text_button_on_click)
             FirebaseSource(c!!).logout()
         }
+        saveAccountButton.setOnClickListener {
+            saveAccountData()
+        }
         deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
-        nicknameEdit.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                nicknameEdit.setTextColor(getColorFromAttr())
-//                cancelNicknameButton.visibility = View.VISIBLE
+        profileSettingsViewModel = ViewModelProviders.of(this)
+            .get(ProfileSettingsViewModel::class.java)
+
+        //set up model for profile settings form
+        profileSettingsViewModel.profileSettingsFormState.observe(viewLifecycleOwner, Observer {
+            val profileSettingsState = it ?: return@Observer
+
+            // disable login button unless both username / password is valid
+            saveAccountButton.isEnabled = profileSettingsState.isDataValid
+
+            nicknameInput.isErrorEnabled = false
+            realNameInput.isErrorEnabled = false
+            if (profileSettingsState.nicknameError != null) {
+                nicknameInput.error = getString(profileSettingsState.nicknameError!!)
+                nicknameInput.isErrorEnabled = true
+            }
+            if (profileSettingsState.realNameError != null) {
+                realNameInput.error = getString(profileSettingsState.realNameError!!)
+                realNameInput.isErrorEnabled = true
             }
         })
-        realnameEdit.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                realnameEdit.setTextColor(getColorFromAttr())
-//                cancelRealnameButton.visibility = View.VISIBLE
+        nicknameEdit.apply {
+            afterTextChanged {
+                profileSettingsViewModel.accountDataChanged(
+                    nicknameEdit.text.toString(),
+                    realnameEdit.text.toString()
+                )
             }
-        })
-        renameNicknameButton.setOnClickListener { setNickname() }
-        renameRealnameButton.setOnClickListener { setRealname() }
-        cancelNicknameButton.setOnClickListener { updateNickname() }
-        cancelRealnameButton.setOnClickListener { updateRealname() }
+            setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE ->
+                        saveAccountData()
+                }
+                false
+            }
+        }
+        realnameEdit.apply {
+            afterTextChanged {
+                profileSettingsViewModel.accountDataChanged(
+                    nicknameEdit.text.toString(),
+                    realnameEdit.text.toString()
+                )
+            }
+            setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE ->
+                        saveAccountData()
+                }
+                false
+            }
+        }
 
-        updateBySaved()
+        updateDataFromServer()
         updateAvatar()
-        updateNickname()
-        updateRealname()
+    }
+
+    /**
+     * Extension function to simplify setting an afterTextChanged action to EditText components.
+     */
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun loadAvatarButtonOnClick() {
@@ -129,7 +164,7 @@ class ProfileSettingsFragment : BaseFragment() {
         }
     }
 
-    private fun updateNickname() {
+    private fun updateDataFromServer() {
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
@@ -137,11 +172,31 @@ class ProfileSettingsFragment : BaseFragment() {
                 if (nickname == null) {
                     nickname = ""
                 }
-                SharedPreferencesUtility(c!!).putString("nickname", nickname!!)
-                if (nicknameEdit != null) {
-                    nicknameEdit.setText(nickname)
-                    nicknameEdit.setTextColor(getColorFromAttr())
-                    cancelNicknameButton.visibility = View.GONE
+                realname = userData.get("real_name") as String?
+                if (realname == null) {
+                    realname = ""
+                }
+                avatar = userData.get("avatar") as String?
+                if (avatar == null) {
+                    avatar = ""
+                }
+                val sp = SharedPreferencesUtility(c!!)
+                sp.putString("nickname", nickname!!)
+                sp.putString("realname", realname!!)
+                sp.putString("avatar", avatar!!)
+                nicknameEdit.setText(nickname)
+                realnameEdit.setText(realname)
+                val savedAvatar = sp.getString("avatar")
+                if (savedAvatar != null) {
+                    val bitmap = LruCache(c!!)[savedAvatar]
+                    if (bitmap != null) {
+                        avatarView.setImageBitmap(bitmap)
+                        Log.i("ProfileSettings", "avatar was loaded from cache")
+                    } else {
+                        Log.e("ProfileSettings", "Avatar is not in cache. Preload can be done")
+                    }
+                } else {
+                    Log.e("ProfileSettings", "avatar was not in SharedPrefences")
                 }
             } else {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
@@ -149,19 +204,28 @@ class ProfileSettingsFragment : BaseFragment() {
         }
     }
 
-    private fun updateRealname() {
-        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+    private fun saveAccountData() {
+        nickname = nicknameEdit.text.toString()
+        realname = realnameEdit.text.toString()
+        val accountDoc = firestore!!.collection("users").document(mAuth!!.uid!!)
+        accountDoc.update(mapOf("nickname" to  nickname))
+        accountDoc.update(mapOf("realname" to  realname))
+        var checkDataSaving = true
+        accountDoc.get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
-                realname = userData.get("real_name") as String?
-                if (realname == null) {
-                    realname = ""
+                val r = userData.get("real_name") as String?
+                val n = userData.get("nickname") as String?
+                if (r != realname) {
+                    checkDataSaving = false
                 }
-                if (realnameEdit != null) {
-                    SharedPreferencesUtility(c!!).putString("realname", realname!!)
-                    realnameEdit.setText(realname)
-                    realnameEdit.setTextColor(getColorFromAttr())
-                    cancelRealnameButton.visibility = View.GONE
+                if (n != nickname) {
+                    checkDataSaving = false
+                }
+                if (checkDataSaving) {
+                    Toast.makeText(c, R.string.toast_saving_account_success, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(c, R.string.toast_saving_account_error, Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
@@ -183,25 +247,7 @@ class ProfileSettingsFragment : BaseFragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.profile_settings_fragment, container, false)
     }
-    private fun updateBySaved() {
-        val pref = SharedPreferencesUtility(c!!)
-        val savedNickname = pref.getString("nickname")
-        val savedRealname = pref.getString("realname")
-        val savedAvatar = pref.getString("avatar")
-        nicknameEdit.setText(savedNickname)
-        realnameEdit.setText(savedRealname)
-        if (savedAvatar != null) {
-            val bitmap = LruCache(c!!)[savedAvatar]
-            if (bitmap != null) {
-                avatarView.setImageBitmap(bitmap)
-                Log.i("ProfileSettings", "avatar was loaded from cache")
-            } else {
-                Log.e("ProfileSettings", "Avatar is not in cache. Preload can be done")
-            }
-        } else {
-            Log.e("ProfileSettings", "avatar was not in SharedPrefences")
-        }
-    }
+
     fun updateAvatar() {
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
@@ -246,61 +292,8 @@ class ProfileSettingsFragment : BaseFragment() {
         }
     }
 
-    private fun setNickname() {
-        if (nicknameEdit != null) {
-            if (isNicknameValid(nicknameEdit.text.toString())){
-                nickname = nicknameEdit.text.toString()
-                firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("nickname" to  nickname)).addOnSuccessListener { (app!!.currentActivity as NavigationActivity).updateAvatar() }
-                cancelNicknameButton.visibility = View.GONE
-            } else {
-                nicknameEdit.setTextColor(resources.getColor(R.color.red))
-//            firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
-//                if (it.isSuccessful) {
-//                    val userData = it.result!!
-//                    nickname = userData.get("nickname") as String?
-//                    if (nickname == null) {
-//                        nickname = ""
-//                    }
-//                    nicknameEdit.setText(nickname)
-//                } else {
-//                    Log.i("FirestoreRequest", "Error getting documents.", it.exception)
-//                }
-//            }
-            }
-        }
-    }
-
-    private fun setRealname() {
-        if (realnameEdit.text.isNotEmpty()){
-            realname = realnameEdit.text.toString()
-            firestore!!.collection("users").document(mAuth!!.uid!!).update(mapOf("nickname" to  realname))
-            cancelRealnameButton.visibility = View.GONE
-        } else {
-            realnameEdit.setTextColor(resources.getColor(R.color.red))
-//            firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
-//                if (it.isSuccessful) {
-//                    val userData = it.result!!
-//                    realname = userData.get("nickname") as String?
-//                    if (realname == null) {
-//                        realname = ""
-//                    }
-//                    realnameEdit.setText(realname)
-//                } else {
-//                    Log.i("FirestoreRequest", "Error getting documents.", it.exception)
-//                }
-//            }
-        }
-    }
-
     private fun deleteAllMessages() {
         MessagesDBHelper(c!!).deleteAllMessages()
-    }
-
-    private fun isNicknameValid(nickname: String): Boolean {
-        val expression  = "^[^0-9][^@#\$%^%&*_()]{3,15}+\$"
-        val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
-        val matcher = pattern.matcher(nickname)
-        return matcher.matches()
     }
 
     override fun onRequestPermissionsResult(

@@ -1,117 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/primaryDark"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:weightSum="100">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primaryDark"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:weightSum="100">
 
     <ImageView
-            android:id="@+id/avatarView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="50"
-            app:srcCompat="@drawable/defaultavatar" />
+        android:id="@+id/avatarView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="50"
+        app:srcCompat="@drawable/defaultavatar" />
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="fill_horizontal"
-            android:layout_weight="10"
-            android:gravity="fill_horizontal|center_vertical"
-            android:orientation="horizontal"
-            android:weightSum="100">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/nicknameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/nicknameEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_weight="90"
             android:backgroundTint="?attr/primaryTextColor"
             android:drawableTint="?attr/primary"
             android:foregroundTint="?attr/primary"
+            android:hint="@string/hint_nickname"
             android:inputType="textPersonName"
-            android:text="Nickname"
             android:textColor="?attr/primaryTextColor"
             android:textColorHighlight="?attr/primaryTextColor"
             android:textColorHint="?attr/primaryTextColor"
             android:textColorLink="@color/colorPrimary" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageView
-            android:id="@+id/renameNicknameButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/button_on_click"
-            app:srcCompat="@drawable/ic_accept" />
-
-        <ImageView
-                android:id="@+id/cancelNicknameButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/roundcorner"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_cancel" />
-
-    </LinearLayout>
-
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="10"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:weightSum="100">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/realNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/realnameEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_weight="90"
             android:backgroundTint="?attr/primaryTextColor"
             android:gravity="fill_horizontal"
+            android:hint="@string/hint_realname"
             android:inputType="textPersonName"
-            android:text="Realname"
             android:textColor="?attr/primaryTextColor" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageView
-            android:id="@+id/renameRealnameButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/button_on_click"
-            app:srcCompat="@drawable/ic_accept" />
-
-        <ImageView
-                android:id="@+id/cancelRealnameButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/roundcorner"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_cancel" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/saveAccountButton"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_on_click"
+        android:enabled="false"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="@string/button_save_account_data" />
 
     <Button
         android:id="@+id/logoutButton"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:background="@color/colorPrimary"
         android:text="@string/button_logout"
         android:textColor="@color/text_button_on_click"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/deleteAllMessagesButton"

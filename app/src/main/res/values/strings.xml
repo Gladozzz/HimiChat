@@ -46,6 +46,7 @@
     <string name="button_send_message">Send message</string>
     <string name="button_remove_friend">Remove friend</string>
     <string name="button_edit_profile">Edit profile</string>
+    <string name="button_save_account_data">Save account data</string>
     <string name="loadRenameButton">Rename</string>
 
     <string name="context_menu_item_remove">Remove</string>
@@ -74,6 +75,8 @@
     <string name="toast_load_avatar_complete">avatar was loaded</string>
     <string name="toast_load_avatar_error">error to load avatar</string>
     <string name="toast_load_avatar_warning">loading avatar can take some time</string>
+    <string name="toast_saving_account_success">Successfully saved account data</string>
+    <string name="toast_saving_account_error">Error to save account data</string>
     <string name="toast_future_feature">Future feature</string>
 
     <string name="channel_name_messages">HimiChat messages</string>
@@ -121,5 +124,6 @@
     <string name="invalid_password_repeat">Passwords must be same</string>
     <string name="invalid_realname">Real name is required</string>
     <string name="invalid_nickname">Nickname must be more than 3 characters and less than 20 characters</string>
+    <string name="invalid_nickname_empty">Nickname can\'t be empty</string>
     <string name="login_failed">"Login failed"</string>
 </resources>
