@@ -165,43 +165,20 @@ class ProfileSettingsFragment : BaseFragment() {
     }
 
     private fun updateDataFromServer() {
-        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
-            if (it.isSuccessful) {
-                val userData = it.result!!
-                nickname = userData.get("nickname") as String?
-                if (nickname == null) {
-                    nickname = ""
-                }
-                realname = userData.get("real_name") as String?
-                if (realname == null) {
-                    realname = ""
-                }
-                avatar = userData.get("avatar") as String?
-                if (avatar == null) {
-                    avatar = ""
-                }
-                val sp = SharedPreferencesUtility(c!!)
-                sp.putString("nickname", nickname!!)
-                sp.putString("realname", realname!!)
-                sp.putString("avatar", avatar!!)
-                nicknameEdit.setText(nickname)
-                realnameEdit.setText(realname)
-                val savedAvatar = sp.getString("avatar")
-                if (savedAvatar != null) {
-                    val bitmap = LruCache(c!!)[savedAvatar]
-                    if (bitmap != null) {
-                        avatarView.setImageBitmap(bitmap)
-                        Log.i("ProfileSettings", "avatar was loaded from cache")
-                    } else {
-                        Log.e("ProfileSettings", "Avatar is not in cache. Preload can be done")
-                    }
-                } else {
-                    Log.e("ProfileSettings", "avatar was not in SharedPrefences")
-                }
+        fbSource!!.getUser(mAuth!!.uid!!, { user ->
+            nicknameEdit.setText(user.nickname)
+            realnameEdit.setText(user.realName)
+            nickname = user.nickname
+            realname = user.realName
+            avatar = user.avatar
+            val bitmap = LruCache(c!!)[user.avatar]
+            if (bitmap != null) {
+                avatarView.setImageBitmap(bitmap)
+                Log.i("ProfileSettings", "avatar was loaded from cache")
             } else {
-                Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                Log.e("ProfileSettings", "Avatar is not in cache. Preload can be done")
             }
-        }
+        })
     }
 
     private fun saveAccountData() {
@@ -256,40 +233,43 @@ class ProfileSettingsFragment : BaseFragment() {
                 if (avatar == null) {
                     avatar = ""
                 }
-                val bitmap = LruCache(c!!.applicationContext)[avatar!!]
-                if (bitmap != null) {
-                    avatarView.setImageBitmap(bitmap)
-                }
-                Glide.with(c!!)
-                    .asBitmap()
-                    .load(avatar)
-                    .into(object : CustomTarget<Bitmap>(){
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            try {
-                                avatarView.setImageBitmap(resource)
-                                LruCache(c!!).set(avatar!!, resource)
-                                SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
-                                Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
-                            } catch (e: Exception) {
-                                Log.e("Profile", "e " + e.message)
-                            }
-                        }
-                        override fun onLoadCleared(placeholder: Drawable?) {
-                            // this is called when imageView is cleared on lifecycle call or for
-                            // some other reason.
-                            // if you are referencing the bitmap somewhere else too other than this imageView
-                            // clear it here as you can no longer have the bitmap
-                        }
-
-                        override fun onLoadFailed(errorDrawable: Drawable?) {
-                            super.onLoadFailed(errorDrawable)
-                            Log.e("Profile", "Загрузка изображения не удалась $avatar")
-                        }
-                    })
             } else {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
         }
+        fbSource!!.getUser(mAuth!!.uid!!, { user ->
+            avatar = user.avatar
+            val bitmap = LruCache(c!!.applicationContext)[avatar!!]
+            if (bitmap != null) {
+                avatarView.setImageBitmap(bitmap)
+            }
+            Glide.with(c!!)
+                .asBitmap()
+                .load(avatar)
+                .into(object : CustomTarget<Bitmap>(){
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        try {
+                            avatarView.setImageBitmap(resource)
+                            LruCache(c!!).set(avatar!!, resource)
+                            SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
+                            Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
+                        } catch (e: Exception) {
+                            Log.e("Profile", "e " + e.message)
+                        }
+                    }
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        // this is called when imageView is cleared on lifecycle call or for
+                        // some other reason.
+                        // if you are referencing the bitmap somewhere else too other than this imageView
+                        // clear it here as you can no longer have the bitmap
+                    }
+
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        super.onLoadFailed(errorDrawable)
+                        Log.e("Profile", "Загрузка изображения не удалась $avatar")
+                    }
+                })
+        })
     }
 
     private fun deleteAllMessages() {

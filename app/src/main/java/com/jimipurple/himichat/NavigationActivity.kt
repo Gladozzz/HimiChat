@@ -33,8 +33,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
@@ -261,55 +259,48 @@ class NavigationActivity : BaseActivity() {
             Log.e("navProfile", "avatar was not in SharedPrefences")
         }
 
-        val data = mapOf("id" to mAuth!!.uid!!)
-        functions!!
-            .getHttpsCallable("getUser")
-            .call(data).continueWith { task ->
-                val result = task.result?.data as HashMap<String, Any>
-                Log.i("navAct", result.toString())
-                navHeaderNicknameView.text = result["nickname"] as String
-                navHeaderRealnameView.text = result["realname"] as String
-                nickname = result["nickname"] as String
-                realname = result["realname"] as String
-                val url = Uri.parse(result["avatar"] as String)
-                pref.putString("nickname", nickname!!)
-                pref.putString("realname", realname!!)
-                pref.putString("avatar", url.toString())
-                Log.i("navAct", url.toString())
-                if (url != null) {
-                    val bitmap = PicLruCache(applicationContext)[result["avatar"] as String]
-                    if (bitmap != null) {
-                        navHeaderAvatarView.setImageBitmap(bitmap)
-                        Log.i("navProfile", "avatar was loaded from cache")
-                    } else {
-                        Log.i("navProfile", "avatar will load from internet")
-                        val b = Glide.with(this)
-                            .asBitmap()
-                            .load(url)
-                            .into(object : CustomTarget<Bitmap>(){
-                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                    navHeaderAvatarView.setImageBitmap(resource)
-                                    PicLruCache(applicationContext).set(url.toString(), resource)
-                                    Log.i("navProfile", "bitmap from $url is loaded and set to imageView")
-                                }
-                                override fun onLoadCleared(placeholder: Drawable?) {
-                                    // this is called when imageView is cleared on lifecycle call or for
-                                    // some other reason.
-                                    // if you are referencing the bitmap somewhere else too other than this imageView
-                                    // clear it here as you can no longer have the bitmap
-                                    navHeaderAvatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
-                                }
-
-                                override fun onLoadFailed(errorDrawable: Drawable?) {
-                                    super.onLoadFailed(errorDrawable)
-                                    Log.e("navProfile", "Загрузка изображения не удалась $url")
-                                }
-                            })
-                    }
+        fbSource!!.getUser(mAuth!!.uid!!, { user ->
+            nickname = user.nickname
+            realname = user.realName
+            val newAvatar = user.avatar
+            pref.putString("nickname", nickname!!)
+            pref.putString("realname", realname!!)
+            pref.putString("avatar", newAvatar)
+            val url = Uri.parse(newAvatar)
+            if (url != null) {
+                val bitmap = PicLruCache(applicationContext)[newAvatar]
+                if (bitmap != null) {
+                    navHeaderAvatarView.setImageBitmap(bitmap)
+                    Log.i("navProfile", "avatar was loaded from cache")
                 } else {
-                    Log.e("navProfile", "avatar wasn't received")
+                    Log.i("navProfile", "avatar will load from internet")
+                    val b = Glide.with(this)
+                        .asBitmap()
+                        .load(url)
+                        .into(object : CustomTarget<Bitmap>(){
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                navHeaderAvatarView.setImageBitmap(resource)
+                                PicLruCache(applicationContext).set(newAvatar, resource)
+                                Log.i("navProfile", "bitmap from $url is loaded and set to imageView")
+                            }
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                                // this is called when imageView is cleared on lifecycle call or for
+                                // some other reason.
+                                // if you are referencing the bitmap somewhere else too other than this imageView
+                                // clear it here as you can no longer have the bitmap
+                                navHeaderAvatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
+                            }
+
+                            override fun onLoadFailed(errorDrawable: Drawable?) {
+                                super.onLoadFailed(errorDrawable)
+                                Log.e("navProfile", "Загрузка изображения не удалась $url")
+                            }
+                        })
                 }
+            } else {
+                Log.e("navProfile", "avatar wasn't received")
             }
+        })
     }
 
     private fun setupPermissions() {

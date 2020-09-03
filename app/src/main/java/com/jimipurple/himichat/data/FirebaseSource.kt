@@ -24,6 +24,9 @@ import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.Encryption
 import com.jimipurple.himichat.models.User
+import com.jimipurple.himichat.utills.SharedPreferencesUtility
+import com.squareup.picasso.LruCache
+import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import kotlinx.coroutines.runBlocking
 
 class FirebaseSource(context: Context) {
@@ -376,9 +379,33 @@ class FirebaseSource(context: Context) {
     fun getUser(
         uid: String,
         onSuccess: (user: User) -> Unit,
-        onError: (e: Exception) -> Unit
+        onError: (e: Exception?) -> Unit = {}
     ) {
-
+        firestore.collection("users").document(uid).get().addOnCompleteListener{
+            if (it.isSuccessful) {
+                val userData = it.result!!
+                var nickname = userData.get("nickname") as String?
+                if (nickname == null) {
+                    nickname = ""
+                }
+                var realname = userData.get("real_name") as String?
+                if (realname == null) {
+                    realname = ""
+                }
+                var avatar = userData.get("avatar") as String?
+                if (avatar == null) {
+                    avatar = ""
+                }
+                sp!!.edit().putString("nickname", nickname)
+                .putString("realname", realname)
+                .putString("avatar", avatar).apply()
+                val user = User(uid, nickname, realname, avatar)
+                onSuccess(user)
+            } else {
+                Log.i(tag, "FirestoreRequest Error getting documents.", it.exception)
+                onError(it.exception)
+            }
+        }
     }
 
     private fun generateKeys(): String {
