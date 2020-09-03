@@ -17,6 +17,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import com.jimipurple.himichat.data.FirebaseSource
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 
@@ -29,6 +30,7 @@ open class BaseActivity : AppCompatActivity() {
     protected var firestore: FirebaseFirestore? = null
     protected var firebaseToken: String  = ""
     protected var functions: FirebaseFunctions? = null
+    protected var fbSource: FirebaseSource? = null
 
     protected var mMyApp: MyApp? = null
 
@@ -38,6 +40,7 @@ open class BaseActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         functions = FirebaseFunctions.getInstance()
+        fbSource = FirebaseSource(applicationContext)
         firebaseToken = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")!!
 
         mMyApp = this.applicationContext as MyApp

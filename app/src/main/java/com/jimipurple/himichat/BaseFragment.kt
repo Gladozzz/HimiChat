@@ -21,6 +21,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import com.jimipurple.himichat.data.FirebaseSource
 
 
 @SuppressLint("Registered")
@@ -35,6 +36,7 @@ open class BaseFragment : Fragment() {
     protected var app: MyApp? = null
     protected var ac: AppCompatActivity? = null
     protected var bar: ActionBar? = null
+    protected var fbSource: FirebaseSource? = null
     var tbar: Toolbar? = null
     var title: CharSequence? = null
     var subtitle: CharSequence? = null
@@ -50,6 +52,7 @@ open class BaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         app = this.c!!.applicationContext as MyApp
+        fbSource = FirebaseSource(c!!)
         tbar = app!!.tbar
         val sp = c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
         val darkMode = sp.getBoolean("night_mode", false)

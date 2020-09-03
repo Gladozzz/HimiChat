@@ -92,22 +92,6 @@ class ProfileFragment : BaseFragment() {
                 }
         }
         profileRemoveFriendButton.setOnClickListener {
-            val data = mapOf("id" to mAuth!!.uid!!, "friendId" to profile_id!!)
-//            functions!!
-//                .getHttpsCallable("removeFriend")
-//                .call(data).continueWith { task ->
-//                    val result = task.result?.data as HashMap<String, Any>
-//                    Log.i("removeFriend", "result $result")
-//                    if (task.exception != null) {
-//                        Log.e("removeFriend", "exception " + task.exception.toString())
-//                    }
-//                }.addOnSuccessListener {
-//                    Toast.makeText(c!!, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
-//                    requireActivity().recreate()
-//                }.addOnFailureListener {
-//                    Log.e("removeFriend", "error " + it.message + " " + it.cause)
-//                    Toast.makeText(c!!, R.string.toast_remove_friend_error, Toast.LENGTH_LONG).show()
-//                }
             val uid = mAuth!!.uid!!
             //removing all existing invites of between those users
             firestore!!.collection("users").document(uid).update(mapOf("invited_by" to  FieldValue.arrayRemove(profile_id!!)))

@@ -22,18 +22,6 @@ import kotlin.collections.ArrayList
 class FriendsFragment : BaseFragment() {
 
     val REQUEST_CODE_DIALOG_ACTIVITY = 1
-//    private var mAuth: FirebaseAuth? = null
-//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//    private var firebaseToken: String  = ""
-//    private var functions = FirebaseFunctions.getInstance()
-
-//    private fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
-//        val u : ArrayList<User> = ArrayList<User>()
-//        h.forEach {
-//            u.add(User((it["id"] as String), (it["nickname"] as String), (it["realname"] as String), (it["avatar"] as String)))
-//        }
-//        return u
-//    }
 
     private fun usersToStrings(h : ArrayList<User>) : ArrayList<String> {
         val s : ArrayList<String> = ArrayList<String>()
@@ -125,38 +113,6 @@ class FriendsFragment : BaseFragment() {
             Log.i("friendsTest", "SharedPreferences is empty")
         }
 
-//        functions!!
-//            .getHttpsCallable("getFriends")
-//            .call(data).continueWith { task ->
-//                val result = task.result?.data as HashMap<String, Any>
-//                if (result["found"] as Boolean) {
-//                    val friends = result["friends"] as ArrayList<String>
-//                    val data1 = mapOf("ids" to friends)
-//                    functions!!
-//                        .getHttpsCallable("getUsers")
-//                        .call(data1).continueWith { task ->
-//                            val result1 = task.result?.data as HashMap<String, Any>
-//                            Log.i("received_inv", "result1 $result1")
-//                            if (result1["found"] == true) {
-//                                val users = result1["users"] as ArrayList<HashMap<String, Any>>
-//                                val unfound = result1["unfound"] as ArrayList<String>
-//                                Log.i("FriendList", "users $users")
-//                                Log.i("FriendList", "unfound $unfound")
-//                                val arr1 = hashMapToUser(users)
-//                                val strings = usersToStrings(arr1)
-//                                pref.putListString("friends", strings)
-//                                val adapter = FriendsListAdapter(c!!.applicationContext, arr1, object : FriendsListAdapter.Callback {
-//                                    override fun onItemClicked(item: User) {
-//                                        profile(item)
-//                                    }
-//                                }, sendMsg)
-//                                FriendsList.adapter = adapter
-//                                FriendsList.layoutManager = LinearLayoutManager(c!!)
-//                                Log.i("friendsTest", "friends was took from server")
-//                            }
-//                        }
-//                }
-//            }
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             try {
                 if (it.isSuccessful) {

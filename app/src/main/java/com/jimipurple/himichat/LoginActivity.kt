@@ -54,7 +54,6 @@ class LoginActivity : BaseActivity() {
     private var realname: String? = null
     private var avatar: String? = null
     private var currentTheme: Boolean = false
-    private var fbSource: FirebaseSource? = null
 
     private lateinit var authViewModel: AuthViewModel
 
@@ -62,7 +61,6 @@ class LoginActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         val sp = applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
-        fbSource = FirebaseSource(applicationContext)
         currentTheme = sp.getBoolean("night_mode", false)
         when (currentTheme) {
             true -> {
@@ -300,37 +298,11 @@ class LoginActivity : BaseActivity() {
 //        startService(Intent(this, MessagingService::class.java))
         createNotificationChannel()
         // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = mAuth!!.currentUser
-        if (currentUser != null) {
-            currentUser.getIdToken(true)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val idToken = task.result!!.token
-                        //TODO sign token with id
-                        // ...
-                    } else { // Handle error -> task.getException();
-                    }
-                }
-            val currentUID = currentUser.uid
-
-            //check keys
-//            val keysDB = KeysDBHelper(applicationContext)
-            var kp = keydb.getKeyPair(currentUID)
-            if (kp == null) {
-                generateKeys()
-                Log.i("auth:start", "New key's generated")
-                kp = keydb.getKeyPair(currentUID)
-            }
-            pushKeysToServer(kp!!.publicKey)
-
-            //updating token
-            pushTokenToServer()
-
-            Log.i("testSuccessful", "successful 219")
+        fbSource!!.updateDataOnFirebase({
             successful()
-        } else {
-            Log.i("auth:start", "Пользователь не авторизован")
-        }
+        },{
+            Log.e("LoginActivity", "e ", it)
+        })
     }
 
     private fun setRegisterMode() {
@@ -363,7 +335,7 @@ class LoginActivity : BaseActivity() {
     //moment when authentication, token check and keys check are successful
     private fun successful() {
         Log.i("testSuccessful", "successful")
-        pushTokenToServer()
+        fbSource!!.updateToken()
         startService(Intent(this, SocketService::class.java))
         val newIntent = Intent(applicationContext, NavigationActivity::class.java)
         finish()
@@ -377,168 +349,8 @@ class LoginActivity : BaseActivity() {
         return kp.publicKey.toString(Charsets.ISO_8859_1)
     }
 
-    //Pushing Public Key from KeysDB to Firebase Firestore
-    private fun pushKeysToServer(key: ByteArray) {
-//        val data = hashMapOf(
-//            "userId" to mAuth!!.uid!!,
-//            "publicKey" to key
-//        )
-//        val test = key.toByteArray(Charsets.ISO_8859_1)
-//        Log.i("setPublicKey", "setPublicKey data $data")
-//        functions
-//            .getHttpsCallable("setPublicKey")
-//            .call(data).addOnCompleteListener { task ->
-//                try {
-//                    Log.i("setPublicKey", "setPublicKey result " + task.result?.data.toString())
-//                } catch (e: Exception) {
-//                    Log.i("setPublicKey", "setPublicKey error " + e.message)
-//                }
-//            }
-        firestore!!.collection("users").document(mAuth!!.uid!!)
-            .update("public_key", Blob.fromBytes(key))
-    }
-
-    //Pushing FCM token to Firestore. Using when token is absent in Preferences
-    private fun pushTokenToServer() {
-        val uid = mAuth!!.uid
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnSuccessListener(
-                this
-            ) { instanceIdResult: InstanceIdResult ->
-                val newToken = instanceIdResult.token
-                Log.i("auth:start", newToken)
-                applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit()
-                    .putString("firebaseToken", newToken).apply()
-                firestore!!.collection("users").document(mAuth!!.uid!!)
-                    .update(mapOf("token" to newToken))
-            }
-    }
-
     private fun signWithGoogleButtonOnClick() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.web_client_id))
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-//        val api =
-//        googleSignInClient!!.asGoogleApiClient().disconnect()
-//        googleSignInClient!!.asGoogleApiClient().connect()
-//        googleSignInClient!!.asGoogleApiClient().clearDefaultAccountAndReconnect()
-        val signInIntent = googleSignInClient!!.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String, account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        mAuth!!.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d("googleAuth", "signInWithCredential:success")
-                    val user = mAuth!!.currentUser
-                    val currentUID = user!!.uid
-                    profile_id = mAuth!!.uid
-
-                    val docRef = firestore!!.collection("users").document("SF")
-                    firestore!!.collection("users").document(profile_id!!).get()
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val document: DocumentSnapshot? = task.result
-                                if (document != null) {
-                                    if (document.exists()) {
-                                        Log.d("googleAuth", "Document exists! Auth")
-                                        Log.i("testSuccessful", "successful 339")
-                                        pushTokenToServer()
-                                        successful()
-                                    } else {
-                                        Log.d("googleAuth:create", "Document does not exist!")
-                                        val userData = mapOf(
-                                            "id" to currentUID,
-                                            "nickname" to account.email!!.substringBefore("@"),
-                                            "avatar" to account.photoUrl!!.toString()
-                                                .replace("s96-c", "s192-c", true),
-                                            "real_name" to account.displayName,
-                                            "email" to account.email
-                                        )
-                                        firestore!!.collection("users").document(mAuth!!.uid!!)
-                                            .set(userData, SetOptions.merge())
-                                            .addOnSuccessListener {
-                                                Log.i(
-                                                    "googleAuth:create",
-                                                    "user data successfully written"
-                                                )
-                                                pushTokenToServer()
-                                                var kp = keydb.getKeyPair(currentUID)
-                                                if (kp == null) {
-                                                    generateKeys()
-                                                    kp = keydb.getKeyPair(currentUID)
-                                                }
-                                                pushKeysToServer(kp!!.publicKey)
-                                                Log.i("testSuccessful", "successful 359")
-                                                successful()
-                                            }
-                                            .addOnFailureListener { e ->
-                                                Log.i(
-                                                    "googleAuth:create",
-                                                    "Error writing user data",
-                                                    e
-                                                )
-                                            }
-                                    }
-                                } else {
-                                    Log.d("googleAuth:create", "Document does not exist!")
-                                    val userData = mapOf(
-                                        "id" to currentUID,
-                                        "nickname" to account.email!!.substringBefore("@"),
-                                        "avatar" to account.photoUrl!!.toString()
-                                            .replace("s96-c", "s192-c", true),
-                                        "real_name" to account.displayName,
-                                        "email" to account.email
-                                    )
-                                    firestore!!.collection("users").document(mAuth!!.uid!!)
-                                        .set(userData, SetOptions.merge())
-                                        .addOnSuccessListener {
-                                            Log.i(
-                                                "googleAuth:create",
-                                                "user data successfully written"
-                                            )
-                                            pushTokenToServer()
-                                            var kp = keydb.getKeyPair(currentUID)
-                                            if (kp == null) {
-                                                generateKeys()
-                                                kp = keydb.getKeyPair(currentUID)
-                                            }
-                                            pushKeysToServer(kp!!.publicKey)
-                                            Log.i("testSuccessful", "successful 384")
-                                            successful()
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.i(
-                                                "googleAuth:create",
-                                                "Error writing user data",
-                                                e
-                                            )
-                                        }
-                                }
-                            } else {
-                                Log.d(
-                                    "googleAuth",
-                                    "Failed with: ",
-                                    task.exception
-                                )
-                            }
-                        }
-                        .addOnFailureListener { exception ->
-                            Log.d("googleAuth:create", "get failed with ", exception)
-                        }
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("googleAuth:create", "signInWithCredential:failure", task.exception)
-//                    Snackbar.make(view, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
-                    Toast.makeText(applicationContext, R.string.toast_auth_error, Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
+        fbSource!!.loginWithGoogle(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -549,7 +361,7 @@ class LoginActivity : BaseActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)!!
                 Log.d("googleAuth", "firebaseAuthWithGoogle:" + account.id)
-                firebaseAuthWithGoogle(account.idToken!!, account)
+                fbSource!!.firebaseAuthWithGoogle(this, account.idToken!!, account, {successful()})
             } catch (e: ApiException) {
                 Log.w("googleAuth", "Google sign in failed", e)
             }

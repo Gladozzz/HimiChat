@@ -62,16 +62,6 @@ class NavigationActivity : BaseActivity() {
         .setPopEnterAnim(com.jimipurple.himichat.R.animator.fragment_fade_in)
         .build()
 
-    private fun hashMapToUser(h : ArrayList<java.util.HashMap<String, Any>>) : ArrayList<User> {
-        val u : ArrayList<User> = ArrayList<User>()
-        h.forEach {
-            u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
-        }
-        Log.i("convert", h.toString())
-        Log.i("convert", u.toString())
-        return u
-    }
-
     private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
         val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (service in manager.getRunningServices(Int.MAX_VALUE)) {
@@ -368,8 +358,8 @@ class NavigationActivity : BaseActivity() {
                     val data1 = mapOf("ids" to friends)
                     functions!!
                         .getHttpsCallable("getUsers")
-                        .call(data1).continueWith { task ->
-                            val result1 = task.result?.data as java.util.HashMap<String, Any>
+                        .call(data1).continueWith { task1 ->
+                            val result1 = task1.result?.data as java.util.HashMap<String, Any>
                             if (result1["found"] == true) {
                                 val users = result1["users"] as ArrayList<java.util.HashMap<String, Any>>
                                 val unfound = result1["unfound"] as ArrayList<String>
