@@ -332,6 +332,7 @@ class FriendRequestsFragment : BaseFragment() {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
         }
+        //TODO
         functions!!
             .getHttpsCallable("getInvites")
             .call(data).continueWith { task ->

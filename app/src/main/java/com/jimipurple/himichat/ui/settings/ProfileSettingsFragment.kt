@@ -73,6 +73,9 @@ class ProfileSettingsFragment : BaseFragment() {
         }
         deleteAllMessagesButton.setOnClickListener { deleteAllMessages() }
 
+        updateDataFromServer()
+        updateAvatar()
+
         profileSettingsViewModel = ViewModelProviders.of(this)
             .get(ProfileSettingsViewModel::class.java)
 
@@ -124,9 +127,6 @@ class ProfileSettingsFragment : BaseFragment() {
                 false
             }
         }
-
-        updateDataFromServer()
-        updateAvatar()
     }
 
     /**
@@ -166,11 +166,13 @@ class ProfileSettingsFragment : BaseFragment() {
 
     private fun updateDataFromServer() {
         fbSource!!.getUser(mAuth!!.uid!!, { user ->
-            nicknameEdit.setText(user.nickname)
-            realnameEdit.setText(user.realName)
             nickname = user.nickname
             realname = user.realName
             avatar = user.avatar
+            profileSettingsViewModel.currentNicknameOnServer = nickname
+            profileSettingsViewModel.currentRealnameOnServer = realname
+            nicknameEdit.setText(user.nickname)
+            realnameEdit.setText(user.realName)
             val bitmap = LruCache(c!!)[user.avatar]
             if (bitmap != null) {
                 avatarView.setImageBitmap(bitmap)
@@ -226,17 +228,6 @@ class ProfileSettingsFragment : BaseFragment() {
     }
 
     fun updateAvatar() {
-        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
-            if (it.isSuccessful) {
-                val userData = it.result!!
-                avatar = userData.get("avatar") as String?
-                if (avatar == null) {
-                    avatar = ""
-                }
-            } else {
-                Log.i("FirestoreRequest", "Error getting documents.", it.exception)
-            }
-        }
         fbSource!!.getUser(mAuth!!.uid!!, { user ->
             avatar = user.avatar
             val bitmap = LruCache(c!!.applicationContext)[avatar!!]
@@ -302,5 +293,19 @@ class ProfileSettingsFragment : BaseFragment() {
             }
         }// other 'case' lines to check for other
         // permissions this app might request
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("nickname", nicknameEdit.text.toString())
+        outState.putString("realName", realnameEdit.text.toString())
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) {
+            nicknameEdit.setText(savedInstanceState.getString("nickname"))
+            realnameEdit.setText(savedInstanceState.getString("realName"))
+        }
     }
 }

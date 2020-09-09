@@ -321,14 +321,6 @@ class NavigationActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-
-        fun hashMapToUser(h : ArrayList<java.util.HashMap<String, Any>>) : ArrayList<User> {
-            val u : ArrayList<User> = ArrayList<User>()
-            h.forEach {
-                u.add(User(it["id"] as String, it["nickname"] as String, it["realname"] as String, it["avatar"] as String))
-            }
-            return u
-        }
         fun usersToStrings(h : ArrayList<User>) : ArrayList<String> {
             val s : ArrayList<String> = ArrayList<String>()
             h.forEach {
@@ -339,29 +331,13 @@ class NavigationActivity : BaseActivity() {
             return s
         }
         val pref = SharedPreferencesUtility(applicationContext)
-        val data = mapOf("id" to mAuth!!.uid!!)
-        functions!!
-            .getHttpsCallable("getFriends")
-            .call(data).continueWith { task ->
-                val result = task.result?.data as java.util.HashMap<String, Any>
-                if (result["found"] as Boolean) {
-                    val friends = result["friends"] as ArrayList<String>
-                    val data1 = mapOf("ids" to friends)
-                    functions!!
-                        .getHttpsCallable("getUsers")
-                        .call(data1).continueWith { task1 ->
-                            val result1 = task1.result?.data as java.util.HashMap<String, Any>
-                            if (result1["found"] == true) {
-                                val users = result1["users"] as ArrayList<java.util.HashMap<String, Any>>
-                                val unfound = result1["unfound"] as ArrayList<String>
-                                val arr1 = hashMapToUser(users)
-                                val strings = usersToStrings(arr1)
-                                pref.putListString("friends", strings)
-                                Log.i("friendsTest", "friends was took from server")
-                            }
-                        }
-                }
-            }
+        fbSource!!.getUser(fbSource!!.uid()!!, {user: User ->
+            user.friends?.let { fbSource!!.getUsers(it, {users: List<User>? ->
+                val strings = usersToStrings(users as ArrayList<User>)
+                pref.putListString("friends", strings)
+                Log.i("friendsTest", "friends was took from server")
+            }) }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

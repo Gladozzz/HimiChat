@@ -26,7 +26,7 @@
     <string name="label_empty_request_list">No requests</string>
     <string name="label_empty_friends_list">No friends</string>
     <string name="label_empty_users_list">No users for your request</string>
-    <string name="label_empty_dialogues_list">No dialogues yet</string>
+    <string name="label_empty_dialogues_list">Sorry, no dialogues yet\n¯\\_(ツ)_/¯</string>
     <string name="label_invalid_nickname">Invalid nickname</string>
     <string name="label_no_user_with_this_nickname">No user with this nickname</string>
 
@@ -54,6 +54,7 @@
     <!--    <string name="context_menu_item_remove">Remove</string>-->
 
 
+    <string name="toast_cant_reach_server">Server is not responding</string>
     <string name="toast_auth_error">Authentication failed.</string>
     <string name="toast_auth_error_wrong_password">Wrong password</string>
     <string name="toast_auth_error_user_doesnt_exist">User does\'nt exist</string>
@@ -125,5 +126,6 @@
     <string name="invalid_realname">Real name is required</string>
     <string name="invalid_nickname">Nickname must be more than 3 characters and less than 20 characters</string>
     <string name="invalid_nickname_empty">Nickname can\'t be empty</string>
+    <string name="invalid_nickname_not_unique">Nickname must be unique</string>
     <string name="login_failed">"Login failed"</string>
 </resources>

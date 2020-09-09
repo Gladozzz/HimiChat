@@ -1,12 +1,10 @@
 package com.jimipurple.himichat
 
-import android.R
 import android.annotation.SuppressLint
 //import android.app.ProgressDialog
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -14,9 +12,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavOptions
-import com.google.android.gms.common.util.VisibleForTesting
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

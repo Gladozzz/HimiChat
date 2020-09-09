@@ -81,10 +81,10 @@ class FindFriendFragment : BaseFragment() {
                                     data = hashMapOf(
                                         "id" to id
                                     )
-                                    firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
+                                    firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{ task1 ->
                                         try {
-                                            if (it.isSuccessful) {
-                                                val userData = it.result!!
+                                            if (task1.isSuccessful) {
+                                                val userData = task1.result!!
                                                 val friendsIDs = userData.get("friends") as? ArrayList<String>?
                                                 firestore!!.collection("users").document(id).get().addOnCompleteListener{
                                                     try {
@@ -202,7 +202,7 @@ class FindFriendFragment : BaseFragment() {
                                                     }
                                                 }
                                             } else {
-                                                Log.e("FirestoreRequest", "Error getting documents.", it.exception)
+                                                Log.e("FirestoreRequest", "Error getting documents.", task1.exception)
                                                 progressBar.visibility = View.GONE
                                                 noUserMessage.visibility = View.VISIBLE
                                                 wrongNicknameMessage.visibility = View.GONE

@@ -1,6 +1,5 @@
 package com.jimipurple.himichat.data
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,10 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.Blob
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.*
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
@@ -24,9 +20,10 @@ import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.Encryption
 import com.jimipurple.himichat.models.User
-import com.jimipurple.himichat.utills.SharedPreferencesUtility
-import com.squareup.picasso.LruCache
-import kotlinx.android.synthetic.main.profile_settings_fragment.*
+import com.google.firebase.firestore.FieldPath
+import com.jimipurple.himichat.models.FriendRequest
+import com.jimipurple.himichat.ui.adapters.FriendRequestsListAdapter
+import kotlinx.android.synthetic.main.fragment_friend_requests.*
 import kotlinx.coroutines.runBlocking
 
 class FirebaseSource(context: Context) {
@@ -73,18 +70,17 @@ class FirebaseSource(context: Context) {
             var kp = keydb.getKeyPair(currentUID)
             if (kp == null) {
                 generateKeys()
-                Log.i("auth:start", "New key's generated")
+                Log.i(tag, "auth:start New key's generated")
                 kp = keydb.getKeyPair(currentUID)
             }
             pushKeysToServer(kp!!.publicKey)
 
             //updating token
             pushTokenToServer()
-
-            Log.i("testSuccessful", "successful 219")
             onSuccess()
         } else {
             onError(Exception("Пользователь не авторизован"))
+            Log.i(tag, "Пользователь не авторизован")
         }
     }
 
@@ -377,11 +373,11 @@ class FirebaseSource(context: Context) {
     }
 
     fun getUser(
-        uid: String,
+        userID: String,
         onSuccess: (user: User) -> Unit,
         onError: (e: Exception?) -> Unit = {}
     ) {
-        firestore.collection("users").document(uid).get().addOnCompleteListener{
+        firestore.collection("users").document(userID).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!
                 var nickname = userData.get("nickname") as String?
@@ -396,16 +392,101 @@ class FirebaseSource(context: Context) {
                 if (avatar == null) {
                     avatar = ""
                 }
-                sp!!.edit().putString("nickname", nickname)
-                .putString("realname", realname)
-                .putString("avatar", avatar).apply()
-                val user = User(uid, nickname, realname, avatar)
+                var friends : List<String>? = null
+                if (userData.get("friends") is List<*>) {
+                    friends = userData.get("friends") as List<String>
+                }
+                val user = User(userID, nickname, realname, avatar, friends)
                 onSuccess(user)
             } else {
                 Log.i(tag, "FirestoreRequest Error getting documents.", it.exception)
                 onError(it.exception)
             }
         }
+    }
+
+    fun getUsers(
+        userIDs: List<String>,
+        onSuccess: (users: List<User>?) -> Unit,
+        onError: (e: Exception?) -> Unit = {}
+    ) {
+        firestore.collection("users").whereIn(FieldPath.documentId(), userIDs).get().addOnCompleteListener { usersDocs ->
+            try {
+                if (usersDocs.isSuccessful) {
+                    val result = usersDocs.result!!
+                    val docs = result.documents
+                    val users = ArrayList<User>()
+                    for (userDoc in docs) {
+                        val userData = userDoc.data!!
+//                        var uid = userData.get("nickname") as String?
+                        val userID = userDoc.id
+                        var nickname = userData["nickname"] as String?
+                        if (nickname == null) {
+                            nickname = ""
+                        }
+                        var realname = userData["real_name"] as String?
+                        if (realname == null) {
+                            realname = ""
+                        }
+                        var avatar = userData["avatar"] as String?
+                        if (avatar == null) {
+                            avatar = ""
+                        }
+                        var friends : List<String>? = null
+                        if (userData["friends"] is List<*>) {
+                            friends = userData["friends"] as List<String>
+                        }
+                        val user = User(userID, nickname, realname, avatar, friends)
+                        users.add(user)
+                    }
+                    if (users.isNotEmpty()) {
+                        onSuccess(users)
+                    } else {
+                        onError(Exception("no one of users were found"))
+                    }
+                } else {
+                    Log.e(tag, "getUsers error: Error getting documents.", usersDocs.exception)
+                    onError(usersDocs.exception)
+                }
+            } catch (e: Exception) {
+                Log.i(tag, "getUsers error: " + e.message)
+                onError(e)
+            }
+        }
+    }
+
+    fun isNicknameUnique(
+        nickname: String,
+        onSuccess: (isUnique: Boolean) -> Unit,
+        onError: (e: Exception) -> Unit = {}
+    ) {
+        val data1 = mapOf("nickname" to nickname)
+        functions
+            .getHttpsCallable("isNicknameUnique")
+            .call(data1).continueWith { task ->
+                val result = task.result?.data as HashMap<String, Any>
+                if (result["isUnique"] is Boolean) {
+                    onSuccess(result["isUnique"] as Boolean)
+                } else {
+                    onError(Exception("Some error on server"))
+                }
+            }
+            .addOnFailureListener { e: Exception ->
+                Log.e(tag, "isNicknameUnique error ", e)
+                onError(e)
+            }
+//        firestore.collection("users").whereEqualTo("nickname", nickname).get().addOnCompleteListener {
+//            if (it.isSuccessful) {
+//                val result = it.result
+//                Log.i(tag, "isNicknameUnique $nickname ${result!!.documents.isEmpty()}")
+//                onSuccess(result.documents.isEmpty())
+//            } else {
+//                it.exception?.let { it1 ->
+//                    Log.e(tag, "isNicknameUnique ", it1)
+//                    onError(it1) }
+//            }
+//
+//        }
     }
 
     private fun generateKeys(): String {

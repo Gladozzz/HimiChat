@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -49,10 +50,10 @@ class LoginActivity : BaseActivity() {
     private var keydb = KeysDBHelper(this)
     private var googleSignInClient: GoogleSignInClient? = null
 
-    var profile_id: String? = null
-    private var nickname: String? = null
-    private var realname: String? = null
-    private var avatar: String? = null
+//    var profile_id: String? = null
+//    private var nickname: String? = null
+//    private var realname: String? = null
+//    private var avatar: String? = null
     private var currentTheme: Boolean = false
 
     private lateinit var authViewModel: AuthViewModel
@@ -365,6 +366,35 @@ class LoginActivity : BaseActivity() {
             } catch (e: ApiException) {
                 Log.w("googleAuth", "Google sign in failed", e)
             }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("authEmail", emailEdit.text.toString())
+        outState.putString("authPassword", passwordSignEdit.text.toString())
+
+        outState.putString("regEmail", emailRegisterEdit.text.toString())
+        outState.putString("regPassword", passwordRegisterEdit.text.toString())
+        outState.putString("regPasswordRepeat", passwordRepeatEdit.text.toString())
+        outState.putString("regNickname", nicknameEdit.text.toString())
+        outState.putString("regRealName", realNameEdit.text.toString())
+    }
+
+    override fun onRestoreInstanceState(
+        savedInstanceState: Bundle?,
+        persistentState: PersistableBundle?
+    ) {
+        super.onRestoreInstanceState(savedInstanceState, persistentState)
+        if (savedInstanceState != null) {
+            emailEdit.setText(savedInstanceState.getString("authEmail"))
+            passwordSignEdit.setText(savedInstanceState.getString("authPassword"))
+
+            emailRegisterEdit.setText(savedInstanceState.getString("regEmail"))
+            passwordRegisterEdit.setText(savedInstanceState.getString("regPassword"))
+            passwordRepeatEdit.setText(savedInstanceState.getString("regPasswordRepeat"))
+            nicknameEdit.setText(savedInstanceState.getString("regNickname"))
+            realNameEdit.setText(savedInstanceState.getString("regRealName"))
         }
     }
 

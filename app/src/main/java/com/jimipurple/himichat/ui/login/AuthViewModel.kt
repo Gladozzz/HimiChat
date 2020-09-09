@@ -1,28 +1,27 @@
 package com.jimipurple.himichat.ui.login
 
+import android.app.Application
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Patterns
-import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.EditText
+import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.android.material.textfield.TextInputLayout
 import com.jimipurple.himichat.R
-import kotlinx.android.synthetic.main.login_mode_layout.*
+import com.jimipurple.himichat.data.FirebaseSource
 import java.util.regex.Pattern
 
 
-class AuthViewModel() : ViewModel() {
+class AuthViewModel(val app: Application) : AndroidViewModel(app) {
 
     private val _authForm = MutableLiveData<AuthFormState>()
     val authFormState: LiveData<AuthFormState> = _authForm
 
     private val _regForm = MutableLiveData<RegFormState>()
     val regFormState: LiveData<RegFormState> = _regForm
+
+    private val fbSource: FirebaseSource = FirebaseSource(app)
 
     private val _authResult = MutableLiveData<AuthResult>()
     val authResult: LiveData<AuthResult> = _authResult
@@ -56,21 +55,19 @@ class AuthViewModel() : ViewModel() {
     fun authDataChanged(email: String, password: String) {
         var mIsDataValid = true
         val state = AuthFormState()
-        if (!isEmailValid(email)) {
-            state.emailError = R.string.invalid_email
-            mIsDataValid = false
-        }
         if (email.isEmpty()) {
             mIsDataValid = false
             state.emailError = null
-        }
-        if (!isPasswordValid(password)) {
-            state.passwordError = R.string.invalid_password
+        } else if (!isEmailValid(email)) {
+            state.emailError = R.string.invalid_email
             mIsDataValid = false
         }
         if (password.isEmpty()) {
             mIsDataValid = false
             state.passwordError = null
+        } else if (!isPasswordValid(password)) {
+            state.passwordError = R.string.invalid_password
+            mIsDataValid = false
         }
         state.isDataValid = mIsDataValid
         _authForm.value = state
@@ -79,6 +76,7 @@ class AuthViewModel() : ViewModel() {
     fun regDataChanged(email: String, password: String, repeatPassword: String, realName: String, nickname: String) {
         var mIsDataValid = true
         val state = RegFormState()
+
         if (!isEmailValid(email)) {
             state.emailError = R.string.invalid_email
             mIsDataValid = false
@@ -87,6 +85,7 @@ class AuthViewModel() : ViewModel() {
             mIsDataValid = false
             state.emailError = null
         }
+
         if (!isPasswordValid(password)) {
             mIsDataValid = false
             state.passwordError = R.string.invalid_password
@@ -95,6 +94,7 @@ class AuthViewModel() : ViewModel() {
             mIsDataValid = false
             state.passwordError = null
         }
+
         if (password != repeatPassword) {
             mIsDataValid = false
             state.passwordRepeatError = R.string.invalid_password_repeat
@@ -110,13 +110,27 @@ class AuthViewModel() : ViewModel() {
         if (!isNicknameValid(nickname)) {
             mIsDataValid = false
             state.nicknameError = R.string.invalid_nickname
+            state.isDataValid = mIsDataValid
+            _regForm.value = state
+        } else {
+            if (nickname.isEmpty()) {
+                mIsDataValid = false
+                state.nicknameError = null
+                state.isDataValid = mIsDataValid
+                _regForm.value = state
+            } else {
+                isNicknameUnique(nickname, {
+                    if (!it) {
+                        state.nicknameError = R.string.invalid_nickname_not_unique
+                        mIsDataValid = false
+                    }
+                    state.isDataValid = mIsDataValid
+                    _regForm.value = state
+                }, {
+                    Toast.makeText(app, R.string.toast_cant_reach_server, Toast.LENGTH_SHORT).show()
+                })
+            }
         }
-        if (nickname.isEmpty()) {
-            mIsDataValid = false
-            state.nicknameError = null
-        }
-        state.isDataValid = mIsDataValid
-        _regForm.value = state
     }
 
     private fun isPasswordValid(password: String): Boolean {
@@ -132,5 +146,9 @@ class AuthViewModel() : ViewModel() {
         val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
         val matcher = pattern.matcher(nickname)
         return matcher.matches()
+    }
+
+    private fun isNicknameUnique(nickname: String, onSuccess: (Boolean) -> Unit, onError: (Exception) -> Unit = {}) {
+        fbSource.isNicknameUnique(nickname, onSuccess, onError)
     }
 }
