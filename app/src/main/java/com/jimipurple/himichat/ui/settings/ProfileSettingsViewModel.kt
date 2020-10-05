@@ -2,6 +2,7 @@ package com.jimipurple.himichat.ui.settings
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.jimipurple.himichat.R
@@ -18,6 +19,7 @@ class ProfileSettingsViewModel(val app: Application) : AndroidViewModel(app) {
     var currentRealnameOnServer: String? = null
 
     fun accountDataChanged(nickname: String, realName: String) {
+        Log.i("PSViewModel", "accountDataChanged")
         var mIsData = true
         val state = ProfileSettingFormState()
         if (nickname.isEmpty()) {
@@ -29,7 +31,9 @@ class ProfileSettingsViewModel(val app: Application) : AndroidViewModel(app) {
             state.isDataValid = mIsData
             _profileSettingsForm.value = state
         } else if (nickname != currentNicknameOnServer) {
+            state.isDataAnalyzing = true
             isNicknameUnique(nickname, {
+                state.isDataAnalyzing = false
                 if (!it) {
                     state.nicknameError = R.string.invalid_nickname_not_unique
                     mIsData = false
@@ -37,6 +41,7 @@ class ProfileSettingsViewModel(val app: Application) : AndroidViewModel(app) {
                 state.isDataValid = mIsData
                 _profileSettingsForm.value = state
             }, {
+                state.isDataAnalyzing = false
                 Toast.makeText(app, R.string.toast_cant_reach_server, Toast.LENGTH_SHORT).show()
             })
         }
@@ -49,7 +54,7 @@ class ProfileSettingsViewModel(val app: Application) : AndroidViewModel(app) {
         return matcher.matches()
     }
 
-    private fun isNicknameUnique(nickname: String, onSuccess: (Boolean) -> Unit, onError: (Exception) -> Unit = {}) {
-        fbSource.isNicknameUnique(nickname, onSuccess, onError)
+    private fun isNicknameUnique(nickname: String, onComplete: (Boolean) -> Unit, onError: (Exception) -> Unit = {}) {
+        fbSource.isNicknameUnique(nickname, onComplete, onError)
     }
 }

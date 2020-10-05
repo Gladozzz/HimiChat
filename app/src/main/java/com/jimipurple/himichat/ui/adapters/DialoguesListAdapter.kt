@@ -54,7 +54,9 @@ class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, v
 
         fun bind(item: Dialog) {
             name.text = item.nickname
-            lastMessage.text = item.lastMessage.text
+            if (item.lastMessage != null) {
+                lastMessage.text = item.lastMessage.text
+            }
 
             if (item.avatar != null && item.nickname != null) {
                 val url = Uri.parse(item.avatar)

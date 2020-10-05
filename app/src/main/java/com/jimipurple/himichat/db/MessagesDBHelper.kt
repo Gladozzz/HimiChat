@@ -8,10 +8,13 @@ import android.provider.BaseColumns
 import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+
+const val tag = "messagesDB"
 
 object TableMessages : BaseColumns {
     const val TABLE_NAME = "messages"
@@ -58,6 +61,13 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
 ) {
 
     private var c = context
+    private val himitsuID: String by lazy {
+        c.getString(R.string.himitsu_id)
+    }
+    private fun himitsuHelloMessage(uid: String): ReceivedMessage  {
+        return ReceivedMessage(null, himitsuID, uid, c.getString(R.string.himitsu_hello_message), Calendar.getInstance().timeInMillis, null, null)
+    }
+    private var himitsuNickname = "Himitsu"
     private var mAuth: FirebaseAuth? = null
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(SQL_CREATE_TABLE_MESSAGES)
@@ -75,10 +85,11 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         onUpgrade(db, oldVersion, newVersion)
     }
-    fun getMessages(): ArrayList<Message>? {
+    fun getMessages(checkHimitsu: Boolean = false): ArrayList<Message>? {
         //TODO получение всех сообщений пользователя из бд
 
         mAuth = FirebaseAuth.getInstance()
+        var isHimitsuHere = false
 
         val db = this.readableDatabase
         val projection = arrayOf(BaseColumns._ID,
@@ -125,13 +136,51 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
                     val msg = ReceivedMessage(id, senderId, receiverId, text, date.time,null, null)
                     msgs.add(msg)
                 }
+                if (checkHimitsu && senderId == himitsuID && receiverId == mAuth!!.uid!! || checkHimitsu && receiverId == himitsuID && senderId == mAuth!!.uid!!) {
+                    isHimitsuHere = true
+                }
             } while (cursor.moveToNext())
+            cursor.close()
+            db.close()
+            if (checkHimitsu && !isHimitsuHere) {
+                val hiMsg = loadHimitsuMessage(mAuth!!.uid!!)
+                msgs.add(hiMsg)
+                Log.i(tag, "himitsu was not here, but i brought him")
+            } else {
+                Log.i(tag, "himitsu is here")
+            }
+            Log.i(tag, "himitsu is here")
             return msgs
         }
         cursor.close()
         db.close()
+        if (checkHimitsu && !isHimitsuHere) {
+            val hiMsg = loadHimitsuMessage(mAuth!!.uid!!)
+            val msgs = ArrayList<Message>()
+            msgs.add(hiMsg)
+            Log.i(tag, "himitsu was not here, but i brought him")
+            return msgs
+        } else {
+            Log.i(tag, "himitsu is here")
+        }
         return null
     }
+
+    private fun loadHimitsuMessage(uid: String): ReceivedMessage {
+        val msg = himitsuHelloMessage(uid)
+        val db = this.writableDatabase
+        val cv = ContentValues()
+        cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)
+        cv.put(TableMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
+        cv.put(TableMessages.COLUMN_NAME_TEXT, msg.text)
+        cv.put(TableMessages.COLUMN_NAME_PUBLIC_KEY, "himitsu")
+        // val date = msg.date!!.hours.toString() + "." + msg.date!!.minutes.toString() + "." + msg.date!!.day.toString() + "." + msg.date!!.month.toString() + "." + (msg.date!!.year + 1900).toString()
+        cv.put(TableMessages.COLUMN_NAME_DATE, msg.date)
+        db!!.insert(TableMessages.TABLE_NAME, null, cv)
+        db.close()
+        return msg as ReceivedMessage
+    }
+
     fun deleteAllMessages() {
         val db = this.writableDatabase
         db.execSQL("delete from "+ TableUndeliveredMessages.TABLE_NAME)
@@ -276,7 +325,6 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         db.close()
     }
     fun pushMessage(msg: UndeliveredMessage) {
-        //TOD Добавление сообщения в бд
         val db = this.writableDatabase
         val cv = ContentValues()
         cv.put(TableUndeliveredMessages.COLUMN_NAME_RECEIVER_ID, msg.receiverId)
@@ -287,7 +335,6 @@ class MessagesDBHelper(context: Context) : SQLiteOpenHelper(context,
         db.close()
     }
     fun pushMessage(msg: ReceivedMessage) {
-        //TOD Добавление сообщения в бд
         val db = this.writableDatabase
         val cv = ContentValues()
         cv.put(TableMessages.COLUMN_NAME_SENDER_ID, msg.senderId)

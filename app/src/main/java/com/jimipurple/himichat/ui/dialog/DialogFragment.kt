@@ -23,6 +23,7 @@ import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.functions.FirebaseFunctionsException
 import com.jimipurple.himichat.*
+import com.jimipurple.himichat.data.HimitsuBotBehavior
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.encryption.CurveKeyPair
@@ -35,15 +36,18 @@ import com.jimipurple.himichat.ui.adapters.MessageListAdapter
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_dialog.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 //passion is a key bro (⌐■_■)
 class DialogFragment : BaseFragment() {
 
-    private var db : MessagesDBHelper? = null
+    private var db: MessagesDBHelper? = null
     private var id: String? = null
     private var friend_id: String? = null
     private var avatar: String? = null
     private var nickname: String? = null
+    private var bot: HimitsuBotBehavior? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,34 +68,40 @@ class DialogFragment : BaseFragment() {
 //        ac = app!!.currentActivity!! as AppCompatActivity
 //        bar = ac!!.supportActionBar!!
 
-        MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
-        SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
-        SocketService.usersToCheck = arrayListOf(friend_id!!)
-        MessagingService.isDialog = true
-        MessagingService.currentDialog = friend_id!!
-        val socket = SocketService.socket
-        socket.on("online_list") { args ->
-            val online = args[0] as String
+        val himitsuID = c!!.getString(R.string.himitsu_id)
+        if (friend_id != himitsuID) {
+            MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
+            SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
+            SocketService.usersToCheck = arrayListOf(friend_id!!)
+            MessagingService.isDialog = true
+            MessagingService.currentDialog = friend_id!!
+            val socket = SocketService.socket
+            socket.on("online_list") { args ->
+                val online = args[0] as String
 //            Log.i("SocketServiceOnline", "online_list $online")
-            if (online != "") {
-                c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("online", online).apply()
-                var userOnline = false
-                online.split(":").forEach {
-                    if (it == friend_id) {
-                        userOnline = true
+                if (online != "") {
+                    c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                        .edit().putString("online", online).apply()
+                    var userOnline = false
+                    online.split(":").forEach {
+                        if (it == friend_id) {
+                            userOnline = true
+                        }
                     }
-                }
-                val handler = Handler(c!!.mainLooper)
-                handler.post {
-                    if (userOnline) {
+                    val handler = Handler(c!!.mainLooper)
+                    handler.post {
+                        if (userOnline) {
 //                        tbar!!.setSubtitle(R.string.online)
-                        setOnline()
-                    } else {
+                            setOnline()
+                        } else {
 //                        tbar!!.setSubtitle(R.string.offline)
-                        setOffline()
+                            setOffline()
+                        }
                     }
                 }
             }
+        } else {
+            bot = HimitsuBotBehavior(c!!, id!!)
         }
     }
 
@@ -157,7 +167,10 @@ class DialogFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()
-        requireActivity().registerReceiver(FCMReceiver, IntentFilter(MessagingService.INTENT_FILTER))
+        requireActivity().registerReceiver(
+            FCMReceiver,
+            IntentFilter(MessagingService.INTENT_FILTER)
+        )
 //        bar!!.title = nickname
 //        bar!!.setSubtitle(R.string.offline)
     }
@@ -168,7 +181,7 @@ class DialogFragment : BaseFragment() {
         socket.off("online_list")
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
-        SocketService.setCallbackOnMessageReceived {  }
+        SocketService.setCallbackOnMessageReceived { }
         try {
             requireActivity().unregisterReceiver(FCMReceiver)
         } catch (e: Exception) {
@@ -182,7 +195,7 @@ class DialogFragment : BaseFragment() {
         socket.off("online_list")
         MessagingService.isDialog = false
         MessagingService.setCallbackOnMessageRecieved { }
-        SocketService.setCallbackOnMessageReceived {  }
+        SocketService.setCallbackOnMessageReceived { }
         try {
             requireActivity().unregisterReceiver(FCMReceiver)
         } catch (e: Exception) {
@@ -192,35 +205,39 @@ class DialogFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
-        SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
-        SocketService.usersToCheck = arrayListOf(friend_id!!)
-        MessagingService.isDialog = true
-        MessagingService.currentDialog = friend_id!!
-        val socket = SocketService.socket
-        socket.on("online_list") { args ->
-            val online = args[0] as String
+        val himitsuID = c!!.getString(R.string.himitsu_id)
+        if (friend_id != himitsuID) {
+            SocketService.usersToCheck = arrayListOf(friend_id!!)
+            val socket = SocketService.socket
+            socket.on("online_list") { args ->
+                val online = args[0] as String
 //            Log.i("SocketServiceOnline", "online_list $online")
-            if (online != "") {
-                c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).edit().putString("online", online).apply()
-                var userOnline = false
-                online.split(":").forEach {
-                    if (it == friend_id) {
-                        userOnline = true
+                if (online != "") {
+                    c!!.applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                        .edit().putString("online", online).apply()
+                    var userOnline = false
+                    online.split(":").forEach {
+                        if (it == friend_id) {
+                            userOnline = true
+                        }
                     }
-                }
-                val handler = Handler(c!!.mainLooper)
-                handler.post {
-                    if (userOnline) {
+                    val handler = Handler(c!!.mainLooper)
+                    handler.post {
+                        if (userOnline) {
 //                        tbar!!.setSubtitle(R.string.online)
-                        setOnline()
-                    } else {
+                            setOnline()
+                        } else {
 //                        tbar!!.setSubtitle(R.string.offline)
-                        setOffline()
+                            setOffline()
+                        }
                     }
                 }
             }
         }
+        MessagingService.isDialog = true
+        MessagingService.currentDialog = friend_id!!
+        MessagingService.setCallbackOnMessageRecieved { requireActivity().runOnUiThread { reloadMsgs() } }
+        SocketService.setCallbackOnMessageReceived { requireActivity().runOnUiThread { reloadMsgs() } }
     }
 
     private fun reloadMsgs() {
@@ -256,88 +273,112 @@ class DialogFragment : BaseFragment() {
             }
         }
 
-        val delete = {msg: Message -> Unit
+        val delete = { msg: Message ->
+            Unit
             db!!.deleteMessage(msg)
             Thread.sleep(50)
             reloadMsgs()
         }
-        val edit = {msg: Message -> Unit
-            Toast.makeText(c,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
+        val edit = { msg: Message ->
+            Unit
+            Toast.makeText(c, resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT)
+                .show()
         }
-        val onHold = {msg: Message -> Unit
-            Toast.makeText(c,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
+        val onHold = { msg: Message ->
+            Unit
+            Toast.makeText(c, resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT)
+                .show()
         }
         val adapter = MessageListAdapter(c!!, msgs, object : MessageListAdapter.Callback {
             override fun onItemClicked(item: Message) {
-                Toast.makeText(c,resources.getText(R.string.toast_future_feature), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    c,
+                    resources.getText(R.string.toast_future_feature),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }, delete, edit, onHold)
         messageList.adapter = adapter
         messageList.scrollToPosition(adapter.itemCount)
     }
 
-    private fun onSendBtnClick(){
-        val text = dialogMessageInput.inputEditText!!.text.toString()
-        if (text != "") {
-            val receiverId = friend_id
-            val senderId = mAuth!!.uid!!
-            val msg = UndeliveredMessage(senderId, receiverId!!, text, db!!.getDeliveredId())
-            db!!.pushMessage(msg)
-            reloadMsgs()
-            var token = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-            val data = hashMapOf(
-                "receiverId" to receiverId,
-                "senderId" to senderId,
-                "deliveredId" to msg.deliveredId.toString(),
-                "text" to text,
-                "token" to token
-            )
-            if (token == "") {
-                Log.i("dialogMessage", "data $data")
-
-                //TODO here i should refresh token
-                token = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
-
-                Log.i("msgTest", "token " + data["token"])
-            }
-            firestore!!.collection("users").document(receiverId).get().addOnCompleteListener(requireActivity()
-            ) {
-                if (it.isSuccessful) {
-                    //                    db!!.pushMessage(msg)
-                    val result = it.result?.get("public_key") as Blob?
-                    val kp = KeysDBHelper(c!!).getKeyPair(mAuth!!.uid!!)
-                    if (result != null && kp != null) {
-                        val pk = result.toBytes()
-                        sendEncryptedMessage(receiverId, senderId, text, msg, kp, pk)
-                        Log.i("dialogMessage", "sendEncryptedMessage data $data")
-                        //                            reloadMsgs()
-                    } else {
-                        sendMessage(receiverId, senderId, text, msg)
-                        Log.i("dialogMessage", "sendMessage data $data")
-                        //                            reloadMsgs()
-                    }
-                } else {
-                    Log.i("dialogMessage", "Error getting documents.", it.exception)
+    private fun onSendBtnClick() {
+        val himitsuID = c!!.getString(R.string.himitsu_id)
+        if (friend_id != himitsuID) {
+            val text = dialogMessageInput.inputEditText!!.text.toString()
+            if (text != "") {
+                val receiverId = friend_id
+                val senderId = mAuth!!.uid!!
+                val msg = UndeliveredMessage(senderId, receiverId!!, text, db!!.getDeliveredId())
+                db!!.pushMessage(msg)
+                reloadMsgs()
+                var token = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                    .getString("firebaseToken", "")
+                val data = hashMapOf(
+                    "receiverId" to receiverId,
+                    "senderId" to senderId,
+                    "deliveredId" to msg.deliveredId.toString(),
+                    "text" to text,
+                    "token" to token
+                )
+                if (token == "") {
+                    Log.d("dialogMessage", "data $data")
+                    //TODO here i should refresh token
+                    token = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                        .getString("firebaseToken", "")
+                    Log.d("msgTest", "token " + data["token"])
                 }
+                firestore!!.collection("users").document(receiverId).get()
+                    .addOnCompleteListener(requireActivity()) {
+                        if (it.isSuccessful) {
+                            val result = it.result?.get("public_key") as Blob?
+                            val kp = KeysDBHelper(c!!).getKeyPair(mAuth!!.uid!!)
+                            if (result != null && kp != null) {
+                                val pk = result.toBytes()
+                                sendEncryptedMessage(receiverId, senderId, text, msg, kp, pk)
+                                Log.d("dialogMessage", "sendEncryptedMessage data $data")
+                            } else {
+                                sendMessage(receiverId, senderId, text, msg)
+                                Log.d("dialogMessage", "sendMessage data $data")
+                            }
+                        } else {
+                            Log.d("dialogMessage", "Error getting documents.", it.exception)
+                        }
+                    }
             }
-            //sendMessage(receiverId, senderId, text, msg)
-            //Log.i("dialogMessage", "data $data")
-//            reloadMsgs()
+        } else {
+            if (bot == null) {
+                bot = HimitsuBotBehavior(c!!, id!!)
+            }
+            val text = dialogMessageInput.inputEditText!!.text.toString()
+            val responseText = bot!!.validateCommand(text)
+            dialogMessageInput.inputEditText!!.setText("")
+            reloadMsgs()
         }
     }
 
-    private fun sendMessage(receiverId: String, senderId: String, text: String, msg: UndeliveredMessage) {
+    private fun sendMessage(
+        receiverId: String,
+        senderId: String,
+        text: String,
+        msg: UndeliveredMessage
+    ) {
         Log.i("sendMessage", "sendMessage")
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,
             "deliveredId" to msg.deliveredId.toString(),
             "text" to text,
-            "token" to c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")
+            "token" to c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                .getString("firebaseToken", "")
         )
 //        messageInput.setText("")
         db!!.pushMessage(msg)
-        Log.i("msgTest", "token: " + c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""))
+        Log.i(
+            "msgTest",
+            "token: " + c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                .getString("firebaseToken", "")
+        )
         functions!!
             .getHttpsCallable("sendMessage")
             .call(data).addOnCompleteListener { task ->
@@ -360,19 +401,33 @@ class DialogFragment : BaseFragment() {
             }
     }
 
-    private fun sendEncryptedMessage(receiverId: String, senderId: String, text: String, msg: UndeliveredMessage, keyPair: CurveKeyPair, receiverPublicKey: ByteArray) {
-        Log.i("sendEncryptedMessage", "keyPair ${keyPair.privateKey.toString(Charsets.UTF_8)} \n${keyPair.privateKey.toString(Charsets.UTF_8)} \nreceiverPublicKey ${receiverPublicKey.toString(Charsets.ISO_8859_1)}")
+    private fun sendEncryptedMessage(
+        receiverId: String,
+        senderId: String,
+        text: String,
+        msg: UndeliveredMessage,
+        keyPair: CurveKeyPair,
+        receiverPublicKey: ByteArray
+    ) {
+        Log.i(
+            "sendEncryptedMessage",
+            "keyPair ${keyPair.privateKey.toString(Charsets.UTF_8)} \n${
+                keyPair.privateKey.toString(Charsets.UTF_8)
+            } \nreceiverPublicKey ${receiverPublicKey.toString(Charsets.ISO_8859_1)}"
+        )
         val sharedSecret = Encryption.calculateSharedSecret(receiverPublicKey, keyPair.privateKey)
         Log.i("sharedSecret", "data ${Base64.encodeToString(sharedSecret, Base64.DEFAULT)}")
         val encryptedText = Encryption.encrypt(sharedSecret, text)
-        val signature = Encryption.generateSignature(text.toByteArray(Charsets.UTF_8), keyPair.privateKey)
+        val signature =
+            Encryption.generateSignature(text.toByteArray(Charsets.UTF_8), keyPair.privateKey)
 
         val data = hashMapOf(
             "receiverId" to receiverId,
             "senderId" to senderId,
             "deliveredId" to msg.deliveredId.toString(),
             "encryptedText" to Base64.encodeToString(encryptedText, Base64.DEFAULT),
-            "token" to c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", ""),
+            "token" to c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0)
+                .getString("firebaseToken", ""),
             "senderPublicKey" to Base64.encodeToString(keyPair.publicKey, Base64.DEFAULT),
             "receiverPublicKey" to Base64.encodeToString(receiverPublicKey, Base64.DEFAULT),
             "signature" to Base64.encodeToString(signature, Base64.DEFAULT)
@@ -381,7 +436,14 @@ class DialogFragment : BaseFragment() {
         dialogMessageInput.inputEditText!!.setText("")
 
         if (SocketService.isAuthorized()) {
-            SocketService.sendEncryptedMessage(c!!, receiverId, msg.deliveredId.toString(), text, keyPair, receiverPublicKey)
+            SocketService.sendEncryptedMessage(
+                c!!,
+                receiverId,
+                msg.deliveredId.toString(),
+                text,
+                keyPair,
+                receiverPublicKey
+            )
         } else {
             Log.i("sendEncryptedMessage", "data $data")
             functions!!
@@ -445,7 +507,10 @@ class DialogFragment : BaseFragment() {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                        Log.i(
+                            "Profile",
+                            "Загрузка изображения не удалась " + url + "\n" + e?.message
+                        )
                     }
                 })
             }

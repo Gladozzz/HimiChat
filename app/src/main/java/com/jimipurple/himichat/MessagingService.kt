@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.jimipurple.himichat.data.FirebaseSource
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.encryption.Encryption
@@ -48,6 +49,7 @@ class MessagingService : FirebaseMessagingService() {
         mAuth = FirebaseAuth.getInstance()
         functions = FirebaseFunctions.getInstance()
         firestore = FirebaseFirestore.getInstance()
+        val fbSource = FirebaseSource(applicationContext)
 
         val db = MessagesDBHelper(applicationContext)
         // Check if message contains a data payload.
@@ -58,44 +60,36 @@ class MessagingService : FirebaseMessagingService() {
                 // For long-running tasks (10 seconds or more) use Firebase Job Dispastcher.
                 if (remoteMessage.data["type"] == "invite"){
                     val sender_id = remoteMessage.data["sender_id"]!!.toString()
-
-                    firestore!!.collection("users").document(sender_id).get().addOnCompleteListener{
-                        if (it.isSuccessful) {
-                            val userData = it.result!!
-                            val nickname = userData["nickname"]!! as String
-                            val avatar = userData["avatar"]!! as String
-                            val b = Bundle()
-                            b.putString("friend_id", sender_id)
-                            b.putString("nickname", nickname)
-                            b.putString("avatar", avatar)
-                            val pendingIntent = NavDeepLinkBuilder(applicationContext)
-                                .setComponentName(NavigationActivity::class.java)
-                                .setGraph(R.navigation.mobile_navigation)
-                                .setDestination(R.id.nav_friend_requests)
-                                .setArguments(b)
-                                .createPendingIntent()
-                            val text = resources.getString(R.string.notification_invite_desc) + " " + nickname
-                            val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID_INVITES)
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .setPriority(NotificationCompat.PRIORITY_MAX)
-                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
-                                .setContentTitle(resources.getText(R.string.notification_invite))
-                                .setContentText(text)
-                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                // Set the intent that will fire when the user taps the notification
-                                .setContentIntent(pendingIntent)
-                                .setAutoCancel(true)
-                            //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
-                            with(NotificationManagerCompat.from(applicationContext)) {
-                                // notificationId is a unique int for each notification that you must define
-                                val m = random!!.nextInt(9999 - 1000) + 1000
-                                notify(m, builder.build())
-                            }
-                        } else {
-                            Log.i("FirestoreRequest", "Error getting documents.", it.exception)
+                    fbSource.getUser(sender_id, {user ->
+                        val b = Bundle()
+                        b.putString("friend_id", sender_id)
+                        b.putString("nickname", user.nickname)
+                        b.putString("avatar", user.avatar)
+                        val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                            .setComponentName(NavigationActivity::class.java)
+                            .setGraph(R.navigation.mobile_navigation)
+                            .setDestination(R.id.nav_friend_requests)
+                            .setArguments(b)
+                            .createPendingIntent()
+                        val text = resources.getString(R.string.notification_invite_desc) + " " + user.nickname
+                        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID_INVITES)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                            .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
+                            .setContentTitle(resources.getText(R.string.notification_invite))
+                            .setContentText(text)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            // Set the intent that will fire when the user taps the notification
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true)
+                        //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                        with(NotificationManagerCompat.from(applicationContext)) {
+                            // notificationId is a unique int for each notification that you must define
+                            val m = random!!.nextInt(9999 - 1000) + 1000
+                            notify(m, builder.build())
                         }
-                    }
+                    })
                 }
                 if (remoteMessage.data["type"] == "message"){
                     val text = remoteMessage.data["text"]!!.toString()
@@ -104,83 +98,74 @@ class MessagingService : FirebaseMessagingService() {
                     val sender_id = remoteMessage.data["sender_id"]!!.toString()
                     val receiver_id = remoteMessage.data["receiver_id"]!!.toString()
 
-                    val data = mapOf("id" to sender_id)
-                    functions!!
-                        .getHttpsCallable("getUser")
-                        .call(data).addOnCompleteListener() { task ->
-                            val result = task.result?.data as HashMap<String, Any>
-                            val nickname = result["nickname"] as String
-                            val avatar = result["avatar"] as String
-                            Log.i("msgService", "data ${remoteMessage.data}")
-                            Log.i("msgService", "text $text")
-                            Log.i("msgService", "sender_id $sender_id")
-                            Log.i("msgService", "receiver_id $receiver_id")
-                            Log.i("msgService", "avatar $avatar")
-                            Log.i("msgService", "nickname $nickname")
-                            //val db = MessagesDBHelper(applicationContext)
-                            val msg = ReceivedMessage(null, sender_id, receiver_id, text, Date().time, null, null)
-                            val data1 = mapOf(
-                                "senderId" to sender_id,
-                                "deliveredId" to remoteMessage.data["delivered_id"]!!,
-                                "text" to text,
-                                "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
-                            )
-                                Log.i("msgService", "message pushed to the db $msg")
-                                db.pushMessage(msg)
-                                functions!!.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener() { task ->
-                                    Log.i("msgService", "confirmDelivery")
-                                }
-                                if (isDialog) {
-                                    callbackOnMessageReceived()
-                                }
-                                if (!isDialog || isDialog && currentDialog != sender_id) {
-                                    firestore!!.collection("users").document(sender_id).get().addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            val senderData = task.result!!
-                                            val senderNickname = senderData["nickname"] as String
-                                            val senderAvatar = senderData["avatar"] as String
-                                            Log.i("msgServiceTread", "notifed")
-                                            //Picasso.get().load(avatar).get()
-                                            // Create an explicit intent for an Activity in your app
-                                            val b = Bundle()
-                                            b.putString("friend_id", sender_id)
-                                            b.putString("nickname", senderNickname)
-                                            b.putString("avatar", senderAvatar)
-                                            val pendingIntent = NavDeepLinkBuilder(applicationContext)
-                                                    .setComponentName(NavigationActivity::class.java)
-                                                    .setGraph(R.navigation.mobile_navigation)
-                                                    .setDestination(R.id.nav_dialog)
-                                                    .setArguments(b)
-                                                    .createPendingIntent()
-                                            val builder = NotificationCompat.Builder(
-                                                applicationContext,
-                                                CHANNEL_ID
-                                            )
-                                                .setSmallIcon(R.mipmap.ic_launcher)
-                                                .setPriority(NotificationCompat.PRIORITY_MAX)
-                                                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                                                .setLargeIcon(
-                                                    resources.getDrawable(R.mipmap.ic_launcher)
-                                                        .toBitmap()
-                                                )
-                                                .setContentTitle(nickname)
-                                                .setContentText(text)
-                                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                                // Set the intent that will fire when the user taps the notification
-                                                .setContentIntent(pendingIntent)
-                                                .setAutoCancel(true)
-                                            //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
-                                            with(NotificationManagerCompat.from(applicationContext)) {
-                                                // notificationId is a unique int for each notification that you must define
-                                                val m = random!!.nextInt(9999 - 1000) + 1000
-                                                notify(m, builder.build())
-                                            }
-                                        } else {
-                                            Log.e("FirestoreRequest", "Error getting documents.", task.exception)
-                                        }
-                                    }
-                                }
+                    fbSource.getUser(sender_id, {user ->
+                        val nickname = user.nickname
+                        val avatar = user.avatar
+                        Log.i("msgService", "data ${remoteMessage.data}")
+                        Log.i("msgService", "text $text")
+                        Log.i("msgService", "sender_id $sender_id")
+                        Log.i("msgService", "receiver_id $receiver_id")
+                        Log.i("msgService", "avatar $avatar")
+                        Log.i("msgService", "nickname $nickname")
+                        //val db = MessagesDBHelper(applicationContext)
+                        val msg = ReceivedMessage(null, sender_id, receiver_id, text, Date().time, null, null)
+                        val data1 = mapOf(
+                            "senderId" to sender_id,
+                            "deliveredId" to remoteMessage.data["delivered_id"]!!,
+                            "text" to text,
+                            "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                        )
+                        Log.i("msgService", "message pushed to the db $msg")
+                        db.pushMessage(msg)
+                        functions!!.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener() { task ->
+                            Log.i("msgService", "confirmDelivery")
                         }
+                        if (isDialog) {
+                            callbackOnMessageReceived()
+                        }
+                        if (!isDialog || isDialog && currentDialog != sender_id) {
+                            fbSource.getUser(sender_id, { sender ->
+                                val senderNickname = sender.nickname
+                                val senderAvatar = sender.avatar
+                                Log.i("msgServiceTread", "notifed")
+                                //Picasso.get().load(avatar).get()
+                                // Create an explicit intent for an Activity in your app
+                                val b = Bundle()
+                                b.putString("friend_id", sender_id)
+                                b.putString("nickname", senderNickname)
+                                b.putString("avatar", senderAvatar)
+                                val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                                    .setComponentName(NavigationActivity::class.java)
+                                    .setGraph(R.navigation.mobile_navigation)
+                                    .setDestination(R.id.nav_dialog)
+                                    .setArguments(b)
+                                    .createPendingIntent()
+                                val builder = NotificationCompat.Builder(
+                                    applicationContext,
+                                    CHANNEL_ID
+                                )
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                                    .setLargeIcon(
+                                        resources.getDrawable(R.mipmap.ic_launcher)
+                                            .toBitmap()
+                                    )
+                                    .setContentTitle(nickname)
+                                    .setContentText(text)
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                    // Set the intent that will fire when the user taps the notification
+                                    .setContentIntent(pendingIntent)
+                                    .setAutoCancel(true)
+                                //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                                with(NotificationManagerCompat.from(applicationContext)) {
+                                    // notificationId is a unique int for each notification that you must define
+                                    val m = random!!.nextInt(9999 - 1000) + 1000
+                                    notify(m, builder.build())
+                                }
+                            })
+                        }
+                    })
                 }
                 if (remoteMessage.data["type"] == "encrypted-message"){
                     val encrypted_text = remoteMessage.data["encrypted_text"]!!.toString()
@@ -194,78 +179,73 @@ class MessagingService : FirebaseMessagingService() {
 
                     val kp = KeysDBHelper(applicationContext).getKeyPair(Base64.decode(receiver_public_key, Base64.DEFAULT))
                     if (kp != null) {
-                        val data = mapOf("id" to sender_id)
-                        //TODO
-                        functions!!
-                            .getHttpsCallable("getUser")
-                            .call(data).addOnCompleteListener { task ->
-                                val sharedSecret = Encryption.calculateSharedSecret(Base64.decode(sender_public_key, Base64.DEFAULT), kp.privateKey)
-                                Log.i("sharedSecret", "data ${Base64.encodeToString(sharedSecret, Base64.DEFAULT)}")
-                                val text = Encryption.decrypt(sharedSecret, Base64.decode(encrypted_text, Base64.DEFAULT))
-                                val isSignatureValid = Encryption.verifySignature(text.toByteArray(Charsets.UTF_8), Base64.decode(sender_public_key, Base64.DEFAULT), Base64.decode(signature, Base64.DEFAULT))
-                                //TODO Сделать обработку после проверки подписи
+                        fbSource.getUser(sender_id, {sender ->
+                            val sharedSecret = Encryption.calculateSharedSecret(Base64.decode(sender_public_key, Base64.DEFAULT), kp.privateKey)
+                            Log.i("sharedSecret", "data ${Base64.encodeToString(sharedSecret, Base64.DEFAULT)}")
+                            val text = Encryption.decrypt(sharedSecret, Base64.decode(encrypted_text, Base64.DEFAULT))
+                            val isSignatureValid = Encryption.verifySignature(text.toByteArray(Charsets.UTF_8), Base64.decode(sender_public_key, Base64.DEFAULT), Base64.decode(signature, Base64.DEFAULT))
+                            //TODO Сделать обработку после проверки подписи
 
-                                val result = task.result?.data as HashMap<String, Any>
-                                val nickname = result["nickname"] as String
-                                val avatar = result["avatar"] as String
-                                Log.i("msgService", "data ${remoteMessage.data}")
-                                Log.i("msgService", "encrypted_text $encrypted_text")
-                                Log.i("msgService", "text $text")
-                                Log.i("msgService", "sender_id $sender_id")
-                                Log.i("msgService", "receiver_id $receiver_id")
-                                Log.i("msgService", "avatar $avatar")
-                                Log.i("msgService", "nickname $nickname")
-                                Log.i("msgService", "sender_public_key $sender_public_key")
-                                Log.i("msgService", "receiver_public_key $receiver_public_key")
-                                Log.i("msgService", "signature $signature")
-                                //val db = MessagesDBHelper(applicationContext)
-                                val msg = ReceivedMessage(null, sender_id, receiver_id, text, Calendar.getInstance().timeInMillis, null, null)
-                                val data1 = mapOf(
-                                    "senderId" to sender_id,
-                                    "deliveredId" to remoteMessage.data["delivered_id"]!!,
-                                    "text" to text,
-                                    "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
-                                )
-                                Log.i("msgService", "message pushed to the db $msg")
-                                db.pushMessage(msg)
-                                functions!!.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener { task ->
-                                    Log.i("msgService", "confirmDelivery")
-                                }
-                                if (isDialog) {
-                                    callbackOnMessageReceived()
-                                }
-                                if (!isDialog || isDialog && currentDialog != sender_id) {
-                                    Log.i("msgServiceTread", "notifed")
-                                    //Picasso.get().load(avatar).get()
-                                    // Create an explicit intent for an Activity in your app
-                                    val b = Bundle()
-                                    b.putString("friend_id", sender_id)
-                                    b.putString("nickname", nickname)
-                                    b.putString("avatar", avatar)
-                                    val pendingIntent = NavDeepLinkBuilder(applicationContext)
-                                        .setComponentName(NavigationActivity::class.java)
-                                        .setGraph(R.navigation.mobile_navigation)
-                                        .setDestination(R.id.nav_dialog)
-                                        .setArguments(b)
-                                        .createPendingIntent()
+                            val nickname = sender.nickname
+                            val avatar = sender.avatar
+                            Log.i("msgService", "data ${remoteMessage.data}")
+                            Log.i("msgService", "encrypted_text $encrypted_text")
+                            Log.i("msgService", "text $text")
+                            Log.i("msgService", "sender_id $sender_id")
+                            Log.i("msgService", "receiver_id $receiver_id")
+                            Log.i("msgService", "avatar $avatar")
+                            Log.i("msgService", "nickname $nickname")
+                            Log.i("msgService", "sender_public_key $sender_public_key")
+                            Log.i("msgService", "receiver_public_key $receiver_public_key")
+                            Log.i("msgService", "signature $signature")
+                            //val db = MessagesDBHelper(applicationContext)
+                            val msg = ReceivedMessage(null, sender_id, receiver_id, text, Calendar.getInstance().timeInMillis, null, null)
+                            val data1 = mapOf(
+                                "senderId" to sender_id,
+                                "deliveredId" to remoteMessage.data["delivered_id"]!!,
+                                "text" to text,
+                                "token" to applicationContext.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "empty")
+                            )
+                            Log.i("msgService", "message pushed to the db $msg")
+                            db.pushMessage(msg)
+                            functions!!.getHttpsCallable("confirmDelivery").call(data1).addOnCompleteListener { task ->
+                                Log.i("msgService", "confirmDelivery")
+                            }
+                            if (isDialog) {
+                                callbackOnMessageReceived()
+                            }
+                            if (!isDialog || isDialog && currentDialog != sender_id) {
+                                Log.i("msgServiceTread", "notifed")
+                                //Picasso.get().load(avatar).get()
+                                // Create an explicit intent for an Activity in your app
+                                val b = Bundle()
+                                b.putString("friend_id", sender_id)
+                                b.putString("nickname", nickname)
+                                b.putString("avatar", avatar)
+                                val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                                    .setComponentName(NavigationActivity::class.java)
+                                    .setGraph(R.navigation.mobile_navigation)
+                                    .setDestination(R.id.nav_dialog)
+                                    .setArguments(b)
+                                    .createPendingIntent()
 
-                                    val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
-                                        .setContentTitle(nickname)
-                                        .setContentText(text)
-                                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                        // Set the intent that will fire when the user taps the notification
-                                        .setContentIntent(pendingIntent)
-                                        .setAutoCancel(true)
-                                    //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
-                                    with(NotificationManagerCompat.from(applicationContext)) {
-                                        // notificationId is a unique int for each notification that you must define
-                                        val m = random!!.nextInt(9999 - 1000) + 1000
-                                        notify(m, builder.build())
-                                    }
+                                val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setLargeIcon(resources.getDrawable(R.mipmap.ic_launcher).toBitmap())
+                                    .setContentTitle(nickname)
+                                    .setContentText(text)
+                                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                    // Set the intent that will fire when the user taps the notification
+                                    .setContentIntent(pendingIntent)
+                                    .setAutoCancel(true)
+                                //NotificationManagerCompat.from(applicationContext).getNotificationChannel(CHANNEL_ID)
+                                with(NotificationManagerCompat.from(applicationContext)) {
+                                    // notificationId is a unique int for each notification that you must define
+                                    val m = random!!.nextInt(9999 - 1000) + 1000
+                                    notify(m, builder.build())
                                 }
                             }
+                        })
                     } else {
                         //TODO Добавление сообщения в диалог с оповещениемс об ошибке расшифрования
                     }
@@ -363,6 +343,7 @@ class MessagingService : FirebaseMessagingService() {
 
         mAuth = FirebaseAuth.getInstance()
         functions = FirebaseFunctions.getInstance()
+        val fbSource = FirebaseSource(applicationContext)
         try {
             val currentUID = FirebaseAuth.getInstance().currentUser?.uid
 //            if (currentUID != null) {
@@ -389,7 +370,8 @@ class MessagingService : FirebaseMessagingService() {
 //                        Log.i("setToken", "error " + e.message)
 //                    }
 //                }
-            firestore!!.collection("users").document(mAuth!!.uid!!).update("token", token)
+//            firestore!!.collection("users").document(mAuth!!.uid!!).update("token", token)
+            fbSource.updateToken(token)
             return true
         } catch (e : Exception) {
             Log.i("msgService:tokenSend", "error " + e.toString())

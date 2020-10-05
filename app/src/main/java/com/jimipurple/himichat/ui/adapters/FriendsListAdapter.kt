@@ -22,13 +22,24 @@ import com.jimipurple.himichat.models.*
 import com.squareup.picasso.LruCache
 
 
-class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val profile: (User) -> Task<DocumentSnapshot>, val dialog: (u: User)-> Unit) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
+class FriendsListAdapter(val context: Context, var items: List<User>, val profile: (User) -> Unit, val dialog: (u: User)-> Unit) : RecyclerView.Adapter<FriendsListAdapter.FriendHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendHolder {
         Log.i("FriendListAdapter", "items $items")
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.friends_list, parent, false)
         return FriendHolder(view)
+    }
+
+    fun clearItems() {
+        items = listOf()
+    }
+
+    fun sortFriends(notify: Boolean = true) {
+        items = items.sortedWith(friendsComporator)
+        if (notify) {
+            this.notifyDataSetChanged()
+        }
     }
 
     override fun getItemCount() = items.size
@@ -83,6 +94,15 @@ class FriendsListAdapter(val context: Context, var items: ArrayList<User>, val p
             }
 
             avatar.setOnClickListener { profile(item)}
+        }
+    }
+
+    private val friendsComporator = Comparator<User> { a, b ->
+        when {
+            (false) -> 0
+            a.nickname < b.nickname -> 1
+            a.nickname > b.nickname -> -1
+            else -> 1
         }
     }
 

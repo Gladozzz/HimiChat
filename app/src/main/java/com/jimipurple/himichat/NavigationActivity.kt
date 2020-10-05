@@ -52,7 +52,6 @@ class NavigationActivity : BaseActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private var nickname: String? = null
     private var realname: String? = null
-    private var storage: FirebaseStorage? = null
     private var navCon: NavController? = null
     var navOptions = NavOptions.Builder()
         .setLaunchSingleTop(true)  // Used to prevent multiple copies of the same destination
@@ -89,13 +88,12 @@ class NavigationActivity : BaseActivity() {
             }
         }
 
-        Log.i("testSuccessful", "successful onCreate")
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_navigation)
+
         val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
         setSupportActionBar(toolbar)
-        storage = FirebaseStorage.getInstance()
-        overridePendingTransition(com.jimipurple.himichat.R.animator.fragment_fade_in, com.jimipurple.himichat.R.animator.fragment_fade_in)
+        overridePendingTransition(R.animator.fragment_fade_in, R.animator.fragment_fade_in)
 
 
 //        val fab: FloatingActionButton = findViewById(R.id.fab)
@@ -103,6 +101,140 @@ class NavigationActivity : BaseActivity() {
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                .setAction("Action", null).show()
 //        }
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view)
+        val navController = findNavController(R.id.nav_host_fragment)
+        navCon = navController
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        appBarConfiguration = AppBarConfiguration(
+            navController.graph, drawerLayout
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+        navView.getHeaderView(0)
+        updateAvatar()
+
+        fbSource!!.isAdmin(fbSource!!.uid()!!, {isAdmin ->
+            if (isAdmin) {
+                navView.menu.findItem(R.id.nav_friends).isVisible = false
+                navView.menu.findItem(R.id.nav_users).isVisible = true
+            }
+        })
+
+        val bar = supportActionBar
+        if (savedInstanceState != null) {
+            val title = savedInstanceState.getCharSequence("title")
+            val subtitle = savedInstanceState.getCharSequence("subtitle")
+            Log.i("savedTitle", "onCreate title $title")
+            bar!!.title = title
+            bar.subtitle = subtitle
+        }
+        navView.setNavigationItemSelectedListener { item ->
+            item.isChecked = true
+            navController.navigate(item.itemId, null, navOptions)
+            drawerLayout.closeDrawers()
+            true
+        }
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            Log.i("navController", "called " + destination.label)
+            when(destination.id) {
+                R.id.nav_dialogues -> {
+                    bar!!.setTitle(R.string.menu_dialogues)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_dialog -> {
+                    Log.i("navController", "arg " + arguments?.get("nickname"))
+                    Log.i("navController", "arg " + arguments?.get("avatar"))
+                    bar!!.setTitle(R.string.menu_dialog)
+                    val title = arguments!!["nickname"] as String
+                    val avatar = arguments["avatar"] as String
+                    bar.title = title
+                    bar.subtitle = resources.getString(R.string.offline)
+                    val url = Uri.parse(avatar)
+                    if (url != null) {
+                        val bitmap = com.squareup.picasso.LruCache(applicationContext)[avatar]
+                        if (bitmap != null) {
+                            bar.setLogo(BitmapDrawable(bitmap))
+                        } else {
+                            Picasso.get().load(url).into(object : com.squareup.picasso.Target {
+                                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                    com.squareup.picasso.LruCache(applicationContext!!).set(avatar, bitmap!!)
+                                    bar.setLogo(BitmapDrawable(bitmap))
+                                }
+
+                                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                                    Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                                }
+                            })
+                        }
+                    } else {
+                        Log.i("Profile", "avatar wasn't received")
+                    }
+                }
+                R.id.nav_find_friend -> {
+                    bar!!.setTitle(R.string.menu_find_friend)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_friend_requests -> {
+                    bar!!.setTitle(R.string.menu_friend_requests)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_profile -> {
+                    bar!!.setTitle(R.string.menu_profile)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_friends -> {
+                    bar!!.setTitle(R.string.menu_friends)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_settings -> {
+                    bar!!.setTitle(R.string.menu_settings)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+            }
+        }
+        mMyApp!!.currentActivity = this
+        mMyApp!!.tbar = toolbar
+        mMyApp!!.bar = bar
+
+        val extras = intent.extras
+        if (extras != null) {
+            val sender = intent.getBundleExtra("sender")
+            if (sender != null) {
+                val senderName = sender.getString("nickname")
+                val senderId = sender.getString("friend_id")
+                Log.i("NAVIGATE_TO_SENDER", "senderId $senderId")
+                val senderAvatar = sender.getString("avatar")
+                val b = Bundle()
+                b.putString("friend_id", senderId)
+                b.putString("nickname", senderName)
+                b.putString("avatar", senderAvatar)
+                navCon!!.navigate(R.id.nav_dialog, b, navOptions)
+            } else {
+                Log.i("NAVIGATE_TO_SENDER", "Bundle is null")
+            }
+        } else {
+            Log.i("NAVIGATE_TO_SENDER", "Extras is null")
+        }
+    }
+
+    fun setUpNavViewOnUser() {
+
+    }
+
+    fun setUpNavViewOnAdmin(savedInstanceState: Bundle?) {
+        val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
+        setSupportActionBar(toolbar)
+        overridePendingTransition(R.animator.fragment_fade_in, R.animator.fragment_fade_in)
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -145,7 +277,7 @@ class NavigationActivity : BaseActivity() {
                     bar!!.setTitle(R.string.menu_dialog)
                     val title = arguments!!["nickname"] as String
                     val avatar = arguments["avatar"] as String
-                    bar!!.title = title
+                    bar.title = title
                     bar.subtitle = resources.getString(R.string.offline)
                     val url = Uri.parse(avatar)
                     if (url != null) {
@@ -187,6 +319,11 @@ class NavigationActivity : BaseActivity() {
                 }
                 R.id.nav_friends -> {
                     bar!!.setTitle(R.string.menu_friends)
+                    bar.subtitle = ""
+                    bar.setLogo(null)
+                }
+                R.id.nav_users -> {
+                    bar!!.setTitle(R.string.menu_users)
                     bar.subtitle = ""
                     bar.setLogo(null)
                 }
@@ -332,6 +469,8 @@ class NavigationActivity : BaseActivity() {
         }
         val pref = SharedPreferencesUtility(applicationContext)
         fbSource!!.getUser(fbSource!!.uid()!!, {user: User ->
+            Log.i("friendsTest", "friends ${user.friends}")
+            if (user.friends != null && user.friends!!.isNotEmpty())
             user.friends?.let { fbSource!!.getUsers(it, {users: List<User>? ->
                 val strings = usersToStrings(users as ArrayList<User>)
                 pref.putListString("friends", strings)

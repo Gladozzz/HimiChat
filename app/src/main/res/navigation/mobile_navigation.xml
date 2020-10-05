@@ -84,6 +84,20 @@
     </fragment>
 
     <fragment
+        android:id="@+id/nav_users"
+        android:name="com.jimipurple.himichat.ui.users.UsersFragment"
+        android:label="@string/menu_users"
+        tools:layout="@layout/fragment_users" >
+        <action
+            android:id="@+id/action_nav_users_to_nav_dialog"
+            app:enterAnim="@animator/fragment_fade_in"
+            app:exitAnim="@animator/fragment_fade_out"
+            app:popEnterAnim="@animator/fragment_fade_in"
+            app:popExitAnim="@animator/fragment_fade_out"
+            app:destination="@id/nav_dialog" />
+    </fragment>
+
+    <fragment
             android:id="@+id/nav_find_friend"
             android:name="com.jimipurple.himichat.ui.friends.FindFriendFragment"
             android:label="@string/menu_find_friend"
@@ -118,25 +132,10 @@
             app:exitAnim="@animator/fragment_fade_out"
             app:popEnterAnim="@animator/fragment_fade_in"
             app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_profile"/>
-    <action android:id="@+id/action_global_nav_settings"
-            app:enterAnim="@animator/fragment_fade_in"
-            app:exitAnim="@animator/fragment_fade_out"
-            app:popEnterAnim="@animator/fragment_fade_in"
-            app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_settings"/>
-    <action android:id="@+id/action_global_nav_friends"
-            app:enterAnim="@animator/fragment_fade_in"
-            app:exitAnim="@animator/fragment_fade_out"
-            app:popEnterAnim="@animator/fragment_fade_in"
-            app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_friends"/>
     <action android:id="@+id/action_global_nav_dialog"
         app:enterAnim="@animator/fragment_fade_in"
         app:exitAnim="@animator/fragment_fade_out"
         app:popEnterAnim="@animator/fragment_fade_in"
         app:popExitAnim="@animator/fragment_fade_out"
         app:destination="@id/nav_dialog" />
-    <action android:id="@+id/action_global_nav_dialogues"
-            app:enterAnim="@animator/fragment_fade_in"
-            app:exitAnim="@animator/fragment_fade_out"
-            app:popEnterAnim="@animator/fragment_fade_in"
-            app:popExitAnim="@animator/fragment_fade_out" app:destination="@id/nav_dialogues"/>
 </navigation>

@@ -16,6 +16,8 @@
     <string name="dark_mode">Dark Mode</string>
 
     <string name="web_client_id" translatable="false">195021957274-o2hlc401ln8feoplko4ql11gfc677q0o.apps.googleusercontent.com</string>
+    <string name="himitsu_id" translatable="false">_himitsu_bot_</string>
+    <string name="himitsu_avatar_url" translatable="false">https://firebasestorage.googleapis.com/v0/b/himichat-d3a97.appspot.com/o/avatars%2Fracoon.jpg?alt=media&amp;token=0a019989-9c1c-4048-821a-4053d68a380e</string>
 
     <string name="label_email">Email:</string>
     <string name="label_password">Password:</string>
@@ -28,7 +30,7 @@
     <string name="label_empty_users_list">No users for your request</string>
     <string name="label_empty_dialogues_list">Sorry, no dialogues yet\n¯\\_(ツ)_/¯</string>
     <string name="label_invalid_nickname">Invalid nickname</string>
-    <string name="label_no_user_with_this_nickname">No user with this nickname</string>
+    <string name="label_no_users_for_request">No users for your request</string>
 
     <string name="button_sign_out">sign out</string>
     <string name="button_delete_all_messages">delete all messages</string>
@@ -45,6 +47,8 @@
     <string name="button_load_avatar">Load avatar</string>
     <string name="button_send_message">Send message</string>
     <string name="button_remove_friend">Remove friend</string>
+    <string name="button_remove_favorite">Remove from favorite</string>
+    <string name="button_add_favorite">Add to favorite</string>
     <string name="button_edit_profile">Edit profile</string>
     <string name="button_save_account_data">Save account data</string>
     <string name="loadRenameButton">Rename</string>
@@ -78,6 +82,7 @@
     <string name="toast_load_avatar_warning">loading avatar can take some time</string>
     <string name="toast_saving_account_success">Successfully saved account data</string>
     <string name="toast_saving_account_error">Error to save account data</string>
+    <string name="toast_text_copied_to_clipboard">Text copied to clipboard</string>
     <string name="toast_future_feature">Future feature</string>
 
     <string name="channel_name_messages">HimiChat messages</string>
@@ -106,6 +111,7 @@
     <string name="menu_dialogues">Dialogues</string>
     <string name="menu_dialog">Dialog</string>
     <string name="menu_friends">Friends</string>
+    <string name="menu_users">Users</string>
     <string name="menu_find_friend">Find friend</string>
     <string name="menu_friend_requests">Friend requests</string>
     <string name="menu_settings">Settings</string>
@@ -116,6 +122,9 @@
     <string name="hint_password_repeat">Repeat password</string>
     <string name="hint_nickname">Nickname</string>
     <string name="hint_realname">Real name</string>
+    <string name="hint_search">Search</string>
+    <string name="hint_search_by_nickname_or_realname">Search (nickname, real name)</string>
+    <string name="avatar_content_description">Profile picture of user</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
@@ -128,4 +137,41 @@
     <string name="invalid_nickname_empty">Nickname can\'t be empty</string>
     <string name="invalid_nickname_not_unique">Nickname must be unique</string>
     <string name="login_failed">"Login failed"</string>
+
+    <string name="himitsu_hello_message">Hello, i\'m a help bot. You can ask "help" for more information.</string>
+
+    <string name="himitsu_bot_help_repeat">You can ask me: "Help", "Delete my account" or "Send message to author"</string>
+    <string name="himitsu_bot_delete_account_repeat">So sad to hear that, but i\'ll do this. Goodbye.</string>
+    <string name="himitsu_bot_yo_repeat">Yo mate!</string>
+    <string name="himitsu_bot_hello_repeat">Hello, my friend!</string>
+
+    <string name="himitsu_bot_message_to_author_start">You want to do this anonymous? (Say "yes" or "no")</string>
+    <string name="himitsu_bot_message_to_author_help">You need to choose how i should send message to author. (Say "yes" to anonymous or "no" to show you as author)</string>
+    <string name="himitsu_bot_message_to_author_text">Type your message and i will send it.</string>
+    <string name="himitsu_bot_message_to_author_end">Your message was sent!</string>
+
+    <string name="himitsu_bot_idk">Sorry, i can\'t understand you. Try to say "help".</string>
+    <string-array name="himitsu_bot_help_command">
+        <item>help</item>
+    </string-array>
+    <string-array name="himitsu_bot_yes_command">
+        <item>yes</item>
+    </string-array>
+    <string-array name="himitsu_bot_no_command">
+        <item>no</item>
+    </string-array>
+    <string-array name="himitsu_bot_delete_account_command">
+        <item>delete my account</item>
+    </string-array>
+    <string-array name="himitsu_bot_yo_command">
+        <item>yo</item>
+    </string-array>
+    <string-array name="himitsu_bot_hello_command">
+        <item>hi</item>
+        <item>hello</item>
+    </string-array>
+    <string-array name="himitsu_bot_message_to_author_command">
+        <item>send message to author</item>
+        <item>send my message to author</item>
+    </string-array>
 </resources>

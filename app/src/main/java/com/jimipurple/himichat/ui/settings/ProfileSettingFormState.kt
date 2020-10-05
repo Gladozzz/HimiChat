@@ -6,5 +6,6 @@ package com.jimipurple.himichat.ui.settings
 data class ProfileSettingFormState(
     var nicknameError: Int? = null,
     var realNameError: Int? = null,
-    var isDataValid: Boolean = false
+    var isDataValid: Boolean = false,
+    var isDataAnalyzing: Boolean = false
 )

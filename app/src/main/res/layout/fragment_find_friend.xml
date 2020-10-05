@@ -1,209 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/primaryDark"
-        android:paddingStart="20dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingRight="20dp"
-        tools:context=".ui.friends.FindFriendFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primaryDark"
+    tools:context=".ui.friends.FindFriendFragment">
 
     <TextView
         android:id="@+id/noUserMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="@string/label_no_user_with_this_nickname"
+        android:text="@string/label_no_users_for_request"
         android:textColor="?attr/primaryTextColor"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nicknameEdit" />
+        app:layout_constraintTop_toBottomOf="@+id/findFriendInput" />
 
-    <TextView
-        android:id="@+id/wrongNicknameMessage"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/findFriendInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/nicknameEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_search_by_nickname_or_realname"
+            android:inputType="textPersonName"
+            android:textColor="?attr/primaryTextColor"
+            android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/FriendsList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="visible"
+        app:layoutManager="LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/findFriendInput"
+        tools:listitem="@layout/friends_list" />
+
+    <ProgressBar
+        android:id="@+id/usersProgressBar"
+        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/label_invalid_nickname"
-        android:textColor="?attr/primaryTextColor"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nicknameEdit" />
-
-    <EditText
-        android:id="@+id/nicknameEdit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:textColor="?attr/primaryTextColor"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-            android:id="@+id/found"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:background="?attr/primaryDark"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:weightSum="100"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nicknameEdit">
-
-        <ImageView
-                android:id="@+id/findFriendAvatarView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="top"
-                android:layout_weight="50"
-                app:srcCompat="@drawable/defaultavatar" />
-
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="fill_horizontal"
-                android:layout_weight="10"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:weightSum="100">
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingStart="10dp"
-                android:text="@string/label_nickname"
-                android:textColor="?attr/primaryTextColor" />
-
-            <EditText
-                android:id="@+id/foundNickname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="90"
-                android:inputType="none"
-                android:text="Nickname"
-                android:textColor="?attr/primaryTextColor"
-                android:textIsSelectable="true" />
-
-        </LinearLayout>
-
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:weightSum="100">
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingStart="10dp"
-                android:text="@string/label_real_name"
-                android:textColor="?attr/primaryTextColor" />
-
-            <EditText
-                android:id="@+id/findfriendRealNameEdit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="90"
-                android:gravity="fill_horizontal"
-                android:inputType="none"
-                android:text="Realname"
-                android:textColor="?attr/primaryTextColor"
-                android:textIsSelectable="true" />
-
-        </LinearLayout>
-
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:gravity="center|center_vertical"
-                android:orientation="horizontal"
-                android:weightSum="100">
-
-
-            <Button
-                android:id="@+id/profileEditButton"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="4"
-                android:background="@drawable/button_on_click"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/button_edit_profile"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/findfriendRemoveFriendButton"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="4"
-                android:background="@drawable/button_on_click"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/button_remove_friend" />
-
-            <Button
-                android:id="@+id/findfriendSendMessageButton"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="4"
-                android:background="@drawable/button_on_click"
-                android:paddingLeft="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/button_send_message" />
-
-            <Button
-                android:id="@+id/findfriendInviteButton"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="4"
-                android:background="@drawable/button_on_click"
-                android:paddingLeft="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/button_Invite"
-                android:visibility="gone" />
-        </LinearLayout>
-
-    </LinearLayout>
-
     <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nicknameEdit" />
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

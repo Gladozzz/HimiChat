@@ -82,6 +82,7 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
         cv.put(TableKeyPairs.COLUMN_NAME_PRIVATE_KEY, data.privateKey)
         cv.put(TableKeyPairs.COLUMN_NAME_USER_ID, uid)
         db.insert(TableKeyPairs.TABLE_NAME, null, cv)
+        db.close()
     }
 
     @Throws(SQLiteException::class)
@@ -120,6 +121,8 @@ class KeysDBHelper(context: Context) : SQLiteOpenHelper(context,
                     kp = CurveKeyPair(publicKey, privateKey)
                 }
             } while (cursor.moveToNext())
+            cursor.close()
+            db.close()
             return kp
         }
         cursor.close()

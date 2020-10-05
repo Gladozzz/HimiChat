@@ -1,60 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="start"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:background="?attr/primaryDark"
+    android:gravity="start"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/avatarDialog"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="start"
+        android:contentDescription="@string/avatar_content_description"
+        android:maxWidth="1dp"
+        android:maxHeight="1dp"
+        app:srcCompat="@drawable/defaultavatar" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:background="?attr/primaryDark"
-        android:orientation="horizontal">
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:gravity="left"
-            android:orientation="horizontal">
+            android:layout_marginStart="15dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:textColor="?attr/primaryTextColor"
+            android:textStyle="bold"
+            tools:text="name" />
 
-            <ImageView
-                android:id="@+id/avatarDialog"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="start"
-                android:maxWidth="1dp"
-                android:maxHeight="1dp"
-                app:srcCompat="@drawable/defaultavatar" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:text="name"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/lastMessage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="5dp"
-                    android:text=""
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/lastMessage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="5dp"
+            android:text=""
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp" />
     </LinearLayout>
-</layout>
+</LinearLayout>

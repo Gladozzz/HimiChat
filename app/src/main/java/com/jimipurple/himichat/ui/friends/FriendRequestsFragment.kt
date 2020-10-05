@@ -132,7 +132,6 @@ class FriendRequestsFragment : BaseFragment() {
     }
 
     private fun receivedButtonOnClick() {
-        val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
         val adapterOfCached = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
             override fun onItemClicked(item: FriendRequest) {
@@ -142,80 +141,26 @@ class FriendRequestsFragment : BaseFragment() {
         friendRequests.adapter = adapterOfCached
         reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
         sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
-        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
-            if (it.isSuccessful) {
-                val userData = it.result!!
-                val received = userData["invited_by"]
-                if (received is ArrayList<*>) {
-                    Log.i("received_inv", "received $received")
-                    if (received.isEmpty()) {
-                        emptyRequestsListMessage.visibility = View.VISIBLE
-                        friendRequests.visibility = View.GONE
-                    } else {
-                        emptyRequestsListMessage.visibility = View.GONE
-                        friendRequests.visibility = View.VISIBLE
-                        val users = ArrayList<FriendRequest>()
-                        firestore!!.collection("users").whereIn(FieldPath.documentId(), received).get().addOnCompleteListener { usersDocs ->
-                            if (usersDocs.isSuccessful) {
-                                val result = usersDocs.result!!
-                                val docs = result.documents
-                                for (userDoc in docs) {
-                                    val friendData = userDoc.data!!
-                                    var nickname = friendData["nickname"] as String?
-                                    if (nickname == null) {
-                                        nickname = ""
-                                    }
-                                    var realname = friendData["real_name"] as String?
-                                    if (realname == null) {
-                                        realname = ""
-                                    }
-                                    var avatar = friendData["avatar"] as String?
-                                    if (avatar == null) {
-                                        avatar = ""
-                                    }
-                                    val user = FriendRequest(userDoc.id, nickname, realname, avatar, true)
-                                    users.add(user)
-                                    Log.i("FirestoreRequest", "received add.")
-                                }
-                                if (users.isNotEmpty()) {
-                                    Log.i("received_inv", "users $users")
-                                    Log.i("received_inv", "users loaded.")
-                                    val adapter = FriendRequestsListAdapter(c!!, users, object : FriendRequestsListAdapter.Callback {
-                                        override fun onItemClicked(item: FriendRequest) {
-                                            profile(item)
-                                        }
-                                    }, cancel,  block, accept)
-                                    friendRequests.adapter = adapter
-                                    //friendRequests.layoutManager = LinearLayoutManager(this)
-                                } else {
-                                    Log.e("FirestoreRequest", "No one of invites were loaded.")
-                                }
-                            } else {
-                                Log.e("FirestoreRequest", "Error getting documents.", usersDocs.exception)
+        fbSource!!.getUser(fbSource!!.uid()!!, { user ->
+            Log.i("received_inv", "received ${user.receivedInvites}")
+            if (user.receivedInvites != null) {
+                if (user.receivedInvites!!.isEmpty()) {
+                    emptyRequestsListMessage.visibility = View.VISIBLE
+                    friendRequests.visibility = View.GONE
+                } else {
+                    emptyRequestsListMessage.visibility = View.GONE
+                    friendRequests.visibility = View.VISIBLE
+                    val users = ArrayList<FriendRequest>()
+                    fbSource!!.getUsers(user.receivedInvites!!, { usersOfInvites ->
+                        if (usersOfInvites != null) {
+                            for (userOfInvites in usersOfInvites) {
+                                users.add(FriendRequest(user.id, user.nickname, user.realName, user.avatar, true))
                             }
                         }
-                    }
-                } else if (received is String) {
-                    firestore!!.collection("users").document(received).get().addOnCompleteListener { userDoc ->
-                        if (userDoc.isSuccessful) {
-                            val friendData = userDoc.result!!
-                            var nickname = friendData["nickname"] as String?
-                            if (nickname == null) {
-                                nickname = ""
-                            }
-                            var realname = friendData["real_name"] as String?
-                            if (realname == null) {
-                                realname = ""
-                            }
-                            var avatar = friendData["avatar"] as String?
-                            if (avatar == null) {
-                                avatar = ""
-                            }
-                            val user = FriendRequest(friendData.id, nickname!!, realname!!, avatar!!, true)
-                            Log.i("FirestoreRequest", "friends add.")
+                        if (users.isNotEmpty()) {
                             Log.i("received_inv", "users $users")
                             Log.i("received_inv", "users loaded.")
-                            val adapter = FriendRequestsListAdapter(c!!, arrayListOf(user), object : FriendRequestsListAdapter.Callback {
+                            val adapter = FriendRequestsListAdapter(c!!, users, object : FriendRequestsListAdapter.Callback {
                                 override fun onItemClicked(item: FriendRequest) {
                                     profile(item)
                                 }
@@ -223,17 +168,58 @@ class FriendRequestsFragment : BaseFragment() {
                             friendRequests.adapter = adapter
                             //friendRequests.layoutManager = LinearLayoutManager(this)
                         } else {
-                            Log.e("FirestoreRequest", "Error getting document.", userDoc.exception)
+                            Log.e("FirestoreRequest", "No one of invites were loaded.")
                         }
-                    }
+                    })
                 }
-            } else {
-                Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
-        }
+        })
     }
 
     private fun sentButtonOnClick() {
+//        val users = ArrayList<HashMap<String, Any>>()
+//        val adapterOfCached = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, true), object : FriendRequestsListAdapter.Callback {
+//            override fun onItemClicked(item: FriendRequest) {
+//                profile(item)
+//            }
+//        }, cancel,  block, accept)
+//        friendRequests.adapter = adapterOfCached
+        reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
+        sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+        fbSource!!.getUser(fbSource!!.uid()!!, { user ->
+            Log.i("received_inv", "received ${user.sentInvites}")
+            if (user.sentInvites != null) {
+                if (user.sentInvites!!.isEmpty()) {
+                    emptyRequestsListMessage.visibility = View.VISIBLE
+                    friendRequests.visibility = View.GONE
+                } else {
+                    emptyRequestsListMessage.visibility = View.GONE
+                    friendRequests.visibility = View.VISIBLE
+                    val users = ArrayList<FriendRequest>()
+                    fbSource!!.getUsers(user.sentInvites!!, { usersOfInvites ->
+                        if (usersOfInvites != null) {
+                            for (userOfInvites in usersOfInvites) {
+                                users.add(FriendRequest(user.id, user.nickname, user.realName, user.avatar, true))
+                            }
+                        }
+                        if (users.isNotEmpty()) {
+                            Log.i("sent_inv", "users $users")
+                            Log.i("sent_inv", "users loaded.")
+                            val adapter = FriendRequestsListAdapter(c!!, users, object : FriendRequestsListAdapter.Callback {
+                                override fun onItemClicked(item: FriendRequest) {
+                                    profile(item)
+                                }
+                            }, cancel,  block, accept)
+                            friendRequests.adapter = adapter
+                            //friendRequests.layoutManager = LinearLayoutManager(this)
+                        } else {
+                            Log.e("FirestoreRequest", "No one of invites were loaded.")
+                        }
+                    })
+                }
+            }
+        })
+
         val data = mapOf("id" to mAuth!!.uid)
         val users = ArrayList<HashMap<String, Any>>()
         val adapterOfCached = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
@@ -332,66 +318,5 @@ class FriendRequestsFragment : BaseFragment() {
                 Log.i("FirestoreRequest", "Error getting documents.", it.exception)
             }
         }
-        //TODO
-        functions!!
-            .getHttpsCallable("getInvites")
-            .call(data).continueWith { task ->
-                val result = task.result?.data as HashMap<String, Any>
-                Log.i("sent_inv", "getInvites result $result")
-                if (result["found"] == true) {
-                    if (result["invites"] is ArrayList<*>) {
-                        val sent = result["invites"] as ArrayList<*>
-                        Log.i("sent_inv", "received $sent")
-                        if (sent.isEmpty()) {
-                            emptyRequestsListMessage.visibility = View.VISIBLE
-                            friendRequests.visibility = View.GONE
-                        } else {
-                            emptyRequestsListMessage.visibility = View.GONE
-                            friendRequests.visibility = View.VISIBLE
-                            val data1 = mapOf("ids" to sent)
-                            functions!!
-                                .getHttpsCallable("getUsers")
-                                .call(data1).continueWith { task ->
-                                    val result1 = task.result?.data as HashMap<String, Any>
-                                    Log.i("sent_inv", "result1 $result1")
-                                    if (result1["found"] == true) {
-                                        val users = result1["users"] as ArrayList<HashMap<String, Any>>
-                                        val unfound = result1["unfound"] as ArrayList<String>
-                                        Log.i("sent_inv", "users $users")
-                                        Log.i("sent_inv", "unfound $unfound")
-                                        val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
-                                            override fun onItemClicked(item: FriendRequest) {
-                                                profile(item)
-                                            }
-                                        }, cancel,  block, accept)
-                                        friendRequests.adapter = adapter
-                                        //friendRequests.layoutManager = LinearLayoutManager(this)
-                                    }
-                                }
-                        }
-                    } else if (result["invites"] is String) {
-                        val sent = result["invites"] as String
-                        Log.i("sent_inv", "users $sent")
-                        val data1 = mapOf("id" to sent)
-                        functions!!
-                            .getHttpsCallable("getUser")
-                            .call(data1).continueWith { task ->
-                                val result1 = task.result?.data as HashMap<String, Any>
-                                if (result1["found"] == true) {
-                                    val users = result1["users"] as ArrayList<HashMap<String, Any>>
-                                    val unfound = result1["found"] as ArrayList<String>
-                                    Log.i("sent_inv", "users $users")
-                                    Log.i("sent_inv", "unfound $unfound")
-                                    val adapter = FriendRequestsListAdapter(c!!, hashMapToFriendRequest(users, false), object : FriendRequestsListAdapter.Callback {
-                                        override fun onItemClicked(item: FriendRequest) {
-                                            profile(item)
-                                        }
-                                    }, cancel,  block, accept)
-                                    friendRequests.adapter = adapter
-                                }
-                            }
-                    }
-                }
-            }
     }
 }

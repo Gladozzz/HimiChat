@@ -23,7 +23,7 @@ class FriendsFragment : BaseFragment() {
 
     val REQUEST_CODE_DIALOG_ACTIVITY = 1
 
-    private fun usersToStrings(h : ArrayList<User>) : ArrayList<String> {
+    private fun usersToStrings(h : List<User>) : ArrayList<String> {
         val s : ArrayList<String> = ArrayList<String>()
         h.forEach {
             val gson = Gson()
@@ -65,32 +65,11 @@ class FriendsFragment : BaseFragment() {
     }
 
     private fun updateFriends() {
-        val data = mapOf("id" to mAuth!!.uid!!)
         val profile = {u: User -> Unit
-            firestore!!.collection("users").document(u.id).get().addOnCompleteListener{
-                if (it.isSuccessful) {
-                    val userData = it.result!!
-                    var nickname1 = userData.get("nickname") as String?
-                    if (nickname1 == null) {
-                        nickname1 = ""
-                    }
-                    var realname1 = userData.get("real_name") as String?
-                    if (realname1 == null) {
-                        realname1 = ""
-                    }
-                    var avatar1 = userData.get("avatar") as String?
-                    if (avatar1 == null) {
-                        avatar1 = ""
-                    }
-                    val user = User(u.id, nickname1, realname1, avatar1)
-                    val b = Bundle()
-                    b.putString("profile_id", u.id)
-                    val navController = findNavController()
-                    navController.navigate(R.id.nav_profile, b, navOptions)
-                } else {
-                    Log.i("FirestoreRequest", "Error getting documents.", it.exception)
-                }
-            }
+            val b = Bundle()
+            b.putString("profile_id", u.id)
+            val navController = findNavController()
+            navController.navigate(R.id.nav_profile, b, navOptions)
         }
         val sendMsg = {u: User -> Unit
             val b = Bundle()
@@ -108,77 +87,42 @@ class FriendsFragment : BaseFragment() {
             val adapter = FriendsListAdapter(c!!.applicationContext, users, profile, sendMsg)
             FriendsList.adapter = adapter
             FriendsList.layoutManager = LinearLayoutManager(c!!)
-            Log.i("friendsTest", "friends was took from SharedPreferences")
+            Log.i(tag, "friends was took from SharedPreferences")
         } else {
-            Log.i("friendsTest", "SharedPreferences is empty")
+            Log.i(tag, "SharedPreferences is empty")
         }
 
-        firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
-            try {
-                if (it.isSuccessful) {
-                    val userData = it.result!!
-                    val friendsIDs = userData.get("friends") as? ArrayList<String>?
-                    val friends = ArrayList<User>()
-                    if (friendsIDs != null) {
-                        if (emptyFriendsListMessage != null) {
-                            emptyFriendsListMessage.visibility = View.GONE
-                        }
-                        FriendsList.visibility = View.VISIBLE
-                        firestore!!.collection("users").whereIn(FieldPath.documentId(), friendsIDs).get().addOnCompleteListener {usersDocs ->
-                            try {
-                                if (usersDocs.isSuccessful) {
-                                    val result = usersDocs.result!!
-                                    val docs = result.documents
-                                    for (userDoc in docs) {
-                                        val friendData = userDoc.data!!
-                                        var nickname = friendData["nickname"] as String?
-                                        if (nickname == null) {
-                                            nickname = ""
-                                        }
-                                        var realname = friendData["real_name"] as String?
-                                        if (realname == null) {
-                                            realname = ""
-                                        }
-                                        var avatar = friendData["avatar"] as String?
-                                        if (avatar == null) {
-                                            avatar = ""
-                                        }
-                                        val user = User(userDoc.id, nickname, realname, avatar)
-                                        friends.add(user)
-                                        Log.i("FirestoreRequest", "friends add.")
-                                    }
-                                    if (friends.isNotEmpty()) {
-                                        val adapter = FriendsListAdapter(c!!, friends, profile, sendMsg)
-                                        if (FriendsList != null) {
-                                            FriendsList.adapter = adapter
-                                        }
-                                        //friendRequests.layoutManager = LinearLayoutManager(this)
-                                        Log.i("FirestoreRequest", "friends $friends")
-                                        Log.i("FirestoreRequest", "friends loaded.")
-                                    } else {
-                                        Log.e("FirestoreRequest", "No one of friends were loaded.")
-                                    }
-                                    val strings = usersToStrings(friends)
-                                    pref.putListString("friends", strings)
-                                } else {
-                                    Log.e("FirestoreRequest", "Error getting documents.", usersDocs.exception)
-                                }
-                            } catch (e: Exception) {
-                                Log.i("friendsFragment", "error " + e.message)
-                            }
-                        }
-                    } else {
-                        Log.e("FirestoreRequest", "There is no friends!")
-                        emptyFriendsListMessage.visibility = View.VISIBLE
-                        FriendsList.visibility = View.GONE
-                    }
-                } else {
-                    Log.e("FirestoreRequest", "Error getting documents.", it.exception)
+        fbSource!!.getUser(fbSource!!.uid()!!, {
+            val friendsIDs = it.friends
+            if (friendsIDs != null) {
+                if (emptyFriendsListMessage != null) {
+                    emptyFriendsListMessage.visibility = View.GONE
                 }
-            } catch (e: Exception) {
-                Log.i("friendsFragment", "error " + e.message)
+                FriendsList.visibility = View.VISIBLE
+                fbSource!!.getUsers(friendsIDs, { friends ->
+                    try {
+                        if (friends != null && friends.isNotEmpty()) {
+                            val adapter = FriendsListAdapter(c!!, friends, profile, sendMsg)
+                            if (FriendsList != null) {
+                                FriendsList.adapter = adapter
+                            }
+                            Log.i(tag, "friends $friends")
+                            Log.i(tag, "friends loaded.")
+                        } else {
+                            Log.e(tag, "No one of friends were loaded.")
+                        }
+                        val strings = usersToStrings(friends!!)
+                        pref.putListString("friends", strings)
+                    } catch (e: Exception) {
+                        Log.i(tag, "error " + e.message)
+                    }
+                })
+            } else {
+                Log.e(tag, "There is no friends!")
+                emptyFriendsListMessage.visibility = View.VISIBLE
+                FriendsList.visibility = View.GONE
             }
-        }
+        })
     }
 
     private fun findFriendButtonOnClick() {

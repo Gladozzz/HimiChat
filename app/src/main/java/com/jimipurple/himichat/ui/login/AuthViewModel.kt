@@ -148,7 +148,7 @@ class AuthViewModel(val app: Application) : AndroidViewModel(app) {
         return matcher.matches()
     }
 
-    private fun isNicknameUnique(nickname: String, onSuccess: (Boolean) -> Unit, onError: (Exception) -> Unit = {}) {
-        fbSource.isNicknameUnique(nickname, onSuccess, onError)
+    private fun isNicknameUnique(nickname: String, onComplete: (Boolean) -> Unit, onError: (Exception) -> Unit = {}) {
+        fbSource.isNicknameUnique(nickname, onComplete, onError)
     }
 }

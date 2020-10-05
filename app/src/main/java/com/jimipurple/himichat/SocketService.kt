@@ -315,7 +315,6 @@ class SocketService : IntentService("SocketService") {
             Log.i("sharedSecret", "data ${Base64.encodeToString(sharedSecret, Base64.DEFAULT)}")
             val encryptedText = Encryption.encrypt(sharedSecret, text)
             val signature = Encryption.generateSignature(text.toByteArray(Charsets.UTF_8), keyPair.privateKey)
-
             val receiverId1 = receiverId
             val deliveredId = deliveredId
             val encryptedText1 = Base64.encodeToString(encryptedText, Base64.DEFAULT)

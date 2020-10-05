@@ -20,6 +20,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
@@ -35,7 +36,6 @@ import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
-import kotlinx.android.synthetic.main.profile_settings_fragment.nicknameEdit
 
 
 class ProfileSettingsFragment : BaseFragment() {
@@ -85,6 +85,8 @@ class ProfileSettingsFragment : BaseFragment() {
 
             // disable login button unless both username / password is valid
             saveAccountButton.isEnabled = profileSettingsState.isDataValid
+            saveAccountButton.isVisible = !profileSettingsState.isDataAnalyzing
+            settingsProgressBar.isVisible = profileSettingsState.isDataAnalyzing
 
             nicknameInput.isErrorEnabled = false
             realNameInput.isErrorEnabled = false
@@ -188,7 +190,7 @@ class ProfileSettingsFragment : BaseFragment() {
         realname = realnameEdit.text.toString()
         val accountDoc = firestore!!.collection("users").document(mAuth!!.uid!!)
         accountDoc.update(mapOf("nickname" to  nickname))
-        accountDoc.update(mapOf("realname" to  realname))
+        accountDoc.update(mapOf("real_name" to  realname))
         var checkDataSaving = true
         accountDoc.get().addOnCompleteListener{
             if (it.isSuccessful) {
@@ -203,6 +205,7 @@ class ProfileSettingsFragment : BaseFragment() {
                 }
                 if (checkDataSaving) {
                     Toast.makeText(c, R.string.toast_saving_account_success, Toast.LENGTH_SHORT).show()
+                    saveAccountButton.isEnabled = false
                 } else {
                     Toast.makeText(c, R.string.toast_saving_account_error, Toast.LENGTH_SHORT).show()
                 }
@@ -297,8 +300,12 @@ class ProfileSettingsFragment : BaseFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("nickname", nicknameEdit.text.toString())
-        outState.putString("realName", realnameEdit.text.toString())
+        if (nicknameEdit != null) {
+            outState.putString("nickname", nicknameEdit.text.toString())
+        }
+        if (realnameEdit != null) {
+            outState.putString("realName", realnameEdit.text.toString())
+        }
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {

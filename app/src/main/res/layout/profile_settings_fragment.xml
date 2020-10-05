@@ -7,13 +7,15 @@
     android:background="?attr/primaryDark"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:weightSum="100">
+    android:weightSum="100"
+    android:windowSoftInputMode="stateUnspecified">
 
     <ImageView
         android:id="@+id/avatarView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="50"
+        android:layout_weight="60"
+        android:layout_margin="8dp"
         app:srcCompat="@drawable/defaultavatar" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -64,6 +66,14 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:text="@string/button_save_account_data" />
+
+    <ProgressBar
+        android:id="@+id/settingsProgressBar"
+        android:layout_marginTop="20dp"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/logoutButton"
