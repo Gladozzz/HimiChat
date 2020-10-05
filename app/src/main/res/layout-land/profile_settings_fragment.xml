@@ -35,13 +35,13 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/nicknameInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp">
 
                 <EditText
                     android:id="@+id/nicknameEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
                     android:backgroundTint="?attr/primaryTextColor"
                     android:drawableTint="?attr/primary"
                     android:foregroundTint="?attr/primary"
@@ -57,13 +57,13 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/realNameInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp">
 
                 <EditText
                     android:id="@+id/realnameEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
                     android:backgroundTint="?attr/primaryTextColor"
                     android:gravity="fill_horizontal"
                     android:hint="@string/hint_realname"
