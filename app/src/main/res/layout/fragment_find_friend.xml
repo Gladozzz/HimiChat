@@ -23,21 +23,17 @@
         android:id="@+id/findFriendInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:ems="10"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/primaryInputStyle">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/nicknameEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_search_by_nickname_or_realname"
             android:inputType="textPersonName"
-            android:textColor="?attr/primaryTextColor"
             android:importantForAutofill="no" />
     </com.google.android.material.textfield.TextInputLayout>
 

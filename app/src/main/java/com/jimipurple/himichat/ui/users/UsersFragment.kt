@@ -72,7 +72,7 @@ class UsersFragment : BaseFragment() {
     }
 
     private fun searchUsers(request: String) {
-        (UsersList.adapter as UsersListAdapter).clearItems()
+        (UsersList.adapter as UsersListAdapter?)?.clearItems()
         usersProgressBar.visibility = View.VISIBLE
         fbSource!!.searchUsers(request, { users ->
             usersProgressBar.visibility = View.GONE
@@ -93,6 +93,7 @@ class UsersFragment : BaseFragment() {
     }
 
     private fun setUpAdapter(users: List<User>) {
+        (UsersList.adapter as UsersListAdapter?)?.sortUsers()
         val profile = { u: User ->
             Unit
             val b = Bundle()

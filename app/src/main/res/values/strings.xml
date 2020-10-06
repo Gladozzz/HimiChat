@@ -37,6 +37,9 @@
     <string name="button_sign_in">sign in</string>
     <string name="button_register">register</string>
     <string name="button_register_mode">I don\'t have account…</string>
+    <string name="button_reset_password">Reset password</string>
+    <string name="button_send_reset_request">Send reset password request to email</string>
+    <string name="button_cancel">Cancel</string>
     <string name="button_login_mode">I already have account…</string>
     <string name="button_find_friend">Find a friend</string>
     <string name="button_friend_requests">Friend requests</string>
@@ -112,6 +115,7 @@
     <string name="menu_dialog">Dialog</string>
     <string name="menu_friends">Friends</string>
     <string name="menu_users">Users</string>
+    <string name="menu_suggestions">Complaints and suggestions</string>
     <string name="menu_find_friend">Find friend</string>
     <string name="menu_friend_requests">Friend requests</string>
     <string name="menu_settings">Settings</string>

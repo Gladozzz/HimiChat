@@ -10,12 +10,22 @@
     android:weightSum="100"
     android:windowSoftInputMode="stateUnspecified">
 
-    <ImageView
+<!--    <ImageView-->
+<!--        android:id="@+id/avatarView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="60"-->
+<!--        android:layout_margin="8dp"-->
+<!--        app:srcCompat="@drawable/defaultavatar" />-->
+
+    <cn.carbs.android.avatarimageview.library.AvatarImageView
         android:id="@+id/avatarView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="60"
+        style="primaryAvatarStyle"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center|top"
         android:layout_margin="8dp"
+        android:foregroundGravity="center"
         app:srcCompat="@drawable/defaultavatar" />
 
     <com.google.android.material.textfield.TextInputLayout

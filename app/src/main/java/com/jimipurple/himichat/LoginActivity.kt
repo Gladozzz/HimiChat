@@ -236,7 +236,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun registerButtonOnClick() {
-        if (isEmailValid(emailRegisterEdit.text.toString()) && isNicknameValid(nicknameEdit.text.toString()) && passwordRegisterEdit.text.toString() == passwordRepeatEdit.text.toString() && passwordRegisterEdit.text.isNotEmpty()) {
+        if (isEmailValid(emailRegisterEdit.text.toString()) && isNicknameValid(nicknameEdit.text.toString()) && passwordRegisterEdit.text.toString() == passwordRepeatEdit.text.toString() && passwordRegisterEdit.text.toString().isNotEmpty() && passwordRegisterEdit.text != null) {
             fbSource!!.register(
                 emailRegisterEdit.text.toString(),
                 passwordRegisterEdit.text.toString(),
@@ -252,8 +252,12 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    private fun resetPasswordButtonOnClick() {
+
+    }
+
     private fun signInButtonOnClick() {
-        if (isEmailValid(emailEdit.text.toString()) && passwordSignEdit.text.isNotEmpty()) {
+        if (isEmailValid(emailEdit.text.toString()) && passwordSignEdit.text != null && passwordSignEdit.text.toString().isNotEmpty()) {
             fbSource!!.login(
                 emailEdit.text.toString(),
                 passwordSignEdit.text.toString(),
@@ -310,16 +314,16 @@ class LoginActivity : BaseActivity() {
         loginLayout.visibility = View.GONE
         registerLayout.visibility = View.VISIBLE
 
-        passwordRepeatEdit.text.clear()
-        nicknameEdit.text.clear()
+        passwordRepeatEdit.text?.clear()
+        nicknameEdit.text?.clear()
     }
 
     private fun setLoginMode() {
         loginLayout.visibility = View.VISIBLE
         registerLayout.visibility = View.GONE
 
-        passwordRepeatEdit.text.clear()
-        nicknameEdit.text.clear()
+        passwordRepeatEdit.text?.clear()
+        nicknameEdit.text?.clear()
     }
 
     fun isNicknameValid(nickname: String): Boolean {

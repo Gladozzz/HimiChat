@@ -11,7 +11,17 @@
     android:gravity="start"
     android:orientation="horizontal">
 
-    <ImageView
+<!--    <ImageView-->
+<!--        android:id="@+id/avatarDialog"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="100dp"-->
+<!--        android:layout_gravity="start"-->
+<!--        android:contentDescription="@string/avatar_content_description"-->
+<!--        android:maxWidth="1dp"-->
+<!--        android:maxHeight="1dp"-->
+<!--        app:srcCompat="@drawable/defaultavatar" />-->
+
+    <cn.carbs.android.avatarimageview.library.AvatarImageView
         android:id="@+id/avatarDialog"
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -19,7 +29,8 @@
         android:contentDescription="@string/avatar_content_description"
         android:maxWidth="1dp"
         android:maxHeight="1dp"
-        app:srcCompat="@drawable/defaultavatar" />
+        app:srcCompat="@drawable/defaultavatar"
+        style="primaryAvatarStyle"/>
 
     <LinearLayout
         android:layout_width="0dp"

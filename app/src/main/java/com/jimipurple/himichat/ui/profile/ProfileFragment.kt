@@ -68,84 +68,18 @@ class ProfileFragment : BaseFragment() {
             navController.navigate(R.id.nav_settings, b, navOptions)
         }
         profileInviteButton.setOnClickListener {
-            val uid = mAuth!!.currentUser!!.uid
-            val data = mapOf("inviterId" to uid, "id" to profile_id)
-            Log.i("inviteUser", "id of inviting user $profile_id")
-            Log.i("inviteUser", "uid $uid")
-            //firestore.collection("users").document(foundId).set(data, SetOptions.merge())
-            functions!!
-                .getHttpsCallable("inviteUser")
-                .call(data)
-                .continueWith { task ->
-                    // This continuation runs on either success or failure, but if the task
-                    // has failed then result will throw an Exception which will be
-                    // propagated down.
-                    val result = task.result?.data as HashMap<String, Any>
-                    if (result["invite"] == true) {
-                        Toast.makeText(c!!, R.string.toast_invite_successful, Toast.LENGTH_LONG).show()
-                        requireActivity().recreate()
-                    } else if (result["invite"] == false) {
-                        Log.e("inviteUser", "reason ${result["reason"]}")
-                        if (result["reason"] == "already invited") {
-                            Toast.makeText(c!!, R.string.toast_invite_already, Toast.LENGTH_LONG).show()
-                        } else if (result["reason"] == "already invited you") {
-                            Toast.makeText(
-                                c!!,
-                                R.string.toast_invite_already_you,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
+            fbSource!!.inviteToFriends(profile_id!!, {
+//                requireActivity().recreate()
+            }, { e ->
+                if (e.message == "already invited you") {
+                    //
                 }
+            })
         }
         profileRemoveFriendButton.setOnClickListener {
-            val uid = mAuth!!.uid!!
-            //removing all existing invites of between those users
-            firestore!!.collection("users").document(uid).update(
-                mapOf(
-                    "invited_by" to FieldValue.arrayRemove(
-                        profile_id!!
-                    )
-                )
-            )
-            firestore!!.collection("users").document(profile_id!!).update(
-                mapOf(
-                    "invites" to FieldValue.arrayRemove(
-                        uid
-                    )
-                )
-            )
-            firestore!!.collection("users").document(uid).update(
-                mapOf(
-                    "invites" to FieldValue.arrayRemove(
-                        profile_id!!
-                    )
-                )
-            )
-            firestore!!.collection("users").document(profile_id!!).update(
-                mapOf(
-                    "invited_by" to FieldValue.arrayRemove(
-                        uid
-                    )
-                )
-            )
-            //removing from friends list's
-            firestore!!.collection("users").document(profile_id!!).update(
-                mapOf(
-                    "friends" to FieldValue.arrayRemove(
-                        uid
-                    )
-                )
-            )
-            firestore!!.collection("users").document(uid).update(
-                mapOf(
-                    "friends" to FieldValue.arrayRemove(
-                        profile_id!!
-                    )
-                )
-            )
-            Toast.makeText(c!!, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
-            requireActivity().recreate()
+            fbSource!!.removeFriend(profile_id!!, {
+//                requireActivity().recreate()
+            })
         }
         fbSource!!.isAdmin(fbSource!!.uid()!!, { isAdmin ->
             fbSource!!.getUser(fbSource!!.uid()!!, { currentUser ->

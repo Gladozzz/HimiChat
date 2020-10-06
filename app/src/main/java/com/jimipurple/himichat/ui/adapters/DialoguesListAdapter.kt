@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
+import cn.carbs.android.avatarimageview.library.AvatarImageView
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.Dialog
 import com.jimipurple.himichat.models.User
@@ -49,7 +50,7 @@ class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, v
     inner class DialogHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val name = itemView.findViewById(R.id.name) as TextView
-        private val avatar = itemView.findViewById(R.id.avatarDialog) as ImageView
+        private val avatar = itemView.findViewById(R.id.avatarDialog) as AvatarImageView
         private val lastMessage = itemView.findViewById(R.id.lastMessage) as TextView
 
         fun bind(item: Dialog) {

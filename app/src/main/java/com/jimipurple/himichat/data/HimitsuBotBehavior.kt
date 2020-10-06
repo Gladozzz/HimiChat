@@ -3,6 +3,7 @@ package com.jimipurple.himichat.data
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -62,7 +63,7 @@ class HimitsuBotBehavior(context: Context, val uid: String) {
     private fun sendMessageToAuthor(text: String, authorId: String) {
         fbSource!!.firestore.collection("author").document("messages").update(
             "fromApp", FieldValue.arrayUnion(
-                mapOf("text" to text, "author_id" to authorId)
+                mapOf("text" to text, "author_id" to authorId, "timestamp" to Timestamp(Date(Calendar.getInstance().timeInMillis)))
             )
         )
     }
@@ -120,11 +121,13 @@ class HimitsuBotBehavior(context: Context, val uid: String) {
                     validatingCommands.sendMessageToAuthorChoosedAnonymous -> {
                         val responseText = c.resources.getString(R.string.himitsu_bot_message_to_author_end)
                         sendMessageToAuthor(text, "anonymous")
+                        currentCommand = null
                         send(responseText)
                     }
                     validatingCommands.sendMessageToAuthorChoosedShowAuthor -> {
                         val responseText = c.resources.getString(R.string.himitsu_bot_message_to_author_end)
                         sendMessageToAuthor(text, uid)
+                        currentCommand = null
                         send(responseText)
                     }
                 }

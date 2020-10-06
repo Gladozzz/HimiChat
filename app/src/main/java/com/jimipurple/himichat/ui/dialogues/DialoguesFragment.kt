@@ -32,23 +32,14 @@ class DialoguesFragment : BaseFragment() {
     private val himitsuID: String by lazy {
         getString(R.string.himitsu_id)
     }
-
-    //    private var mAuth: FirebaseAuth? = null
-//    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//    private var firebaseToken: String  = ""
-//    private var functions = FirebaseFunctions.getInstance()
     private var db: MessagesDBHelper? = null
     private var id: String? = null
     private var currentTime: Date? = null
-//    private val himitsuBot: Dialog by lazy {
-//        Dialog(himitsuID, himitsuNickname, getString(R.string.himitsu_avatar_url))
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_dialogues, container, false)
     }
 
@@ -62,12 +53,10 @@ class DialoguesFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        setContentView(R.layout.fragment_dialogues)
         db = MessagesDBHelper(c!!)
         mAuth = FirebaseAuth.getInstance()
         id = mAuth!!.uid!!
         app = c!!.applicationContext as MyApp
-//        ac = app!!.currentActivity!! as AppCompatActivity
         ac = app!!.currentActivity!! as AppCompatActivity
         bar = ac!!.supportActionBar!!
         if (savedInstanceState != null) {

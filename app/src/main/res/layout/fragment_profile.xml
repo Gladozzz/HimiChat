@@ -10,13 +10,23 @@
     android:weightSum="100"
     tools:context=".ui.profile.ProfileFragment">
 
-    <ImageView
+<!--    <ImageView-->
+<!--        android:id="@+id/profileAvatarView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_margin="8dp"-->
+<!--        android:layout_gravity="top"-->
+<!--        android:layout_weight="50"-->
+<!--        app:srcCompat="@drawable/defaultavatar" />-->
+
+    <cn.carbs.android.avatarimageview.library.AvatarImageView
         android:id="@+id/profileAvatarView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        style="primaryAvatarStyle"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center|top"
         android:layout_margin="8dp"
-        android:layout_gravity="top"
-        android:layout_weight="50"
+        android:foregroundGravity="center"
         app:srcCompat="@drawable/defaultavatar" />
 
     <com.google.android.material.textfield.TextInputLayout

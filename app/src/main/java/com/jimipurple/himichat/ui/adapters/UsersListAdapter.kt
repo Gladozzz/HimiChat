@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import cn.carbs.android.avatarimageview.library.AvatarImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -47,7 +48,7 @@ class UsersListAdapter(
         items = listOf()
     }
 
-    private fun sortUsers(notify: Boolean = true) {
+    fun sortUsers(notify: Boolean = true) {
         items = items.sortedWith(userComporator)
         if (notify) {
             this.notifyDataSetChanged()
@@ -58,7 +59,7 @@ class UsersListAdapter(
 
         private val name = itemView.findViewById(R.id.nameUsers) as TextView
         private val realName = itemView.findViewById(R.id.realNameUsers) as TextView
-        private val avatar = itemView.findViewById(R.id.avatarUsers) as ImageView
+        private val avatar = itemView.findViewById(R.id.avatarUsers) as AvatarImageView
         private val favoriteButton = itemView.findViewById(R.id.favoriteButton) as ImageButton
 
         fun bind(item: User) {

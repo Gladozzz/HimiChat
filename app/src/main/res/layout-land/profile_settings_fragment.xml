@@ -9,7 +9,15 @@
     android:orientation="horizontal"
     android:weightSum="100">
 
-    <ImageView
+<!--    <ImageView-->
+<!--        android:id="@+id/avatarView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_margin="8dp"-->
+<!--        android:layout_weight="50"-->
+<!--        app:srcCompat="@drawable/defaultavatar" />-->
+
+    <cn.carbs.android.avatarimageview.library.AvatarImageView
         android:id="@+id/avatarView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

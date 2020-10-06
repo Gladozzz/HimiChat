@@ -19,20 +19,17 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/authEmailInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            style="@style/primaryInputStyle"
+            app:boxBackgroundColor="@color/colorPrimaryDarkBrighter">
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/emailEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
-                android:backgroundTint="?attr/primaryTextColor"
-                android:ems="10"
                 android:hint="@string/hint_email"
                 android:inputType="textEmailAddress"
-                android:textColor="?attr/primaryTextColor"
-                android:textColorHighlight="@color/colorAccent" />
+                android:autofillHints="email" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -47,20 +44,19 @@
             android:id="@+id/authPasswordInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTintMode="add"
+            app:boxBackgroundMode="outline"
+            style="@style/primaryInputStyle"
             app:passwordToggleEnabled="true">
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/passwordSignEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
-                android:backgroundTint="?attr/primaryTextColor"
+                android:autofillHints="password"
                 android:ems="10"
                 android:hint="@string/hint_password"
-                android:inputType="textPassword"
-                android:textColor="?attr/primaryTextColor"
-                android:textColorHighlight="@color/colorAccent" />
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -102,6 +98,18 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/button_register_mode"
+        android:visibility="visible" />
+
+    <Button
+        android:id="@+id/resetPasswordButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:textColor="@color/text_button_on_click"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/button_reset_password"
         android:visibility="visible" />
 
 </LinearLayout>

@@ -101,6 +101,10 @@ class FirebaseSource(context: Context) {
             .putString("firebaseToken", newToken).apply()
     }
 
+    fun resetPassword(email: String) {
+        firebaseAuth.sendPasswordResetEmail(email)
+    }
+
     fun login(
         email: String, password: String,
         onComplete: (result: Boolean) -> Unit
@@ -502,7 +506,7 @@ class FirebaseSource(context: Context) {
                     }
                     var friends: List<String>? = null
                     if (userData.get("friends") is List<*>) {
-                        friends = userData.get("friends") as List<String>
+                        friends = userData.get("friends") as List<String>?
                     }
                     var receivedInvites: List<String>? = null
                     if (userData.get("friends") is List<*>) {
@@ -1016,6 +1020,85 @@ class FirebaseSource(context: Context) {
                 onError(Exception("Some issue with isAdmin function"))
             }
         })
+    }
+
+    fun removeFriend(
+        profileId: String,
+        onSuccess: () -> Unit = {},
+        onError: (e: Exception) -> Unit = {}
+    ) {
+        val uid = uid()!!
+        //removing all existing invites of between those users
+        firestore.collection("users").document(uid).update(
+            mapOf(
+                "invited_by" to FieldValue.arrayRemove(
+                    profileId
+                ),
+                "invites" to FieldValue.arrayRemove(
+                    profileId
+                ),
+                "friends" to FieldValue.arrayRemove(
+                    profileId
+                )
+            )
+        ).addOnSuccessListener {
+            firestore.collection("users").document(profileId).update(
+                mapOf(
+                    "invites" to FieldValue.arrayRemove(
+                        uid
+                    ),
+                    "invited_by" to FieldValue.arrayRemove(
+                        uid
+                    ),
+                    "friends" to FieldValue.arrayRemove(
+                        uid
+                    )
+                )
+            ).addOnSuccessListener {
+                onSuccess()
+            }.addOnFailureListener { e ->
+                onError(e) }
+        }.addOnFailureListener { e ->
+            onError(e) }
+        Toast.makeText(c, R.string.toast_remove_friend_complete, Toast.LENGTH_LONG).show()
+    }
+
+    fun inviteToFriends(
+        profileId: String,
+        onSuccess: () -> Unit = {},
+        onError: (e: Exception) -> Unit = {}
+    ) {
+        val uid = uid()!!
+        val data = mapOf("inviterId" to uid, "id" to profileId)
+        Log.i("inviteUser", "id of inviting user $profileId")
+        Log.i("inviteUser", "uid $uid")
+        //firestore.collection("users").document(foundId).set(data, SetOptions.merge())
+        functions!!
+            .getHttpsCallable("inviteUser")
+            .call(data)
+            .continueWith { task ->
+                // This continuation runs on either success or failure, but if the task
+                // has failed then result will throw an Exception which will be
+                // propagated down.
+                val result = task.result?.data as HashMap<String, Any>
+                if (result["invite"] == true) {
+                    Toast.makeText(c, R.string.toast_invite_successful, Toast.LENGTH_LONG).show()
+                    onSuccess()
+                } else if (result["invite"] == false) {
+                    Log.e("inviteUser", "reason ${result["reason"]}")
+                    if (result["reason"] == "already invited") {
+                        onSuccess()
+                        Toast.makeText(c, R.string.toast_invite_already, Toast.LENGTH_LONG).show()
+                    } else if (result["reason"] == "already invited you") {
+                        onError(Exception("already invited you"))
+                        Toast.makeText(
+                            c,
+                            R.string.toast_invite_already_you,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
     }
 
     private fun generateKeys(): String {

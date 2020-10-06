@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import cn.carbs.android.avatarimageview.library.AvatarImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -53,7 +54,7 @@ class FriendsListAdapter(val context: Context, var items: List<User>, val profil
 
         private val name = itemView.findViewById(R.id.name) as TextView
         private val realName = itemView.findViewById(R.id.realName) as TextView
-        private val avatar = itemView.findViewById(R.id.avatarFriend) as ImageView
+        private val avatar = itemView.findViewById(R.id.avatarFriend) as AvatarImageView
 
         fun bind(item: User) {
             name.text = item.nickname
