@@ -36,6 +36,7 @@ import com.jimipurple.himichat.data.FirebaseSource
 import com.jimipurple.himichat.db.KeysDBHelper
 import com.jimipurple.himichat.encryption.Encryption
 import com.jimipurple.himichat.ui.login.AuthViewModel
+import com.jimipurple.himichat.ui.login.ResetPasswordDialog
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.login_mode_layout.*
 import kotlinx.android.synthetic.main.register_mode_layout.*
@@ -86,6 +87,7 @@ class LoginActivity : BaseActivity() {
         registerButton.setOnClickListener { registerButtonOnClick() }
         signInButton.setOnClickListener { signInButtonOnClick() }
         signWithGoogleButton.setOnClickListener { signWithGoogleButtonOnClick() }
+        resetPasswordButton.setOnClickListener { resetPasswordButtonOnClick() }
 
         authViewModel = ViewModelProviders.of(this)
             .get(AuthViewModel::class.java)
@@ -253,7 +255,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun resetPasswordButtonOnClick() {
-
+        ResetPasswordDialog(this).show()
     }
 
     private fun signInButtonOnClick() {

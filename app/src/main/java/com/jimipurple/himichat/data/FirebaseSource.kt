@@ -409,12 +409,6 @@ class FirebaseSource(context: Context) {
                         }
                     }
                 }
-//                "firebase" -> {
-//                    firebaseLogout {
-//                        if (restart) restartApp()
-//                        callback()
-//                    }
-//                }
             }
         }
         if (!isLogout) {

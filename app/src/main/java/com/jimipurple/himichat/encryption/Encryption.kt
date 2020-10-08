@@ -1,7 +1,6 @@
 package com.jimipurple.himichat.encryption
 
 import android.net.Uri
-//import android.util.Log
 import org.whispersystems.curve25519.Curve25519
 import org.whispersystems.curve25519.Curve25519KeyPair
 import java.io.File

@@ -168,19 +168,21 @@ class ProfileSettingsFragment : BaseFragment() {
 
     private fun updateDataFromServer() {
         fbSource!!.getUser(mAuth!!.uid!!, { user ->
-            nickname = user.nickname
-            realname = user.realName
-            avatar = user.avatar
-            profileSettingsViewModel.currentNicknameOnServer = nickname
-            profileSettingsViewModel.currentRealnameOnServer = realname
-            nicknameEdit.setText(user.nickname)
-            realnameEdit.setText(user.realName)
-            val bitmap = LruCache(c!!)[user.avatar]
-            if (bitmap != null) {
-                avatarView.setImageBitmap(bitmap)
-                Log.i("ProfileSettings", "avatar was loaded from cache")
-            } else {
-                Log.e("ProfileSettings", "Avatar is not in cache. Preload can be done")
+            if (nicknameEdit!= null) {
+                nickname = user.nickname
+                realname = user.realName
+                avatar = user.avatar
+                profileSettingsViewModel.currentNicknameOnServer = nickname
+                profileSettingsViewModel.currentRealnameOnServer = realname
+                nicknameEdit.setText(user.nickname)
+                realnameEdit.setText(user.realName)
+                val bitmap = LruCache(c!!)[user.avatar]
+                if (bitmap != null) {
+                    avatarView.setImageBitmap(bitmap)
+                    Log.i("ProfileSettings", "avatar was loaded from cache")
+                } else {
+                    Log.e("ProfileSettings", "Avatar is not in cache. Preload can be done")
+                }
             }
         })
     }
