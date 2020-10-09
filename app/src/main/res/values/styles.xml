@@ -64,6 +64,17 @@
         <item name="boxBackgroundColor">@color/colorPrimaryDarkBrighter</item>
         <item name="android:textColor">?attr/primaryTextColor</item>
         <item name="android:textColorHint">?attr/primaryTextColor</item>
+        <item name="passwordToggleTint">?attr/primaryTextColor</item>
+    </style>
+
+    <style name="primaryTextEditStyle">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textColorHighlight">?attr/primaryTextColor</item>
+        <item name="android:textColorHint">?attr/primaryTextColor</item>
+        <item name="android:textColorLink">@color/colorPrimary</item>
+        <item name="android:backgroundTint">?attr/primaryTextColor</item>
+        <item name="android:drawableTint">?attr/primary</item>
+        <item name="android:foregroundTint">?attr/primary</item>
     </style>
 
     <style name="primaryAvatarStyle">
@@ -71,6 +82,10 @@
         <item name="aiv_BoarderWidth">2dp</item>
         <item name="aiv_ShowBoarder">false</item>
         <item name="aiv_TextSizeRatio">0.4</item>
+    </style>
+
+    <style name="TextButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?attr/primaryTextColor</item>
     </style>
 
 </resources>

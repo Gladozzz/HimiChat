@@ -91,8 +91,7 @@
                 android:enabled="false"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="@string/button_save_account_data"
-                style="@style/primaryInputStyle" />
+                android:text="@string/button_save_account_data" />
 
             <ProgressBar
                 android:id="@+id/settingsProgressBar"
@@ -104,24 +103,23 @@
 
             <Button
                 android:id="@+id/logoutButton"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/TextButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginTop="20dp"
                 android:background="@color/colorPrimary"
                 android:text="@string/button_logout"
-                android:textColor="@color/text_button_on_click"
                 android:textSize="24sp" />
 
             <Button
                 android:id="@+id/deleteAllMessagesButton"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/TextButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:background="@color/colorPrimary"
                 android:text="@string/button_delete_all_messages"
-                android:textColor="@color/text_button_on_click"
                 android:textSize="24sp" />
         </LinearLayout>
     </ScrollView>

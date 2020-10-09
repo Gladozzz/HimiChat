@@ -29,7 +29,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_email"
                 android:inputType="textEmailAddress"
-                android:autofillHints="email" />
+                android:autofillHints="email"
+                style="@style/primaryTextEditStyle" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -56,7 +57,8 @@
                 android:autofillHints="password"
                 android:ems="10"
                 android:hint="@string/hint_password"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                style="@style/primaryTextEditStyle" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -90,8 +92,7 @@
 
     <Button
         android:id="@+id/registerModeButton"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:textColor="@color/text_button_on_click"
+        style="@style/TextButtonStyle"
         android:textSize="18sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -102,8 +103,7 @@
 
     <Button
         android:id="@+id/resetPasswordButton"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:textColor="@color/text_button_on_click"
+        style="@style/TextButtonStyle"
         android:textSize="18sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

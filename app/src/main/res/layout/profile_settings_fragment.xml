@@ -39,15 +39,15 @@
             android:id="@+id/nicknameEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="?attr/primaryTextColor"
-            android:drawableTint="?attr/primary"
-            android:foregroundTint="?attr/primary"
             android:hint="@string/hint_nickname"
             android:inputType="textPersonName"
             android:textColor="?attr/primaryTextColor"
             android:textColorHighlight="?attr/primaryTextColor"
             android:textColorHint="?attr/primaryTextColor"
-            android:textColorLink="@color/colorPrimary" />
+            android:textColorLink="@color/colorPrimary"
+            android:backgroundTint="?attr/primaryTextColor"
+            android:drawableTint="?attr/primary"
+            android:foregroundTint="?attr/primary" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -89,24 +89,22 @@
 
     <Button
         android:id="@+id/logoutButton"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/TextButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="20dp"
         android:background="@color/colorPrimary"
         android:text="@string/button_logout"
-        android:textColor="@color/text_button_on_click"
         android:textSize="20sp" />
 
     <Button
         android:id="@+id/deleteAllMessagesButton"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/TextButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
         android:background="@color/colorPrimary"
         android:text="@string/button_delete_all_messages"
-        android:textColor="@color/text_button_on_click"
         android:textSize="24sp" />
 
 </LinearLayout>

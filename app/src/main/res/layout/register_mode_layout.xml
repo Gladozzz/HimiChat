@@ -26,7 +26,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_email"
                 android:inputType="textEmailAddress"
-                android:autofillHints="email" />
+                android:autofillHints="email"
+                style="@style/primaryTextEditStyle" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
@@ -49,7 +50,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_password"
                 android:inputType="textPassword"
-                android:autofillHints="password" />
+                android:autofillHints="password"
+                style="@style/primaryTextEditStyle" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
@@ -73,7 +75,8 @@
                 android:hint="@string/hint_password_repeat"
                 android:inputType="textPassword"
                 android:visibility="visible"
-                android:autofillHints="password" />
+                android:autofillHints="password"
+                style="@style/primaryTextEditStyle" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -94,7 +97,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_nickname"
                 android:inputType="textPersonName"
-                android:visibility="visible" />
+                android:visibility="visible"
+                style="@style/primaryTextEditStyle" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
@@ -117,7 +121,8 @@
                 android:hint="@string/hint_realname"
                 android:autofillHints="name"
                 android:inputType="textPersonName"
-                android:visibility="visible" />
+                android:visibility="visible"
+                style="@style/primaryTextEditStyle" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -138,7 +143,7 @@
 
     <Button
         android:id="@+id/loginModeButton"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/TextButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -147,7 +152,6 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/roundcorner"
         android:text="@string/button_login_mode"
-        android:textColor="@color/text_button_on_click"
         android:textSize="18sp"
         android:visibility="visible" />
 
