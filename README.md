@@ -1,6 +1,6 @@
 # Himichat
 
-This is my demo app for represent my current skills
+This is my demo app for representation my current skills.
 
 ## Installation
 
