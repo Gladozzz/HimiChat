@@ -44,7 +44,8 @@
                 android:id="@+id/nicknameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp">
+                android:layout_margin="10dp"
+                style="@style/primaryInputStyle">
 
                 <EditText
                     android:id="@+id/nicknameEdit"
@@ -66,7 +67,8 @@
                 android:id="@+id/realNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp">
+                android:layout_margin="10dp"
+                style="@style/primaryInputStyle">
 
                 <EditText
                     android:id="@+id/realnameEdit"
@@ -89,7 +91,8 @@
                 android:enabled="false"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="@string/button_save_account_data" />
+                android:text="@string/button_save_account_data"
+                style="@style/primaryInputStyle" />
 
             <ProgressBar
                 android:id="@+id/settingsProgressBar"

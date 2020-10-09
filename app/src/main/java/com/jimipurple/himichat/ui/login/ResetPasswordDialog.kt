@@ -41,7 +41,7 @@ class ResetPasswordDialog(context: Context) : Dialog(context) {
     private fun sendRequestButtonOnClick() {
         if (!emailEdit.text.isNullOrEmpty()) {
             val fbSource = FirebaseSource(context)
-            fbSource.resetPassword(emailEdit.text.toString())
+            fbSource.resetPassword(emailEdit.text.toString()) { this.cancel() }
         }
     }
 

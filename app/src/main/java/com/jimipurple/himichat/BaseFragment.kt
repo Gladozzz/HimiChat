@@ -55,11 +55,11 @@ open class BaseFragment : Fragment() {
         currentTheme = when (darkMode) {
             true -> {
                 sp.edit().putBoolean("night_mode", true).apply()
-                ContextThemeWrapper(c!!, com.jimipurple.himichat.R.style.NightTheme).theme
+                ContextThemeWrapper(c!!, R.style.NightTheme).theme
             }
             false -> {
                 sp.edit().putBoolean("night_mode", false).apply()
-                ContextThemeWrapper(c!!, com.jimipurple.himichat.R.style.DayTheme).theme
+                ContextThemeWrapper(c!!, R.style.DayTheme).theme
             }
         }
     }

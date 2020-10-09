@@ -101,8 +101,9 @@ class FirebaseSource(context: Context) {
             .putString("firebaseToken", newToken).apply()
     }
 
-    fun resetPassword(email: String) {
-        firebaseAuth.sendPasswordResetEmail(email)
+    fun resetPassword(email: String,
+                      onComplete: (result: Boolean) -> Unit) {
+        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener { onComplete(true) }
     }
 
     fun login(

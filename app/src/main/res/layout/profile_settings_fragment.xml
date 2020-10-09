@@ -32,7 +32,8 @@
         android:id="@+id/nicknameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        style="@style/primaryInputStyle">
 
         <EditText
             android:id="@+id/nicknameEdit"
@@ -53,7 +54,8 @@
         android:id="@+id/realNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        style="@style/primaryInputStyle">
 
         <EditText
             android:id="@+id/realnameEdit"
