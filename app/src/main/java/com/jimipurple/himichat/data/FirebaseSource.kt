@@ -934,13 +934,22 @@ class FirebaseSource(context: Context) {
             .getHttpsCallable("isNicknameUnique")
             .call(data1).continueWith { task ->
                 val result = task.result?.data as HashMap<String, Any>
-                if (result["isUnique"] is Boolean) {
-                    getUser(uid()!!, {user ->
-
-                    })
-                    onComplete(result["isUnique"] as Boolean)
-                } else {
-                    onError(Exception("Some error on server"))
+                val isNicknameUnique = result["isUnique"] as Boolean?
+                Log.e(tag, "isNicknameUnique $isNicknameUnique")
+                when (isNicknameUnique) {
+                    true -> {
+                        onComplete(isNicknameUnique)
+                    }
+                    false -> {
+                        getUser(uid()!!, {user ->
+                            if (user.nickname == nickname) {
+                                onComplete(true)
+                            }
+                        })
+                    }
+                    else -> {
+                        onError(Exception("Some error on server"))
+                    }
                 }
             }
             .addOnFailureListener { e: Exception ->
