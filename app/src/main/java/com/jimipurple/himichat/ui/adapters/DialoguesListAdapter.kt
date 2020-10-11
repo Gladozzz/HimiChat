@@ -2,27 +2,31 @@ package com.jimipurple.himichat.ui.adapters
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.RecyclerView
-import cn.carbs.android.avatarimageview.library.AvatarImageView
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.models.Dialog
-import com.jimipurple.himichat.models.User
+import com.liangfeizc.avatarview.AvatarView
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
-import java.lang.Exception
+import net.sectorsieteg.avatars.AvatarDrawableFactory
 
-class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, val clickCallback: Callback?, val onHoldCallback: (d: Dialog)-> Unit) : RecyclerView.Adapter<DialoguesListAdapter.DialogHolder>() {
+
+class DialoguesListAdapter(
+    val context: Context,
+    var items: ArrayList<Dialog>,
+    val clickCallback: Callback?,
+    val onHoldCallback: (d: Dialog) -> Unit
+) : RecyclerView.Adapter<DialoguesListAdapter.DialogHolder>() {
 
 //    private fun hashMapToUser(h : ArrayList<HashMap<String, Any>>) : ArrayList<User> {
 //        val u : ArrayList<User> = ArrayList<User>()
@@ -50,7 +54,7 @@ class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, v
     inner class DialogHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val name = itemView.findViewById(R.id.name) as TextView
-        private val avatar = itemView.findViewById(R.id.avatarDialog) as AvatarImageView
+        private val avatar = itemView.findViewById(R.id.avatarDialog) as AvatarView
         private val lastMessage = itemView.findViewById(R.id.lastMessage) as TextView
 
         fun bind(item: Dialog) {
@@ -67,15 +71,28 @@ class DialoguesListAdapter(val context: Context, var items: ArrayList<Dialog>, v
                         avatar.setImageBitmap(bitmap)
                     } else {
                         Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                avatar.setImageBitmap(bitmap)
-                                LruCache(context).set(url.toString(), bitmap!!)
+                            override fun onBitmapLoaded(
+                                bitmap: Bitmap?,
+                                from: Picasso.LoadedFrom?
+                            ) {
+//                                val options = BitmapFactory.Options()
+//                                options.inMutable = false
+//                                val avatarFactory = AvatarDrawableFactory(context.resources)
+//                                val avatarDrawable =
+//                                    avatarFactory.getRoundedAvatarDrawable(bitmap)
+                                if (bitmap != null) {
+                                    avatar.setImageBitmap(bitmap)
+                                    LruCache(context).set(url.toString(), bitmap)
+                                }
                             }
 
                             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                                Log.i("DialoguesListAdapter", "Загрузка изображения не удалась " + avatar + "\n" + e?.message)
+                                Log.i(
+                                    "DialoguesListAdapter",
+                                    "Загрузка изображения не удалась " + avatar + "\n" + e?.message
+                                )
                             }
                         })
                     }

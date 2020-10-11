@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -36,6 +37,7 @@ import com.jimipurple.himichat.ui.adapters.MessageListAdapter
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_dialog.*
+import net.sectorsieteg.avatars.AvatarDrawableFactory
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -136,6 +138,11 @@ class DialogFragment : BaseFragment() {
                     Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                             com.squareup.picasso.LruCache(c!!).set(avatar!!, bitmap!!)
+//                            val options = BitmapFactory.Options()
+//                            options.inMutable = false
+//                            val avatarFactory = AvatarDrawableFactory(c!!.resources)
+//                            val avatarDrawable =
+//                                avatarFactory.getRoundedAvatarDrawable(bitmap)
                             t.setLogo(BitmapDrawable(bitmap))
                         }
 

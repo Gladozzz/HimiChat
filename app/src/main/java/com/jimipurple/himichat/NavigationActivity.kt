@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -39,6 +40,7 @@ import com.google.gson.Gson
 import com.jimipurple.himichat.models.User
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.Picasso
+import net.sectorsieteg.avatars.AvatarDrawableFactory
 import com.squareup.picasso.LruCache as PicLruCache
 
 class NavigationActivity : BaseActivity() {
@@ -161,7 +163,12 @@ class NavigationActivity : BaseActivity() {
                             Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                                 override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                                     com.squareup.picasso.LruCache(applicationContext!!).set(avatar, bitmap!!)
-                                    bar.setLogo(BitmapDrawable(bitmap))
+                                    val options = BitmapFactory.Options()
+                                    options.inMutable = false
+                                    val avatarFactory = AvatarDrawableFactory(resources)
+                                    val avatarDrawable =
+                                        avatarFactory.getRoundedAvatarDrawable(bitmap)
+                                    bar.setLogo(avatarDrawable)
                                 }
 
                                 override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
@@ -416,8 +423,13 @@ class NavigationActivity : BaseActivity() {
                         .load(url)
                         .into(object : CustomTarget<Bitmap>(){
                             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                navHeaderAvatarView.setImageBitmap(resource)
                                 PicLruCache(applicationContext).set(newAvatar, resource)
+//                                val options = BitmapFactory.Options()
+//                                options.inMutable = false
+//                                val avatarFactory = AvatarDrawableFactory(resources)
+//                                val avatarDrawable =
+//                                    avatarFactory.getRoundedAvatarDrawable(resource)
+                                navHeaderAvatarView.setImageBitmap(resource)
                                 Log.i("navProfile", "bitmap from $url is loaded and set to imageView")
                             }
                             override fun onLoadCleared(placeholder: Drawable?) {

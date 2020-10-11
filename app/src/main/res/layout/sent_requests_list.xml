@@ -23,7 +23,7 @@
 <!--                android:maxHeight="1dp"-->
 <!--                app:srcCompat="@drawable/defaultavatar" />-->
 
-        <cn.carbs.android.avatarimageview.library.AvatarImageView
+        <ImageView
             android:id="@+id/avatarSentRequest"
             android:layout_width="100dp"
             android:layout_height="100dp"

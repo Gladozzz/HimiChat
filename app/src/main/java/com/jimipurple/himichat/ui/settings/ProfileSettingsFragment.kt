@@ -5,6 +5,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
@@ -20,6 +21,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -35,7 +37,12 @@ import com.jimipurple.himichat.data.FirebaseSource
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.LruCache
+import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
+import kotlinx.android.synthetic.main.profile_settings_fragment.nicknameEdit
+import kotlinx.android.synthetic.main.profile_settings_fragment.nicknameInput
+import kotlinx.android.synthetic.main.profile_settings_fragment.realnameEdit
+import net.sectorsieteg.avatars.AvatarDrawableFactory
 
 
 class ProfileSettingsFragment : BaseFragment() {
@@ -245,9 +252,18 @@ class ProfileSettingsFragment : BaseFragment() {
                 .into(object : CustomTarget<Bitmap>(){
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         try {
+//                                avatarView.setImageBitmap(resource)
+//                                LruCache(c!!).set(avatar!!, resource)
+//                                SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
+//                                Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
+
+//                            val options = BitmapFactory.Options()
+//                            options.inMutable = false
+//                            val avatarFactory = AvatarDrawableFactory(c!!.resources)
+//                            val avatarDrawable =
+//                                avatarFactory.getRoundedAvatarDrawable(resource)
                             avatarView.setImageBitmap(resource)
                             LruCache(c!!).set(avatar!!, resource)
-                            SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
                             Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
                         } catch (e: Exception) {
                             Log.e("Profile", "e " + e.message)

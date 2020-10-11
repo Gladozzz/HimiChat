@@ -24,15 +24,18 @@
 <!--                android:maxHeight="1dp"-->
 <!--                app:srcCompat="@drawable/defaultavatar" />-->
 
-        <cn.carbs.android.avatarimageview.library.AvatarImageView
+        <com.liangfeizc.avatarview.AvatarView
             android:id="@+id/avatarFriend"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="start"
             android:maxWidth="1dp"
             android:maxHeight="1dp"
-            app:srcCompat="@drawable/defaultavatar"
-            style="primaryAvatarStyle"/>
+            app:border_width="4dp"
+            app:border_color="@android:color/white"
+            app:shadow_width="4dp"
+            app:shadow_color="@color/colorPrimary"
+            android:src="@drawable/defaultavatar"/>
 
         <LinearLayout
                 android:layout_width="wrap_content"

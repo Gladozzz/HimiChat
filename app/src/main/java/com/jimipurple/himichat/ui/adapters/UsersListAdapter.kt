@@ -2,6 +2,7 @@ package com.jimipurple.himichat.ui.adapters
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
@@ -11,15 +12,17 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.RecyclerView
-import cn.carbs.android.avatarimageview.library.AvatarImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.data.FirebaseSource
 import com.jimipurple.himichat.models.*
+import com.liangfeizc.avatarview.AvatarView
 import com.squareup.picasso.LruCache
+import net.sectorsieteg.avatars.AvatarDrawableFactory
 
 class UsersListAdapter(
     val context: Context,
@@ -59,7 +62,7 @@ class UsersListAdapter(
 
         private val name = itemView.findViewById(R.id.nameUsers) as TextView
         private val realName = itemView.findViewById(R.id.realNameUsers) as TextView
-        private val avatar = itemView.findViewById(R.id.avatarUsers) as AvatarImageView
+        private val avatar = itemView.findViewById(R.id.avatarUsers) as AvatarView
         private val favoriteButton = itemView.findViewById(R.id.favoriteButton) as ImageButton
 
         fun bind(item: User) {
@@ -115,11 +118,13 @@ class UsersListAdapter(
                                     resource: Bitmap,
                                     transition: Transition<in Bitmap>?
                                 ) {
-                                    avatar.setImageBitmap(resource)
-                                    LruCache(context.applicationContext).set(
-                                        url.toString(),
-                                        resource
-                                    )
+                                    val options = BitmapFactory.Options()
+                                    options.inMutable = false
+                                    val avatarFactory = AvatarDrawableFactory(context.resources)
+                                    val avatarDrawable =
+                                        avatarFactory.getRoundedAvatarDrawable(resource)
+                                    avatar.setImageDrawable(avatarDrawable)
+                                    LruCache(context).set(url.toString(), avatarDrawable.toBitmap())
                                 }
 
                                 override fun onLoadCleared(placeholder: Drawable?) {
