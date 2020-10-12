@@ -2,11 +2,13 @@ package com.jimipurple.himichat.ui.settings
 
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -30,6 +32,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.jimipurple.himichat.BaseFragment
 import com.jimipurple.himichat.NavigationActivity
 import com.jimipurple.himichat.R
@@ -37,12 +40,15 @@ import com.jimipurple.himichat.data.FirebaseSource
 import com.jimipurple.himichat.db.MessagesDBHelper
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.LruCache
+import com.squareup.picasso.RequestCreator
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.profile_settings_fragment.*
 import kotlinx.android.synthetic.main.profile_settings_fragment.nicknameEdit
 import kotlinx.android.synthetic.main.profile_settings_fragment.nicknameInput
 import kotlinx.android.synthetic.main.profile_settings_fragment.realnameEdit
 import net.sectorsieteg.avatars.AvatarDrawableFactory
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 
 class ProfileSettingsFragment : BaseFragment() {
@@ -163,12 +169,12 @@ class ProfileSettingsFragment : BaseFragment() {
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
                 )
             } else {
-                Log.e("settingsFragment", "PERMISSION GRANTED")
+                Log.i(tag, "load PERMISSION GRANTED")
                 val i = Intent(
                     Intent.ACTION_PICK,
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
-                startActivityForResult(i, RESULT_LOAD_IMAGE)
+                this.startActivityForResult(i, RESULT_LOAD_IMAGE)
             }
         }
     }
@@ -252,16 +258,6 @@ class ProfileSettingsFragment : BaseFragment() {
                 .into(object : CustomTarget<Bitmap>(){
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         try {
-//                                avatarView.setImageBitmap(resource)
-//                                LruCache(c!!).set(avatar!!, resource)
-//                                SharedPreferencesUtility(c!!).putString("avatar", avatar!!)
-//                                Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
-
-//                            val options = BitmapFactory.Options()
-//                            options.inMutable = false
-//                            val avatarFactory = AvatarDrawableFactory(c!!.resources)
-//                            val avatarDrawable =
-//                                avatarFactory.getRoundedAvatarDrawable(resource)
                             avatarView.setImageBitmap(resource)
                             LruCache(c!!).set(avatar!!, resource)
                             Log.i("Profile", "bitmap from $avatar is loaded and set to imageView")
@@ -298,12 +294,17 @@ class ProfileSettingsFragment : BaseFragment() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     // start Activity if granted
-                    startActivityForResult(
-                        Intent(
-                            Intent.ACTION_PICK,
-                            MediaStore.Images.Media.INTERNAL_CONTENT_URI
-                        ), GET_FROM_GALLERY
+//                    this.startActivityForResult(
+//                        Intent(
+//                            Intent.ACTION_PICK,
+//                            MediaStore.Images.Media.INTERNAL_CONTENT_URI
+//                        ), GET_FROM_GALLERY
+//                    )
+                    val i = Intent(
+                        Intent.ACTION_PICK,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                     )
+                    this.startActivityForResult(i, RESULT_LOAD_IMAGE)
 
                 } else {
 
@@ -331,6 +332,124 @@ class ProfileSettingsFragment : BaseFragment() {
         if (savedInstanceState != null) {
             nicknameEdit.setText(savedInstanceState.getString("nickname"))
             realnameEdit.setText(savedInstanceState.getString("realName"))
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.i(tag, "onActivityResult $requestCode $resultCode $data")
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && null != data) {
+//        if (requestCode == RESULT_LOAD_IMAGE) {
+            Toast.makeText(c!!, R.string.toast_load_avatar_warning, Toast.LENGTH_LONG).show()
+            val selectedImage = data.data
+            val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
+
+            val cursor = c!!.contentResolver.query(
+                selectedImage!!,
+                filePathColumn, null, null, null
+            )
+            cursor!!.moveToFirst()
+
+            val columnIndex = cursor.getColumnIndex(filePathColumn[0])
+            val picturePath = cursor.getString(columnIndex)
+            cursor.close()
+            val outputStream = ByteArrayOutputStream()
+            var ref: StorageReference?
+            val rawImage : RequestCreator?
+            val setAvatar = {uri: Uri -> Unit
+                firestore!!.collection("users").document(mAuth!!.uid!!).update("avatar", uri.toString()).addOnCompleteListener { task1 ->
+                    try {
+                        val i = Log.i(
+                            "setAvatar",
+                            "result " + task1.result?.toString()
+                        )
+                        if (task1.isSuccessful) {
+                            Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_complete), Toast.LENGTH_SHORT).show()
+                            updateAvatar()
+                            val a = requireActivity()
+                            if (a is NavigationActivity) {
+                                a.updateAvatar()
+                            }
+                        } else {
+                            Toast.makeText(c!!.applicationContext, resources.getText(R.string.toast_load_avatar_error), Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.i("setAvatar", "error " + e.message)
+                    }
+                }
+            }
+            Glide.with(this)
+                .asBitmap()
+                .load(File(picturePath.trim()))
+                .override(500, 500)
+                .into(object : CustomTarget<Bitmap>(){
+                    override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
+                        when {
+                            picturePath.endsWith(".png", true) -> {
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                                storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg").delete().addOnCompleteListener {
+                                    ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".png")
+                                    ref!!.putBytes(outputStream.toByteArray())
+                                        .addOnSuccessListener {
+                                            ref!!.downloadUrl.addOnSuccessListener { uri ->
+                                                Log.i("avatar_load", "onSuccess: uri= $uri")
+                                                Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
+                                                requireActivity().recreate()
+                                                setAvatar(uri)
+                                            }
+                                        }.addOnFailureListener {
+                                            Log.i("avatar_load", "onFailure: error= ${it.message}")
+                                        }
+                                }
+                            }
+                            picturePath.endsWith(".jpg", true) -> {
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                                storage.reference.child("avatars/" + mAuth!!.uid!! + ".png").delete().addOnCompleteListener {
+                                    ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
+                                    ref!!.putBytes(outputStream.toByteArray())
+                                        .addOnSuccessListener {
+                                            ref!!.downloadUrl.addOnSuccessListener { uri ->
+                                                Log.i("avatar_load", "onSuccess: uri= $uri")
+                                                Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
+                                                setAvatar(uri)
+                                            }
+                                        }.addOnFailureListener {
+                                            Log.i("avatar_load", "onFailure: error= ${it.message}")
+                                        }
+                                }
+                            }
+                            picturePath.endsWith(".jpeg", true) -> {
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                                storage.reference.child("avatars/" + mAuth!!.uid!! + ".png").delete().addOnCompleteListener {
+                                    ref = storage.reference.child("avatars/" + mAuth!!.uid!! + ".jpg")
+                                    ref!!.putBytes(outputStream.toByteArray())
+                                        .addOnSuccessListener {
+                                            ref!!.downloadUrl.addOnSuccessListener { uri ->
+                                                Log.i("avatar_load", "onSuccess: uri= $uri")
+                                                Toast.makeText(requireContext(), R.string.toast_load_avatar_complete, Toast.LENGTH_LONG).show()
+                                                setAvatar(uri)
+                                            }
+                                        }.addOnFailureListener {
+                                            Log.i("avatar_load", "onFailure: error= ${it.message}")
+                                        }
+                                }
+                            }
+                        }
+                    }
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        // this is called when imageView is cleared on lifecycle call or for
+                        // some other reason.
+                        // if you are referencing the bitmap somewhere else too other than this imageView
+                        // clear it here as you can no longer have the bitmap
+                    }
+
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        super.onLoadFailed(errorDrawable)
+                        Log.e("avatar_load", "Загрузка изображения не удалась $picturePath")
+                        Toast.makeText(requireContext(), R.string.toast_load_avatar_error, Toast.LENGTH_LONG).show()
+                    }
+                })
         }
     }
 }

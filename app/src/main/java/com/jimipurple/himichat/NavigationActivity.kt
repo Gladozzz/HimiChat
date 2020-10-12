@@ -1,6 +1,7 @@
 package com.jimipurple.himichat
 
 import android.Manifest
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -11,14 +12,13 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -27,6 +27,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -35,15 +36,21 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
 import com.jimipurple.himichat.models.User
+import com.jimipurple.himichat.ui.settings.SettingsFragment
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
 import net.sectorsieteg.avatars.AvatarDrawableFactory
+import java.io.ByteArrayOutputStream
+import java.io.File
 import com.squareup.picasso.LruCache as PicLruCache
 
 class NavigationActivity : BaseActivity() {
+
+    private val tag = "NavigationActivity"
 
     private val NAVIGATE_TO_SENDER = 6
     private val RESULT_LOAD_IMAGE = 1
@@ -117,7 +124,7 @@ class NavigationActivity : BaseActivity() {
         navView.getHeaderView(0)
         updateAvatar()
 
-        fbSource!!.isAdmin(fbSource!!.uid()!!, {isAdmin ->
+        fbSource!!.isAdmin(fbSource!!.uid()!!, { isAdmin ->
             if (isAdmin) {
                 navView.menu.findItem(R.id.nav_friends).isVisible = false
                 navView.menu.findItem(R.id.nav_users).isVisible = true
@@ -161,8 +168,14 @@ class NavigationActivity : BaseActivity() {
                             bar.setLogo(BitmapDrawable(bitmap))
                         } else {
                             Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                    com.squareup.picasso.LruCache(applicationContext!!).set(avatar, bitmap!!)
+                                override fun onBitmapLoaded(
+                                    bitmap: Bitmap?,
+                                    from: Picasso.LoadedFrom?
+                                ) {
+                                    com.squareup.picasso.LruCache(applicationContext!!).set(
+                                        avatar,
+                                        bitmap!!
+                                    )
                                     val options = BitmapFactory.Options()
                                     options.inMutable = false
                                     val avatarFactory = AvatarDrawableFactory(resources)
@@ -173,8 +186,14 @@ class NavigationActivity : BaseActivity() {
 
                                 override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
-                                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                                    Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                                override fun onBitmapFailed(
+                                    e: Exception?,
+                                    errorDrawable: Drawable?
+                                ) {
+                                    Log.i(
+                                        "Profile",
+                                        "Загрузка изображения не удалась " + url + "\n" + e?.message
+                                    )
                                 }
                             })
                         }
@@ -293,15 +312,27 @@ class NavigationActivity : BaseActivity() {
                             bar.setLogo(BitmapDrawable(bitmap))
                         } else {
                             Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                    com.squareup.picasso.LruCache(applicationContext!!).set(avatar, bitmap!!)
+                                override fun onBitmapLoaded(
+                                    bitmap: Bitmap?,
+                                    from: Picasso.LoadedFrom?
+                                ) {
+                                    com.squareup.picasso.LruCache(applicationContext!!).set(
+                                        avatar,
+                                        bitmap!!
+                                    )
                                     bar.setLogo(BitmapDrawable(bitmap))
                                 }
 
                                 override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
-                                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                                    Log.i("Profile", "Загрузка изображения не удалась " + url + "\n" + e?.message)
+                                override fun onBitmapFailed(
+                                    e: Exception?,
+                                    errorDrawable: Drawable?
+                                ) {
+                                    Log.i(
+                                        "Profile",
+                                        "Загрузка изображения не удалась " + url + "\n" + e?.message
+                                    )
                                 }
                             })
                         }
@@ -421,8 +452,11 @@ class NavigationActivity : BaseActivity() {
                     val b = Glide.with(this)
                         .asBitmap()
                         .load(url)
-                        .into(object : CustomTarget<Bitmap>(){
-                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
                                 PicLruCache(applicationContext).set(newAvatar, resource)
 //                                val options = BitmapFactory.Options()
 //                                options.inMutable = false
@@ -430,14 +464,20 @@ class NavigationActivity : BaseActivity() {
 //                                val avatarDrawable =
 //                                    avatarFactory.getRoundedAvatarDrawable(resource)
                                 navHeaderAvatarView.setImageBitmap(resource)
-                                Log.i("navProfile", "bitmap from $url is loaded and set to imageView")
+                                Log.i(
+                                    "navProfile",
+                                    "bitmap from $url is loaded and set to imageView"
+                                )
                             }
+
                             override fun onLoadCleared(placeholder: Drawable?) {
                                 // this is called when imageView is cleared on lifecycle call or for
                                 // some other reason.
                                 // if you are referencing the bitmap somewhere else too other than this imageView
                                 // clear it here as you can no longer have the bitmap
-                                navHeaderAvatarView.setImageBitmap(resources.getDrawable(R.drawable.defaultavatar).toBitmap())
+                                navHeaderAvatarView.setImageBitmap(
+                                    resources.getDrawable(R.drawable.defaultavatar).toBitmap()
+                                )
                             }
 
                             override fun onLoadFailed(errorDrawable: Drawable?) {
@@ -453,8 +493,10 @@ class NavigationActivity : BaseActivity() {
     }
 
     private fun setupPermissions() {
-        val permission = ContextCompat.checkSelfPermission(this,
-            Manifest.permission.READ_EXTERNAL_STORAGE)
+        val permission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             Log.i("SettingsActivity", "Permission to read storage denied")
@@ -463,14 +505,16 @@ class NavigationActivity : BaseActivity() {
     }
 
     private fun makeRequest() {
-        ActivityCompat.requestPermissions(this,
+        ActivityCompat.requestPermissions(
+            this,
             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
+            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
+        )
     }
 
     override fun onStart() {
         super.onStart()
-        fun usersToStrings(h : ArrayList<User>) : ArrayList<String> {
+        fun usersToStrings(h: ArrayList<User>) : ArrayList<String> {
             val s : ArrayList<String> = ArrayList<String>()
             h.forEach {
                 val gson = Gson()
@@ -480,19 +524,22 @@ class NavigationActivity : BaseActivity() {
             return s
         }
         val pref = SharedPreferencesUtility(applicationContext)
-        fbSource!!.getUser(fbSource!!.uid()!!, {user: User ->
+        fbSource!!.getUser(fbSource!!.uid()!!, { user: User ->
             Log.i("friendsTest", "friends ${user.friends}")
             if (user.friends != null && user.friends!!.isNotEmpty())
-            user.friends?.let { fbSource!!.getUsers(it, {users: List<User>? ->
-                val strings = usersToStrings(users as ArrayList<User>)
-                pref.putListString("friends", strings)
-                Log.i("friendsTest", "friends was took from server")
-            }) }
+                user.friends?.let {
+                    fbSource!!.getUsers(it, { users: List<User>? ->
+                        val strings = usersToStrings(users as ArrayList<User>)
+                        pref.putListString("friends", strings)
+                        Log.i("friendsTest", "friends was took from server")
+                    })
+                }
         })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.i(tag, "onActivityResult $requestCode $resultCode $data")
         when (requestCode) {
             NAVIGATE_TO_SENDER -> {
                 val sender = data!!.getBundleExtra("sender")!!
@@ -519,31 +566,31 @@ class NavigationActivity : BaseActivity() {
 //        outState?.putSerializable("logo", toolbar!!.logo)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>, grantResults: IntArray
-    ) {
-        when (requestCode) {
-            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE -> {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // start Activity if granted
-                    startActivityForResult(
-                        Intent(
-                            Intent.ACTION_PICK,
-                            MediaStore.Images.Media.INTERNAL_CONTENT_URI
-                        ), GET_FROM_GALLERY
-                    )
-
-                } else {
-                    Log.i("SettingsActivity", " no permission to load avatar from storage")
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return
-            }
-        }// other 'case' lines to check for other
-        // permissions this app might request
-    }
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<String>, grantResults: IntArray
+//    ) {
+//        when (requestCode) {
+//            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE -> {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                    // start Activity if granted
+//                    startActivityForResult(
+//                        Intent(
+//                            Intent.ACTION_PICK,
+//                            MediaStore.Images.Media.INTERNAL_CONTENT_URI
+//                        ), RESULT_LOAD_IMAGE
+//                    )
+//
+//                } else {
+//                    Log.i("SettingsActivity", " no permission to load avatar from storage")
+//                    // permission denied, boo! Disable the
+//                    // functionality that depends on this permission.
+//                }
+//                return
+//            }
+//        }// other 'case' lines to check for other
+//        // permissions this app might request
+//    }
 }

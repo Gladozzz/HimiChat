@@ -97,43 +97,6 @@ open class BaseFragment : Fragment() {
         firebaseToken = c!!.getSharedPreferences("com.jimipurple.himichat.prefs", 0).getString("firebaseToken", "")!!
     }
 
-//    @VisibleForTesting
-//    val progressDialog by lazy {
-//        ProgressDialog(c)
-//    }
-
-//    override fun onResume() {
-//        super.onResume()
-//        mMyApp!!.currentActivity = this
-//    }
-
-//    override fun onPause() {
-//        clearReferences()
-//        super.onPause()
-//    }
-
-//    override fun onDestroy() {
-//        clearReferences()
-//        super.onDestroy()
-//    }
-
-//    private fun clearReferences() {
-//        val currActivity = mMyApp!!.currentActivity
-//        if (this == currActivity) mMyApp!!.currentActivity = null
-//    }
-
-//    fun showProgressDialog() {
-//        progressDialog.setMessage(getString(R.string.loading))
-//        progressDialog.isIndeterminate = true
-//        progressDialog.show()
-//    }
-
-//    private fun hideProgressDialog() {
-//        if (progressDialog.isShowing) {
-//            progressDialog.dismiss()
-//        }
-//    }
-
     fun hideKeyboard(view: View) {
         val imm = c!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)

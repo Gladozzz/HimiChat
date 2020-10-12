@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -157,6 +158,7 @@ class DialogFragment : BaseFragment() {
                     })
                 }
             } else {
+                t.setLogo(resources.getDrawable(R.drawable.defaultavatar))
                 Log.i("Profile", "avatar wasn't received")
             }
         }

@@ -16,6 +16,7 @@ import com.google.firebase.firestore.*
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
+import com.google.firebase.storage.FirebaseStorage
 import com.jimipurple.himichat.LoginActivity
 import com.jimipurple.himichat.R
 import com.jimipurple.himichat.db.KeysDBHelper
@@ -40,6 +41,9 @@ class FirebaseSource(context: Context) {
     }
     val firebaseAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
+    }
+    val storage: FirebaseStorage by lazy {
+        FirebaseStorage.getInstance()
     }
 
     init {
