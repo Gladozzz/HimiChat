@@ -77,6 +77,30 @@
         <item name="android:foregroundTint">?attr/primary</item>
     </style>
 
+    <style name="primaryAvatarStyle">
+        <item name="shadow_color">@color/colorPrimaryDark</item>
+        <item name="shadow_width">10dp</item>
+        <item name="border_color">@color/colorPrimary</item>
+        <item name="border_width">10dp</item>
+        <item name="android:src">@drawable/defaultavatar</item>
+    </style>
+
+    <style name="smallAvatarStyle">
+        <item name="shadow_color">@color/colorPrimaryDark</item>
+        <item name="shadow_width">4dp</item>
+        <item name="border_color">@color/colorPrimary</item>
+        <item name="border_width">4dp</item>
+        <item name="android:src">@drawable/defaultavatar</item>
+    </style>
+
+    <style name="toolbarAvatarStyle">
+        <item name="shadow_color">@color/colorPrimaryDark</item>
+        <item name="shadow_width">1dp</item>
+        <item name="border_color">@color/colorPrimary</item>
+        <item name="border_width">1dp</item>
+        <item name="android:src">@drawable/defaultavatar</item>
+    </style>
+
     <style name="TextButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">?attr/primaryTextColor</item>
     </style>

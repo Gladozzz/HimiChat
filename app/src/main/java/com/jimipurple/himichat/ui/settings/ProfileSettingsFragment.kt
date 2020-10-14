@@ -298,7 +298,7 @@ class ProfileSettingsFragment : BaseFragment() {
 //                        Intent(
 //                            Intent.ACTION_PICK,
 //                            MediaStore.Images.Media.INTERNAL_CONTENT_URI
-//                        ), GET_FROM_GALLERY
+//                        ), RESULT_LOAD_IMAGE
 //                    )
                     val i = Intent(
                         Intent.ACTION_PICK,
@@ -340,7 +340,6 @@ class ProfileSettingsFragment : BaseFragment() {
         Log.i(tag, "onActivityResult $requestCode $resultCode $data")
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && null != data) {
-//        if (requestCode == RESULT_LOAD_IMAGE) {
             Toast.makeText(c!!, R.string.toast_load_avatar_warning, Toast.LENGTH_LONG).show()
             val selectedImage = data.data
             val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
@@ -360,7 +359,7 @@ class ProfileSettingsFragment : BaseFragment() {
             val setAvatar = {uri: Uri -> Unit
                 firestore!!.collection("users").document(mAuth!!.uid!!).update("avatar", uri.toString()).addOnCompleteListener { task1 ->
                     try {
-                        val i = Log.i(
+                        Log.i(
                             "setAvatar",
                             "result " + task1.result?.toString()
                         )

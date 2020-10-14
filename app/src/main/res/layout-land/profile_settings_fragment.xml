@@ -24,10 +24,7 @@
         android:layout_margin="8dp"
         android:layout_weight="50"
         android:src="@drawable/defaultavatar"
-        app:border_width="10dp"
-        app:border_color="@android:color/white"
-        app:shadow_width="10dp"
-        app:shadow_color="@color/colorPrimary" />
+        style="@style/primaryAvatarStyle"/>
 
     <ScrollView
         android:layout_width="match_parent"

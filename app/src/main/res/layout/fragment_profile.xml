@@ -10,27 +10,13 @@
     android:weightSum="100"
     tools:context=".ui.profile.ProfileFragment">
 
-<!--    <ImageView-->
-<!--        android:id="@+id/profileAvatarView"-->
-<!--        style="primaryAvatarStyle"-->
-<!--        android:layout_width="300dp"-->
-<!--        android:layout_height="300dp"-->
-<!--        android:layout_gravity="center|top"-->
-<!--        android:layout_margin="8dp"-->
-<!--        android:foregroundGravity="center"-->
-<!--        app:srcCompat="@drawable/defaultavatar" />-->
-
     <com.liangfeizc.avatarview.AvatarView
         android:id="@+id/profileAvatarView"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_gravity="center|top"
         android:layout_margin="8dp"
-        app:border_width="10dp"
-        app:border_color="@android:color/white"
-        app:shadow_width="10dp"
-        app:shadow_color="@color/colorPrimary"
-        android:src="@drawable/defaultavatar" />
+        style="@style/primaryAvatarStyle"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/nicknameInput"
