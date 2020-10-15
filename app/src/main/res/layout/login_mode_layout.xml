@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/primaryDark"
+    android:background="?attr/primaryBackground"
     android:foregroundGravity="center"
     android:gravity="center"
     android:orientation="vertical"
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/primaryInputStyle"
-            app:boxBackgroundColor="@color/colorPrimaryDarkBrighter">
+            app:boxBackgroundColor="@color/colorBackgroundBrighter">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/emailEdit"

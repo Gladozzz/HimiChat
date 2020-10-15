@@ -3,14 +3,15 @@
     <attr name="MessageInput" format="reference"/>
 
     <attr name="primary" format="color|reference"/>
-    <attr name="primaryDark" format="color|reference"/>
-    <attr name="primaryDarkBrighter" format="color|reference"/>
+    <attr name="primaryBackground" format="color|reference"/>
+    <attr name="primaryBackgroundBrighter" format="color|reference"/>
+    <attr name="primaryLight" format="color|reference"/>
     <attr name="accent" format="color|reference"/>
     <attr name="primaryTextColor" format="color|reference"/>
+    <attr name="secondaryTextColor" format="color|reference"/>
     <attr name="сloudSent" format="color|reference"/>
     <attr name="сloudReceived" format="color|reference"/>
     <attr name="dateViewShape" format="color|reference"/>
-    <attr name="darkTextColor" format="color"/>
 
     <declare-styleable name="MessageInput">
         <attr name="inputButtonBackground" format="reference"/>

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="?attr/primaryDark">
+    android:background="?attr/primaryBackground">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchUserInput"

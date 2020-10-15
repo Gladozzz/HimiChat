@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#43305E</color>
+    <color name="colorPrimaryDark">#512DA8</color>
+    <color name="colorPrimaryLight">#D1C4E9</color>
     <color name="colorCloudSent">#3C3C4C</color>
     <color name="colorCloudReceived">#2F2F3C</color>
-    <color name="colorPrimaryDark">#1A1A22</color>
-    <color name="colorPrimaryDarkBrighter">#252530</color>
-    <color name="colorAccent">#95E5F0</color>
+    <color name="colorBackground">#1A1A22</color>
+    <color name="colorBackgroundBrighter">#21212B</color>
+    <color name="colorAccent">#00BCD4</color>
     <color name="colorAccentDark">#114471</color>
 
     <color name="colorPrimaryDay">#43305E</color>
+    <color name="colorPrimaryDarkDay">#512DA8</color>
+    <color name="colorPrimaryLightDay">#D1C4E9</color>
     <color name="colorCloudSentDay">#D5D5E8</color>
     <color name="colorCloudReceivedDay">#C0C0D1</color>
-    <color name="colorPrimaryDarkDay">#E7E4EC</color>
-    <color name="colorPrimaryDarkBrighterDay">#CBE7E4EC</color>
-    <color name="colorAccentDay">#95E5F0</color>
+    <color name="colorBackgroundDay">#E7E4EC</color>
+    <color name="colorPrimaryDarkBrighterDay">#DCD9E1</color>
+    <color name="colorAccentDay">#00BCD4</color>
     <color name="colorAccentDarkDay">#114471</color>
 
     <color name="white">#ffffff</color>

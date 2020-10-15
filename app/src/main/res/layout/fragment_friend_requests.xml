@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.friends.FriendRequestsFragment"
-        android:background="?attr/primaryDark">
+        android:background="?attr/primaryBackground">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendRequests"

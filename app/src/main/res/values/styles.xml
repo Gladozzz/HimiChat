@@ -5,17 +5,18 @@
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorBackground</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="primary">@color/colorPrimary</item>
-        <item name="primaryDark">@color/colorPrimaryDark</item>
-        <item name="primaryDarkBrighter">#21212B</item>
+        <item name="primaryLight">@color/colorPrimaryLight</item>
+        <item name="primaryBackground">@color/colorBackground</item>
+        <item name="primaryBackgroundBrighter">@color/colorBackgroundBrighter</item>
         <item name="accent">@color/colorAccent</item>
         <item name="primaryTextColor">@color/white</item>
         <item name="сloudSent">@drawable/sent_message_cloud</item>
         <item name="сloudReceived">@drawable/received_message_cloud</item>
         <item name="dateViewShape">@drawable/date_view_shape</item>
-        <item name="darkTextColor">@color/dialog_date_text</item>
+        <item name="secondaryTextColor">@color/dialog_date_text</item>
 <!--        <item name="сloudSent">@color/colorCloudSent</item>-->
 <!--        <item name="сloudReceived">@color/colorCloudReceived</item>-->
     </style>
@@ -23,17 +24,18 @@
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="colorPrimary">@color/colorPrimaryDay</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDarkDay</item>
+        <item name="colorPrimaryDark">@color/colorBackgroundDay</item>
         <item name="colorAccent">@color/colorAccentDay</item>
         <item name="primary">@color/colorPrimaryDay</item>
-        <item name="primaryDark">#E7E4EC</item>
-        <item name="primaryDarkBrighter">#DCD9E1</item>
+        <item name="primaryLight">@color/colorPrimaryLightDay</item>
+        <item name="primaryBackground">@color/colorBackgroundDay</item>
+        <item name="primaryBackgroundBrighter">@color/colorPrimaryDarkBrighterDay</item>
         <item name="accent">@color/colorAccentDay</item>
-        <item name="primaryTextColor">@color/black</item>
+        <item name="primaryTextColor">#212121</item>
         <item name="сloudSent">@drawable/sent_message_cloud_day</item>
         <item name="сloudReceived">@drawable/received_message_cloud_day</item>
         <item name="dateViewShape">@drawable/date_view_shape_day</item>
-        <item name="darkTextColor">@color/dark_gray</item>
+        <item name="secondaryTextColor">@color/dark_gray</item>
 <!--        <item name="сloudSent">@color/colorCloudSentDay</item>-->
 <!--        <item name="сloudReceived">@color/colorCloudReceivedDay</item>-->
     </style>
@@ -61,7 +63,7 @@
 
     <style name="primaryInputStyle" parent="Widget.Design.TextInputLayout">
         <item name="android:layout_margin">8dp</item>
-        <item name="boxBackgroundColor">@color/colorPrimaryDarkBrighter</item>
+        <item name="boxBackgroundColor">@color/colorBackgroundBrighter</item>
         <item name="android:textColor">?attr/primaryTextColor</item>
         <item name="android:textColorHint">?attr/primaryTextColor</item>
         <item name="passwordToggleTint">?attr/primaryTextColor</item>
@@ -78,7 +80,7 @@
     </style>
 
     <style name="primaryAvatarStyle">
-        <item name="shadow_color">@color/colorPrimaryDark</item>
+        <item name="shadow_color">@color/colorBackground</item>
         <item name="shadow_width">10dp</item>
         <item name="border_color">@color/colorPrimary</item>
         <item name="border_width">10dp</item>
@@ -86,7 +88,7 @@
     </style>
 
     <style name="smallAvatarStyle">
-        <item name="shadow_color">@color/colorPrimaryDark</item>
+        <item name="shadow_color">@color/colorBackground</item>
         <item name="shadow_width">4dp</item>
         <item name="border_color">@color/colorPrimary</item>
         <item name="border_width">4dp</item>
@@ -94,7 +96,7 @@
     </style>
 
     <style name="toolbarAvatarStyle">
-        <item name="shadow_color">@color/colorPrimaryDark</item>
+        <item name="shadow_color">@color/colorBackground</item>
         <item name="shadow_width">1dp</item>
         <item name="border_color">@color/colorPrimary</item>
         <item name="border_width">1dp</item>

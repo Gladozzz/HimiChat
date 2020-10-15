@@ -1,25 +1,17 @@
 package com.jimipurple.himichat.ui.friends
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.firestore.FieldPath
 import com.jimipurple.himichat.*
 import com.jimipurple.himichat.ui.adapters.FriendRequestsListAdapter
 import com.jimipurple.himichat.models.FriendRequest
 import com.jimipurple.himichat.models.User
-import com.jimipurple.himichat.ui.adapters.FriendsListAdapter
-import com.squareup.picasso.LruCache
 import kotlinx.android.synthetic.main.fragment_friend_requests.*
-import kotlinx.android.synthetic.main.fragment_profile.*
 
 
 class FriendRequestsFragment : BaseFragment() {
@@ -139,7 +131,7 @@ class FriendRequestsFragment : BaseFragment() {
             }
         }, cancel,  block, accept)
         friendRequests.adapter = adapterOfCached
-        reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
+        reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorBackground))
         sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
         fbSource!!.getUser(fbSource!!.uid()!!, { user ->
             Log.i("received_inv", "received ${user.receivedInvites}")
@@ -184,7 +176,7 @@ class FriendRequestsFragment : BaseFragment() {
 //            }
 //        }, cancel,  block, accept)
 //        friendRequests.adapter = adapterOfCached
-        reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
+        reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorBackground))
         sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
         fbSource!!.getUser(fbSource!!.uid()!!, { user ->
             Log.i("received_inv", "received ${user.sentInvites}")
@@ -229,7 +221,7 @@ class FriendRequestsFragment : BaseFragment() {
         }, cancel,  block, accept)
         friendRequests.adapter = adapterOfCached
         reсeivedButton.setBackgroundColor(resources.getColor(R.color.colorPrimary))
-        sentButton.setBackgroundColor(resources.getColor(R.color.colorPrimaryDark))
+        sentButton.setBackgroundColor(resources.getColor(R.color.colorBackground))
         firestore!!.collection("users").document(mAuth!!.uid!!).get().addOnCompleteListener{
             if (it.isSuccessful) {
                 val userData = it.result!!

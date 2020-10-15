@@ -37,6 +37,7 @@ import com.jimipurple.himichat.models.UndeliveredMessage
 import com.jimipurple.himichat.ui.adapters.MessageListAdapter
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.custom_toolbar.*
 import kotlinx.android.synthetic.main.fragment_dialog.*
 import net.sectorsieteg.avatars.AvatarDrawableFactory
 import java.util.*
@@ -119,6 +120,7 @@ class DialogFragment : BaseFragment() {
         messageList.layoutManager = linearLayoutManager
         title = nickname
         subtitle = resources.getString(R.string.offline)
+//        toolbarBox.visibility = View.VISIBLE
 
         app = c!!.applicationContext as MyApp
 //        this.setOffline()
@@ -135,6 +137,7 @@ class DialogFragment : BaseFragment() {
                 val bitmap = com.squareup.picasso.LruCache(c!!)[avatar!!]
                 if (bitmap != null) {
                     t.setLogo(BitmapDrawable(bitmap))
+//                    toolbarAvatar.setImageBitmap(bitmap)
                 } else {
                     Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
@@ -144,7 +147,8 @@ class DialogFragment : BaseFragment() {
 //                            val avatarFactory = AvatarDrawableFactory(c!!.resources)
 //                            val avatarDrawable =
 //                                avatarFactory.getRoundedAvatarDrawable(bitmap)
-                            t.setLogo(BitmapDrawable(bitmap))
+//                            t.setLogo(BitmapDrawable(bitmap))
+//                            toolbarAvatar.setImageBitmap(bitmap)
                         }
 
                         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}

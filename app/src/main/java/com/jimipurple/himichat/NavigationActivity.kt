@@ -132,6 +132,7 @@ class NavigationActivity : BaseActivity() {
         })
 
         val bar = supportActionBar
+        bar!!.setCustomView(R.layout.custom_toolbar)
         if (savedInstanceState != null) {
             val title = savedInstanceState.getCharSequence("title")
             val subtitle = savedInstanceState.getCharSequence("subtitle")
