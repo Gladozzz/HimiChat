@@ -4,7 +4,7 @@ This is demo app for representation my current skills.
 
 ## Installation
 
-You can download apk from this [link](https://1drv.ms/u/s!AsPXl4829pEzjcIPRQemmNDon_xL_g?e=7fiSNa).
+You can download apk from this [link](https://1drv.ms/u/s!AsPXl4829pEzjcIQ6Rmf514QrimHXg?e=i0MqbX).
 
 ## What is this app?
 
