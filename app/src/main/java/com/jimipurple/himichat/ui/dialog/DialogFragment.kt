@@ -1,5 +1,6 @@
 package com.jimipurple.himichat.ui.dialog
 
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,6 +17,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,9 +37,10 @@ import com.jimipurple.himichat.models.ReceivedMessage
 import com.jimipurple.himichat.models.SentMessage
 import com.jimipurple.himichat.models.UndeliveredMessage
 import com.jimipurple.himichat.ui.adapters.MessageListAdapter
+import com.liangfeizc.avatarview.AvatarView
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.custom_toolbar.*
+import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.fragment_dialog.*
 import net.sectorsieteg.avatars.AvatarDrawableFactory
 import java.util.*
@@ -66,11 +69,6 @@ class DialogFragment : BaseFragment() {
         subtitle = resources.getString(R.string.offline)
 
         app = c!!.applicationContext as MyApp
-//        this.setOffline()
-//        tbar!!.title = nickname
-//        tbar!!.setSubtitle(R.string.offline)
-//        ac = app!!.currentActivity!! as AppCompatActivity
-//        bar = ac!!.supportActionBar!!
 
         val himitsuID = c!!.getString(R.string.himitsu_id)
         if (friend_id != himitsuID) {
@@ -95,10 +93,8 @@ class DialogFragment : BaseFragment() {
                     val handler = Handler(c!!.mainLooper)
                     handler.post {
                         if (userOnline) {
-//                        tbar!!.setSubtitle(R.string.online)
                             setOnline()
                         } else {
-//                        tbar!!.setSubtitle(R.string.offline)
                             setOffline()
                         }
                     }
@@ -106,6 +102,7 @@ class DialogFragment : BaseFragment() {
             }
         } else {
             bot = HimitsuBotBehavior(c!!, id!!)
+            setOnline()
         }
     }
 
@@ -120,52 +117,8 @@ class DialogFragment : BaseFragment() {
         messageList.layoutManager = linearLayoutManager
         title = nickname
         subtitle = resources.getString(R.string.offline)
-//        toolbarBox.visibility = View.VISIBLE
 
         app = c!!.applicationContext as MyApp
-//        this.setOffline()
-//        tbar!!.title = nickname
-//        tbar!!.setSubtitle(R.string.offline)
-        val handler = Handler(c!!.mainLooper)
-        handler.post {
-            val act = app!!.currentActivity!!
-            val t = act.supportActionBar!!
-            t.title = nickname
-            t.setSubtitle(R.string.offline)
-            val url = Uri.parse(avatar)
-            if (url != null) {
-                val bitmap = com.squareup.picasso.LruCache(c!!)[avatar!!]
-                if (bitmap != null) {
-                    t.setLogo(BitmapDrawable(bitmap))
-//                    toolbarAvatar.setImageBitmap(bitmap)
-                } else {
-                    Picasso.get().load(url).into(object : com.squareup.picasso.Target {
-                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                            com.squareup.picasso.LruCache(c!!).set(avatar!!, bitmap!!)
-//                            val options = BitmapFactory.Options()
-//                            options.inMutable = false
-//                            val avatarFactory = AvatarDrawableFactory(c!!.resources)
-//                            val avatarDrawable =
-//                                avatarFactory.getRoundedAvatarDrawable(bitmap)
-//                            t.setLogo(BitmapDrawable(bitmap))
-//                            toolbarAvatar.setImageBitmap(bitmap)
-                        }
-
-                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                            Log.i(
-                                "Profile",
-                                "Загрузка изображения не удалась " + url + "\n" + e?.message
-                            )
-                        }
-                    })
-                }
-            } else {
-                t.setLogo(resources.getDrawable(R.drawable.defaultavatar))
-                Log.i("Profile", "avatar wasn't received")
-            }
-        }
         reloadMsgs()
         dialogMessageInput.button!!.setOnClickListener { onSendBtnClick() }
     }
@@ -184,8 +137,6 @@ class DialogFragment : BaseFragment() {
             FCMReceiver,
             IntentFilter(MessagingService.INTENT_FILTER)
         )
-//        bar!!.title = nickname
-//        bar!!.setSubtitle(R.string.offline)
     }
 
     override fun onDestroy() {
@@ -237,10 +188,8 @@ class DialogFragment : BaseFragment() {
                     val handler = Handler(c!!.mainLooper)
                     handler.post {
                         if (userOnline) {
-//                        tbar!!.setSubtitle(R.string.online)
                             setOnline()
                         } else {
-//                        tbar!!.setSubtitle(R.string.offline)
                             setOffline()
                         }
                     }
@@ -492,29 +441,31 @@ class DialogFragment : BaseFragment() {
     }
 
     private fun setOffline() {
-//        val act = requireActivity()
-//        val t = act.actionBar
         val act = app!!.currentActivity!!
         val t = act.supportActionBar!!
-        t.title = nickname
-        t.setSubtitle(R.string.offline)
+        t.setLogo(null)
+        t.title = ""
+        t.subtitle = ""
+        (c!! as Activity).findViewById<TextView?>(R.id.customTitle)?.text = nickname
+        (c!! as Activity).findViewById<TextView?>(R.id.customSubtitle)?.text = resources.getString(R.string.offline)
     }
 
     private fun setOnline() {
-//        val act = requireActivity()
-//        val t = act.actionBar
         val act = app!!.currentActivity!!
         val t = act.supportActionBar!!
         val url = Uri.parse(avatar)
+        t.setLogo(null)
+        t.title = ""
+        t.subtitle = ""
         if (url != null) {
             val bitmap = com.squareup.picasso.LruCache(c!!)[avatar!!]
             if (bitmap != null) {
-                t.setLogo(BitmapDrawable(bitmap))
+                (c!! as Activity).findViewById<AvatarView?>(R.id.customAvatar)?.setImageBitmap(bitmap)
             } else {
                 Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         com.squareup.picasso.LruCache(c!!).set(avatar!!, bitmap!!)
-                        t.setLogo(BitmapDrawable(bitmap))
+                        (c!! as Activity).findViewById<AvatarView?>(R.id.customAvatar)?.setImageBitmap(bitmap)
                     }
 
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
@@ -530,8 +481,8 @@ class DialogFragment : BaseFragment() {
         } else {
             Log.i("Profile", "avatar wasn't received")
         }
-        t.title = nickname
-        t.setSubtitle(R.string.online)
+        (c!! as Activity).findViewById<TextView?>(R.id.customTitle)?.text = nickname
+        (c!! as Activity).findViewById<TextView?>(R.id.customSubtitle)?.text = resources.getString(R.string.online)
     }
 
     private val FCMReceiver = object : BroadcastReceiver() {

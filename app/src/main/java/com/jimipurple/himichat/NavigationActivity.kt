@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
+import android.view.View
 import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
@@ -35,6 +36,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
@@ -43,6 +45,7 @@ import com.jimipurple.himichat.ui.settings.SettingsFragment
 import com.jimipurple.himichat.utills.SharedPreferencesUtility
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
+import kotlinx.android.synthetic.main.app_bar_navigation.*
 import net.sectorsieteg.avatars.AvatarDrawableFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -101,6 +104,7 @@ class NavigationActivity : BaseActivity() {
         setContentView(R.layout.activity_navigation)
 
         val toolbar: Toolbar? = findViewById(R.id.mytoolbar)
+        val appbar: AppBarLayout? = findViewById(R.id.appbar)
         setSupportActionBar(toolbar)
         overridePendingTransition(R.animator.fragment_fade_in, R.animator.fragment_fade_in)
 
@@ -132,7 +136,6 @@ class NavigationActivity : BaseActivity() {
         })
 
         val bar = supportActionBar
-        bar!!.setCustomView(R.layout.custom_toolbar)
         if (savedInstanceState != null) {
             val title = savedInstanceState.getCharSequence("title")
             val subtitle = savedInstanceState.getCharSequence("subtitle")
@@ -148,11 +151,12 @@ class NavigationActivity : BaseActivity() {
         }
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             Log.i("navController", "called " + destination.label)
-            when(destination.id) {
+            when (destination.id) {
                 R.id.nav_dialogues -> {
                     bar!!.setTitle(R.string.menu_dialogues)
                     bar.subtitle = ""
                     bar.setLogo(null)
+                    toolbarBox.visibility = View.GONE
                 }
                 R.id.nav_dialog -> {
                     Log.i("navController", "arg " + arguments?.get("nickname"))
@@ -160,14 +164,17 @@ class NavigationActivity : BaseActivity() {
                     bar!!.setTitle(R.string.menu_dialog)
                     val title = arguments!!["nickname"] as String
                     val avatar = arguments["avatar"] as String
-                    bar.title = title
-                    bar.subtitle = resources.getString(R.string.offline)
+                    bar.title = ""
+                    bar.subtitle = ""
+                    customTitle.text = title
+                    customSubtitle.text = resources.getString(R.string.offline)
                     val url = Uri.parse(avatar)
                     if (url != null) {
                         val bitmap = com.squareup.picasso.LruCache(applicationContext)[avatar]
                         if (bitmap != null) {
                             bar.setLogo(BitmapDrawable(bitmap))
                         } else {
+                            toolbarBox.visibility = View.VISIBLE
                             Picasso.get().load(url).into(object : com.squareup.picasso.Target {
                                 override fun onBitmapLoaded(
                                     bitmap: Bitmap?,
@@ -177,12 +184,8 @@ class NavigationActivity : BaseActivity() {
                                         avatar,
                                         bitmap!!
                                     )
-                                    val options = BitmapFactory.Options()
-                                    options.inMutable = false
-                                    val avatarFactory = AvatarDrawableFactory(resources)
-                                    val avatarDrawable =
-                                        avatarFactory.getRoundedAvatarDrawable(bitmap)
-                                    bar.setLogo(avatarDrawable)
+                                    customAvatar.setImageBitmap(bitmap)
+                                    bar.setLogo(null)
                                 }
 
                                 override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
@@ -192,7 +195,7 @@ class NavigationActivity : BaseActivity() {
                                     errorDrawable: Drawable?
                                 ) {
                                     Log.i(
-                                        "Profile",
+                                        "navController",
                                         "Загрузка изображения не удалась " + url + "\n" + e?.message
                                     )
                                 }
@@ -206,26 +209,31 @@ class NavigationActivity : BaseActivity() {
                     bar!!.setTitle(R.string.menu_find_friend)
                     bar.subtitle = ""
                     bar.setLogo(null)
+                    toolbarBox.visibility = View.GONE
                 }
                 R.id.nav_friend_requests -> {
                     bar!!.setTitle(R.string.menu_friend_requests)
                     bar.subtitle = ""
                     bar.setLogo(null)
+                    toolbarBox.visibility = View.GONE
                 }
                 R.id.nav_profile -> {
                     bar!!.setTitle(R.string.menu_profile)
                     bar.subtitle = ""
                     bar.setLogo(null)
+                    toolbarBox.visibility = View.GONE
                 }
                 R.id.nav_friends -> {
                     bar!!.setTitle(R.string.menu_friends)
                     bar.subtitle = ""
                     bar.setLogo(null)
+                    toolbarBox.visibility = View.GONE
                 }
                 R.id.nav_settings -> {
                     bar!!.setTitle(R.string.menu_settings)
                     bar.subtitle = ""
                     bar.setLogo(null)
+                    toolbarBox.visibility = View.GONE
                 }
             }
         }
@@ -292,7 +300,7 @@ class NavigationActivity : BaseActivity() {
         }
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             Log.i("navController", "called " + destination.label)
-            when(destination.id) {
+            when (destination.id) {
                 R.id.nav_dialogues -> {
                     bar!!.setTitle(R.string.menu_dialogues)
                     bar.subtitle = ""
@@ -409,7 +417,7 @@ class NavigationActivity : BaseActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    fun updateAvatar(){
+    fun updateAvatar() {
         val navView: NavigationView = findViewById(R.id.nav_view)
         val parentView = navView.getHeaderView(0).rootView
 
@@ -515,8 +523,8 @@ class NavigationActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        fun usersToStrings(h: ArrayList<User>) : ArrayList<String> {
-            val s : ArrayList<String> = ArrayList<String>()
+        fun usersToStrings(h: ArrayList<User>): ArrayList<String> {
+            val s: ArrayList<String> = ArrayList<String>()
             h.forEach {
                 val gson = Gson()
                 val json = gson.toJson(it)
@@ -524,6 +532,7 @@ class NavigationActivity : BaseActivity() {
             }
             return s
         }
+
         val pref = SharedPreferencesUtility(applicationContext)
         fbSource!!.getUser(fbSource!!.uid()!!, { user: User ->
             Log.i("friendsTest", "friends ${user.friends}")

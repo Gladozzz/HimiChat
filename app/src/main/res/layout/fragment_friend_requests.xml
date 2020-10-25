@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.friends.FriendRequestsFragment"
-        android:background="?attr/primaryBackground">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.friends.FriendRequestsFragment"
+    android:background="?attr/primaryBackground">
 
     <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/friendRequests"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:visibility="visible"
-            app:layoutManager="LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@+id/reсeivedButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.363"
-            tools:listitem="@layout/received_requests_list" />
+        android:id="@+id/friendRequests"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:visibility="visible"
+        app:layoutManager="LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/receivedButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.363"
+        tools:listitem="@layout/received_requests_list" />
 
     <TextView
         android:id="@+id/emptyRequestsListMessage"
@@ -34,6 +34,7 @@
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
         android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:text="@string/label_empty_request_list"
         android:textColor="?attr/primaryTextColor"
         android:textSize="20sp"
@@ -42,24 +43,78 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-            android:id="@+id/reсeivedButton"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:background="@color/colorPrimary"
+    <RelativeLayout
+        android:id="@+id/receivedButton"
+        android:clickable="true"
+        android:background="@color/colorPrimary"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sentButton"
+        app:layout_constraintStart_toStartOf="parent"
+        android:focusable="true">
+        <TextView
+            android:id="@+id/receivedButtonImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:background="@drawable/badge_circle"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="0"
+            app:autoSizeMaxTextSize="100sp"
+            app:autoSizeMinTextSize="5sp"
+            app:autoSizeStepGranularity="2sp"
+            app:autoSizeTextType="uniform">
+        </TextView>
+        <TextView
+            android:id="@+id/receivedButtonText"
             android:text="@string/button_received"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/sentButton"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:textAppearance="?android:attr/textAppearanceButton"
+            android:layout_toEndOf="@id/receivedButtonImage"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"/>
+    </RelativeLayout>
 
-    <Button
-            android:id="@+id/sentButton"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:background="@color/colorPrimary"
+    <RelativeLayout
+        android:id="@+id/sentButton"
+        android:clickable="true"
+        android:background="@color/colorPrimary"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/receivedButton"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/sentButtonImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:background="@drawable/badge_circle"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="0"
+            app:autoSizeMaxTextSize="100sp"
+            app:autoSizeMinTextSize="5sp"
+            app:autoSizeStepGranularity="2sp"
+            app:autoSizeTextType="uniform" />
+        <TextView
+            android:id="@+id/sentButtonText"
             android:text="@string/button_sent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/reсeivedButton" />
+            android:textAppearance="?android:attr/textAppearanceButton"
+            android:layout_toEndOf="@id/sentButtonImage"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"/>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
