@@ -459,11 +459,11 @@ class FirebaseSource(context: Context) {
                             friends = userData.get("friends") as List<String>
                         }
                         var receivedInvites: List<String>? = null
-                        if (userData.get("friends") is List<*>) {
+                        if (userData.get("invited_by") is List<*>) {
                             receivedInvites = userData.get("invited_by") as List<String>
                         }
                         var sentInvites: List<String>? = null
-                        if (userData.get("friends") is List<*>) {
+                        if (userData.get("invites") is List<*>) {
                             sentInvites = userData.get("invites") as List<String>
                         }
                         var favorite: Boolean = false
@@ -508,11 +508,11 @@ class FirebaseSource(context: Context) {
                         friends = userData.get("friends") as List<String>?
                     }
                     var receivedInvites: List<String>? = null
-                    if (userData.get("friends") is List<*>) {
+                    if (userData.get("invited_by") is List<*>) {
                         receivedInvites = userData.get("invited_by") as List<String>
                     }
                     var sentInvites: List<String>? = null
-                    if (userData.get("friends") is List<*>) {
+                    if (userData.get("invites") is List<*>) {
                         sentInvites = userData.get("invites") as List<String>
                     }
                     var favorites: List<String>? = null

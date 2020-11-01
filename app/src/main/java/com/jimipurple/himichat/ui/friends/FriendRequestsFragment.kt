@@ -222,14 +222,19 @@ class FriendRequestsFragment : BaseFragment() {
                 if (user.receivedInvites!!.isEmpty()) {
                     emptyRequestsListMessage.visibility = View.VISIBLE
                     friendRequests.visibility = View.GONE
+                    friendRequests.adapter = FriendRequestsListAdapter(c!!, ArrayList(), object : FriendRequestsListAdapter.Callback {
+                        override fun onItemClicked(item: FriendRequest) {
+                            profile(item)
+                        }
+                    }, cancel,  block, accept)
                 } else {
                     emptyRequestsListMessage.visibility = View.GONE
                     friendRequests.visibility = View.VISIBLE
                     val users = ArrayList<FriendRequest>()
                     fbSource!!.getUsers(user.receivedInvites!!, { usersOfInvites ->
-                        if (usersOfInvites != null) {
+                        if (usersOfInvites != null && usersOfInvites.isNotEmpty()) {
                             for (userOfInvites in usersOfInvites) {
-                                users.add(FriendRequest(user.id, user.nickname, user.realName, user.avatar, true))
+                                users.add(FriendRequest(userOfInvites.id, userOfInvites.nickname, userOfInvites.realName, userOfInvites.avatar, true))
                             }
                         }
                         if (users.isNotEmpty()) {
@@ -280,6 +285,11 @@ class FriendRequestsFragment : BaseFragment() {
                 if (user.sentInvites!!.isEmpty()) {
                     emptyRequestsListMessage.visibility = View.VISIBLE
                     friendRequests.visibility = View.GONE
+                    friendRequests.adapter = FriendRequestsListAdapter(c!!, ArrayList(), object : FriendRequestsListAdapter.Callback {
+                        override fun onItemClicked(item: FriendRequest) {
+                            profile(item)
+                        }
+                    }, cancel,  block, accept)
                 } else {
                     emptyRequestsListMessage.visibility = View.GONE
                     friendRequests.visibility = View.VISIBLE
@@ -287,7 +297,7 @@ class FriendRequestsFragment : BaseFragment() {
                     fbSource!!.getUsers(user.sentInvites!!, { usersOfInvites ->
                         if (usersOfInvites != null) {
                             for (userOfInvites in usersOfInvites) {
-                                users.add(FriendRequest(user.id, user.nickname, user.realName, user.avatar, true))
+                                users.add(FriendRequest(userOfInvites.id, userOfInvites.nickname, userOfInvites.realName, userOfInvites.avatar, false))
                             }
                         }
                         if (users.isNotEmpty()) {
