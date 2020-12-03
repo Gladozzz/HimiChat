@@ -264,6 +264,7 @@ class DialogFragment : BaseFragment() {
         messageList.scrollToPosition(adapter.itemCount)
     }
 
+    // on this moment we need to check if interlocutor in SocketServer right now. If not, then message will be sending to Firebase.
     private fun onSendBtnClick() {
         val himitsuID = c!!.getString(R.string.himitsu_id)
         if (friend_id != himitsuID) {
@@ -290,6 +291,7 @@ class DialogFragment : BaseFragment() {
                         .getString("firebaseToken", "")
                     Log.d("msgTest", "token " + data["token"])
                 }
+                //check if interlocutor have the public key
                 firestore!!.collection("users").document(receiverId).get()
                     .addOnCompleteListener(requireActivity()) {
                         if (it.isSuccessful) {
